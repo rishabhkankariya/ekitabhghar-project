@@ -1,0 +1,116 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+/* Container Styling */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    background: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Heading Styling */
+.heading {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.heading::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #3498db;
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+/* Year Block Styling */
+.year {
+    background-color: #ecf0f1;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.year h2 {
+    font-size: 1.8rem;
+    color: #3498db;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* Semester Styling */
+.semester {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.semester h3 {
+    font-size: 1.2rem;
+    color: #8e44ad;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+/* Subject Styling */
+.subject {
+    flex: 1 1 calc(33.333% - 10px); /* Make each subject responsive */
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    font-size: 1rem;
+    color: #2c3e50;
+    transition: transform 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.subject:hover {
+    transform: translateY(-5px);
+    background-color: #3498db;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .subject {
+        flex: 1 1 calc(50% - 10px);
+    }
+    .year h2 {
+        font-size: 1.5rem;
+    }
+    .semester h3 {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .subject {
+        flex: 1 1 100%;
+    }
+    .heading {
+        font-size: 2rem;
+    }
+}

@@ -1,0 +1,6 @@
+vendor/
+node_modules/
+.env
+*.log
+docker-compose.override.yml
+ekitabhghar.sql

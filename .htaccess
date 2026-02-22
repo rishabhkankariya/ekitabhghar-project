@@ -1,0 +1,33 @@
+# Enable mod_rewrite
+RewriteEngine On
+
+# Prevent directory listing (Security)
+Options -Indexes
+
+# Set default file
+DirectoryIndex index.php
+
+# 1. Hide .php extensions (Works for root AND subdirectories like /admin/login)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+)$ $1.php [L]
+
+# 2. Hide .html extensions
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L]
+
+# 3. Allow PDF access explicitly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^(.+\.pdf)$ $1 [L]
+
+# 4. Error Document
+# Pointing to root /404.html for live server (ProFreeHost).
+# Note: On Localhost XAMPP, this might look for localhost/404.html instead of localhost/website/404.html
+ErrorDocument 404 /404.html
+
+# Block direct access to .htaccess
+<Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>

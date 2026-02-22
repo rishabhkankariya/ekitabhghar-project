@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KITABGHAR | Help & FAQ</title>
+  <link rel="icon" href="img/kitabghar.png" type="image/x-icon">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .glass-header {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .dark .glass-header {
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+    }
+  </style>
+</head>
+
+<body
+  class="font-sans antialiased text-slate-800 bg-slate-50 dark:bg-slate-950 dark:text-slate-200 transition-colors duration-300">
+
+
+  <!-- 🧭 Navbar -->
+  <nav
+    class="sticky top-0 z-[100] bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300"
+    id="mainNavbar">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between h-16 md:h-20">
+
+        <!-- Mobile Menu Triggers -->
+        <div class="flex items-center gap-4 md:hidden">
+          <button onclick="toggleSidebar()"
+            class="p-2 text-slate-700 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i class="fa-solid fa-bars text-2xl"></i>
+          </button>
+          <img src="img/kitabghar.png" alt="Logo" class="h-10 rounded-lg">
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center gap-1">
+          <a href="index.php"
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+          <a href="about.html"
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            <i class="bi bi-bookmark-star-fill"></i> About
+          </a>
+
+          <!-- Dropdown -->
+          <div class="relative group">
+            <button
+              class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2 group">
+              <i class="bi bi-journal-bookmark-fill"></i> CSE Notes <i
+                class="fa-solid fa-chevron-down text-xs transition-transform group-hover:rotate-180"></i>
+            </button>
+            <div
+              class="absolute top-full left-0 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 p-2">
+              <a href="notes/firstsem.html"
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">1st
+                Semester</a>
+              <a href="notes/secondsem.html"
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">2nd
+                Semester</a>
+              <a href="notes/thirdsem.html"
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">3rd
+                Semester</a>
+              <a href="notes/fourthsem.html"
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">4th
+                Semester</a>
+              <a href="notes/fifthsem.html"
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">5th
+                Semester</a>
+              <a href="notes/sixthsem.html"
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">6th
+                Semester</a>
+            </div>
+          </div>
+
+          <a href="syllabus.html"
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            <i class="bi bi-stickies-fill"></i> Syllabus
+          </a>
+          <a href="question.html"
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            <i class="bi bi-stickies-fill"></i> Papers
+          </a>
+          <a href="library/index.php"
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            <i class="bi bi-book-half"></i> Library
+          </a>
+        </div>
+
+        <!-- Right: Developers & Login -->
+        <div class="hidden md:flex items-center gap-3">
+          <!-- Developer 1 Group -->
+          <div class="relative group hidden xl:block">
+            <div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700 cursor-pointer">
+              <img src="img/rishabh.jpeg" alt="Rishabh"
+                class="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-blue-500 transition-all">
+              <div class="text-left">
+                <p class="text-xs font-bold text-slate-900 dark:text-white">Rishabh K.</p>
+                <p class="text-[10px] text-blue-600 font-semibold tracking-wide">DEVELOPER</p>
+              </div>
+            </div>
+            <!-- Hover Card -->
+            <div
+              class="absolute top-full right-0 mt-4 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+              <div class="flex flex-col items-center text-center">
+                <img src="img/rishabh.jpeg" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md">
+                <h4 class="font-bold text-slate-900 dark:text-white">Rishabh Kankariya</h4>
+                <p class="text-xs text-slate-500 mb-4">Full Stack Developer</p>
+                <div class="flex gap-2 w-full mb-2">
+                  <a href="mailto:rishabhkankariya69@gmail.com"
+                    class="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition-colors"><i
+                      class="bi bi-envelope-fill"></i> Email</a>
+                  <a href="tel:+917014834315"
+                    class="flex-1 py-2 bg-green-50 text-green-600 rounded-lg text-[10px] font-bold hover:bg-green-100 transition-colors"><i
+                      class="bi bi-telephone-fill"></i> Call</a>
+                </div>
+                <a href="https://www.linkedin.com/in/rishabh-kankariya-202a93252/" target="_blank"
+                  class="w-full py-2 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                  <i class="bi bi-linkedin"></i> LinkedIn Profile
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Developer 2 Group -->
+          <div class="relative group hidden xl:block">
+            <div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700 cursor-pointer">
+              <img src="img/gourav.jpeg" alt="Gourav"
+                class="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-purple-500 transition-all">
+              <div class="text-left">
+                <p class="text-xs font-bold text-slate-900 dark:text-white">Gourav S.</p>
+                <p class="text-[10px] text-purple-600 font-semibold tracking-wide">DEVELOPER</p>
+              </div>
+            </div>
+            <!-- Hover Card -->
+            <div
+              class="absolute top-full right-0 mt-4 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+              <div class="flex flex-col items-center text-center">
+                <img src="img/gourav.jpeg" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md">
+                <h4 class="font-bold text-slate-900 dark:text-white">Gourav Sen</h4>
+                <p class="text-xs text-slate-500 mb-4">Full Stack Developer</p>
+                <div class="flex gap-2 w-full mb-2">
+                  <a href="mailto:gsen5448@gmail.com"
+                    class="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition-colors"><i
+                      class="bi bi-envelope-fill"></i> Email</a>
+                  <a href="tel:+917772834736"
+                    class="flex-1 py-2 bg-green-50 text-green-600 rounded-lg text-[10px] font-bold hover:bg-green-100 transition-colors"><i
+                      class="bi bi-telephone-fill"></i> Call</a>
+                </div>
+                <a href="https://www.linkedin.com/in/gourav-sen-614b62375/" target="_blank"
+                  class="w-full py-2 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                  <i class="bi bi-linkedin"></i> LinkedIn Profile
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Login Button -->
+          <div class="relative group ml-2">
+            <button
+              class="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:shadow-lg transition-all transform group-hover:scale-105 flex items-center gap-2">
+              <i class="bi bi-person-circle"></i> Login
+            </button>
+            <div
+              class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+              <a href="student_login.html"
+                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200">
+                <i class="bi bi-mortarboard-fill text-blue-500 mr-2"></i> Student Login
+              </a>
+              <a href="admin/admin_login.php"
+                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 border-t border-slate-100 dark:border-slate-700">
+                <i class="bi bi-shield-lock-fill text-red-500 mr-2"></i> Admin Login
+              </a>
+              <a href="library_login.html"
+                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 border-t border-slate-100 dark:border-slate-700">
+                <i class="bi bi-book-fill text-yellow-500 mr-2"></i> Library Login
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 📱 Modern Off-Canvas Sidebar -->
+  <div id="sidebar"
+    class="fixed inset-y-0 left-0 w-72 bg-white dark:bg-slate-900 shadow-2xl z-[999] transform -translate-x-full transition-transform duration-300 ease-out flex flex-col h-full">
+    <div
+      class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950">
+      <img src="img/kitabghar.png" alt="Logo" class="h-10 rounded-lg shadow-sm">
+      <button onclick="toggleSidebar()"
+        class="w-8 h-8 flex items-center justify-center bg-white dark:bg-slate-800 rounded-full shadow-sm text-slate-500 hover:text-red-500 transition-colors">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar">
+      <a href="index.php"
+        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold mb-2">
+        <i class="fa-solid fa-house"></i> Home
+      </a>
+      <a href="about.html"
+        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
+        <i class="bi bi-bookmark-star-fill text-slate-400"></i> About Us
+      </a>
+
+      <!-- Sidebar Dropdown -->
+      <div class="relative">
+        <button
+          onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.arrow').classList.toggle('rotate-180')"
+          class="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
+          <span class="flex items-center gap-3"><i class="bi bi-journal-bookmark-fill text-slate-400"></i> CSE
+            Notes</span>
+          <i class="fa-solid fa-chevron-down text-xs arrow transition-transform duration-300"></i>
+        </button>
+        <div class="hidden pl-11 pr-2 space-y-1 py-1">
+          <a href="notes/firstsem.html"
+            class="block py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">1st
+            Semester</a>
+          <a href="notes/secondsem.html"
+            class="block py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">2nd
+            Semester</a>
+          <a href="notes/thirdsem.html"
+            class="block py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">3rd
+            Semester</a>
+          <a href="notes/fourthsem.html"
+            class="block py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">4th
+            Semester</a>
+          <a href="notes/fifthsem.html"
+            class="block py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">5th
+            Semester</a>
+          <a href="notes/sixthsem.html"
+            class="block py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">6th
+            Semester</a>
+        </div>
+      </div>
+
+      <a href="syllabus.html"
+        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
+        <i class="bi bi-stickies-fill text-slate-400"></i> Syllabus
+      </a>
+      <a href="question.html"
+        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
+        <i class="fa-solid fa-file-circle-question text-slate-400"></i> Question Papers
+      </a>
+      <a href="library/index.php"
+        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
+        <i class="bi bi-book-half text-slate-400"></i> Digital Library
+      </a>
+      <a href="feedback.html"
+        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 font-bold transition-colors">
+        <i class="bi bi-person-rolodex text-blue-600"></i> Feedback
+      </a>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800">
+      <a href="student_login.html"
+        class="flex items-center justify-center gap-2 w-full py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 active:scale-95 transition-all">
+        <i class="bi bi-person-circle"></i> Login Now
+      </a>
+    </div>
+  </div>
+  <div id="overlay" onclick="toggleSidebar()"
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[990] hidden opacity-0 transition-opacity duration-300">
+  </div>
+
+  <!-- Help & FAQ Section -->
+  <div class="container mx-auto px-4 py-12">
+    <div class="flex flex-col lg:flex-row items-start gap-12">
+
+      <!-- Image/Hero Section -->
+      <div class="lg:w-1/2 w-full sticky top-24" data-aos="fade-right">
+        <img src="img/Taking_notes.png" alt="Help and FAQ"
+          class="w-full h-auto rounded-3xl shadow-2xl border-4 border-white dark:border-slate-700 transform rotate-2 hover:rotate-0 transition-transform duration-500">
+        <div class="mt-8 bg-blue-600 text-white p-6 rounded-2xl shadow-xl">
+          <h3 class="text-xl font-bold mb-2">Still Have Questions?</h3>
+          <p class="text-blue-100 mb-4">If you couldn't find what you were looking for, feel free to reach out to our
+            team via email or the feedback form.</p>
+          <a href="mailto:ekitabghar@gmail.com"
+            class="inline-block bg-white text-blue-600 px-6 py-2 rounded-lg font-bold hover:bg-blue-50 transition-colors">Email
+            Support</a>
+        </div>
+      </div>
+
+      <!-- Content Section -->
+      <div class="lg:w-1/2 w-full space-y-6" id="help" data-aos="fade-left">
+
+        <!-- Header -->
+        <div class="mb-8">
+          <h2 class="text-3xl lg:text-4xl font-black text-slate-800 dark:text-white mb-4">Frequently Asked Questions
+          </h2>
+          <p class="text-slate-600 dark:text-slate-400">Everything you need to know about Kitabghar and how to make
+            the most of our digital library resources.</p>
+        </div>
+
+        <!-- General Info -->
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
+          <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-3 mb-4">
+            <i class="bi bi-info-circle-fill"></i> General Information
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">1. What is Kitabghar?</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Kitabghar is a dedicated educational repository
+                designed for Diploma students, providing streamlined access to semester-wise notes, previous year
+                questions, and digital textbooks.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">2. Do I need an account to download notes?
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Most resources like CSE Notes and Syllabus can be
+                accessed directly. However, some advanced features and personal dashboards may require a student login.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Resources -->
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
+          <h3 class="text-xl font-bold text-green-600 dark:text-green-400 flex items-center gap-3 mb-4">
+            <i class="bi bi-journal-check"></i> Academic Resources
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">1. Where can I find the latest Syllabus?
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">You can find the updated curriculum for all
+                semesters in the 'Syllabus' section available in the main menu navigation.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">2. Are the question papers verified?</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Yes, the papers in our 'Question Papers' section are
+                collected from official board examinations to provide the best preparation material.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Digital Library -->
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
+          <h3 class="text-xl font-bold text-purple-600 dark:text-purple-400 flex items-center gap-3 mb-4">
+            <i class="bi bi-book-half"></i> Digital Library & Login
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">1. How to access Digital Library?</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Visit the 'Digital Library' section to browse our
+                collection. Access is restricted to students of the polytechnic college with a valid ID.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">2. Problems with Student Login?</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">If you are unable to login, please contact your
+                department administrator or the library head to verify your credentials and account status.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support -->
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
+          <h3 class="text-xl font-bold text-red-600 dark:text-red-400 flex items-center gap-3 mb-4">
+            <i class="bi bi-chat-dots-fill"></i> Support & Troubleshooting
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">1. How can I provide feedback?</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">We value your input! Use the 'Feedback' page to
+                suggest improvements, report missing resources, or share your experience with our platform.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-1">2. PDF not opening?</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Ensure you have a modern browser or a PDF reader
+                installed. If a link appears to be broken, please report it via our dedicated feedback form.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 🦶 Modern Footer -->
+  <footer class="footer bg-slate-950 text-slate-300 pt-20 pb-10 relative overflow-hidden font-sans">
+
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-5"
+      style="background-image: radial-gradient(#3b82f6 1px, transparent 1px); background-size: 32px 32px;"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+
+        <!-- Brand Column -->
+        <div class="space-y-6">
+          <div class="flex items-center gap-3">
+            <img src="img/kitabghar.png" alt="Kitabghar Logo" class="h-14 rounded-xl shadow-2xl border border-white/10">
+          </div>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            An online platform designed to empower diploma students with easy access to high-quality
+            educational resources, notes, and tools.
+          </p>
+          <div class="flex gap-4">
+            <a href="https://www.instagram.com/ekitabghar/"
+              class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-gradient-to-r hover:from-[#833ab4] hover:via-[#fd1d1d] hover:to-[#fcb045] hover:bg-clip-text hover:text-transparent transition-colors">
+              <i class="fa-brands fa-instagram text-lg"></i>
+            </a>
+            <a href="#"
+              class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+            <a href="#"
+              class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
+              <i class="fa-brands fa-youtube"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Links Column -->
+        <div>
+          <h4 class="text-white font-bold text-lg mb-6 flex items-center gap-2"><span
+              class="w-2 h-2 bg-blue-500 rounded-full"></span> Useful Links</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="index.php" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Home</a></li>
+            <li><a href="about.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> About Us</a></li>
+            <li><a href="syllabus.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Syllabus</a></li>
+            <li><a href="question.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Question Papers</a></li>
+            <li><a href="features.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Features</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal Column -->
+        <div>
+          <h4 class="text-white font-bold text-lg mb-6 flex items-center gap-2"><span
+              class="w-2 h-2 bg-green-500 rounded-full"></span> Legal</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="term&condition.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Terms & Conditions</a></li>
+            <li><a href="privacy&policy.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Privacy Policy</a></li>
+            <li><a href="help&faq.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Help & FAQ</a></li>
+            <li><a href="feedback.html" class="hover:text-blue-400 transition-colors flex items-center gap-2"><i
+                  class="fa-solid fa-chevron-right text-xs text-slate-600"></i> Feedback</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Column -->
+        <div>
+          <h4 class="text-white font-bold text-lg mb-6 flex items-center gap-2"><span
+              class="w-2 h-2 bg-orange-500 rounded-full"></span> Contact</h4>
+          <ul class="space-y-4 text-sm">
+            <li class="flex items-start gap-3">
+              <i class="fa-solid fa-location-dot mt-1 text-blue-500"></i>
+              <span>Govt Polytechnic College,<br>Dewas Road, Ujjain - 456001 (M.P)</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <i class="fa-solid fa-phone text-blue-500"></i>
+              <span>+91 7697164221</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <i class="fa-solid fa-envelope text-blue-500"></i>
+              <span>ekitabghar[at]gmail[dot]com</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <p class="text-sm text-slate-500">
+          © <span id="currentYear"></span> Kitabghar | All Rights Reserved | This website is designed, developed and
+          maintained
+          <span class="text-blue-400 font-medium">
+            <a href="https://www.linkedin.com/in/rishabh-kankariya-202a93252/" target="_blank"
+              class="hover:underline">Rishabh Kankariya</a> ,
+            <a href="https://www.linkedin.com/in/gourav-sen-614b62375/" target="_blank" class="hover:underline">Gourav
+              Sen</a>
+          </span>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      sidebar.classList.toggle("-translate-x-full");
+      if (!sidebar.classList.contains("-translate-x-full")) {
+        overlay.classList.remove("hidden");
+
+        setTimeout(() => {
+          overlay.classList.remove("opacity-0");
+        }, 10);
+      } else {
+        overlay.classList.add("opacity-0");
+        setTimeout(() => {
+          overlay.classList.add("hidden");
+        }, 300);
+      }
+    }
+
+    // Set current year
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+  </script>
+</body>
+
+</html>

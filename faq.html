@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQs - Kitabghar</title>
+
+  <!-- Tailwind CSS and AOS CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f7fafc;
+      color: #333;
+    }
+
+    .faq-item:hover {
+      transform: scale(1.02);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 10px 20px;
+      background-color: #f1f5f9;
+      border-radius: 8px;
+    }
+
+    .rotate-icon {
+      transition: transform 0.3s ease;
+    }
+
+    .rotate-icon.open {
+      transform: rotate(180deg);
+    }
+
+    .typewriter {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 3px solid #6366f1;
+      animation: typing 3s steps(40) 1, blink 0.7s step-end infinite;
+    }
+
+    @keyframes typing {
+      from {
+        width: 0;
+      }
+
+      to {
+        width: 100%;
+      }
+    }
+
+    @keyframes blink {
+      50% {
+        border-color: transparent;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Back Button -->
+  <div class="fixed top-5 left-5 z-50">
+    <a href="javascript:history.back()"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow transition-all duration-300">
+      <i class="bi bi-arrow-left-circle-fill mr-2"></i> Back
+    </a>
+
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button onclick="scrollToTop()" id="scrollTopBtn"
+    class="hidden fixed bottom-5 right-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full shadow-lg text-lg z-50 transition-all">
+    <i class="bi bi-arrow-up-circle-fill"></i>
+  </button>
+
+  <!-- FAQ Section -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-8 py-20" data-aos="fade-up">
+    <h2
+      class="w-full max-w-4xl px-4 sm:px-6 lg:px-8 mx-auto text-center flex flex-wrap items-center justify-center gap-2 text-indigo-600 font-extrabold leading-tight mb-12 sm:mb-16 typewriter">
+      <i class="bi bi-question-circle-fill text-2xl sm:text-3xl md:text-4xl lg:text-5xl"></i>
+      <span class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">FAQs for Kitabghar</span>
+    </h2>
+
+
+
+
+    <div class="space-y-6">
+      <!-- FAQs loaded via JS -->
+      <script>
+        const faqData = [
+          ["What exactly is Kitabghar?", "It's your CSE department's digital hub for notes, books, question papers, syllabus PDFs, and more. Access is restricted to students of the polytechnic college with a valid ID. Everything you need — one place!"],
+          ["Are the resources free?", "No, access is restricted. You must be a student of the polytechnic college and provide your ID to access these resources."],
+          ["How do I find notes for my semester?", "Head to the 'Notes' section, pick your semester & subject. Boom — download it instantly."],
+          ["Can I download syllabus PDFs?", "Of course! Click 'Syllabus', select your course and semester, and download the official PDFs."],
+          ["Are the books available offline?", "If you download them, yes! Many books are PDFs that you can access even without internet."],
+          ["Where can I find previous year question papers?", "Click on 'Question Papers' from the menu. We’ve got them sorted semester-wise for quick access."],
+          ["How do I fill the exam form here?", "Go to 'Exam Form', fill out the required details, upload your challan, and you're done in minutes."],
+          ["Is this only for CSE students?", "Yessir! This platform is built specially for CSE students of our department. Custom-fit just for you."],
+          ["Can I contribute my own notes or papers?", "Yes please! GO to  'Contribute Section', upload your material, and help your juniors & peers."],
+          ["Is there a mobile app?", "We're a Progressive Web App (PWA). Add it to your home screen for a full app-like experience."],
+          ["How often is the content updated?", "Almost real-time. New notes, papers, and syllabus updates are uploaded regularly by admins and students."],
+          ["How do I know if the resources are valid?", "All uploads are reviewed manually to ensure accuracy, quality, and originality."],
+          ["What if I spot a mistake in a note?", "You can report it using the 'feedback' icon under any file. We’ll verify and fix it ASAP."],
+          ["Can faculty members use this too?", "Absolutely. Faculty can upload verified resources and help guide students."],
+          ["How do I contact support?", "Use the Contact form or shoot a mail to ekitabghar@gmail.com. We usually reply within 24 hours."]
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+          const container = document.querySelector('.space-y-6');
+          faqData.forEach((faq, index) => {
+            const delay = (index + 1) * 100;
+            const item = document.createElement('div');
+            item.className = 'faq-item bg-white p-6 rounded-lg shadow-lg';
+            item.setAttribute('data-aos', 'fade-up');
+            item.setAttribute('data-aos-delay', delay);
+
+            item.innerHTML = `
+              <button onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-lg font-semibold text-left">
+                <span><i class="bi bi-question-circle-fill mr-2 text-indigo-600"></i> ${faq[0]}</span>
+                <i class="bi bi-chevron-down rotate-icon"></i>
+              </button>
+              <div class="accordion-content mt-4 text-gray-600">${faq[1]}</div>
+            `;
+            container.appendChild(item);
+          });
+        });
+      </script>
+    </div>
+  </section>
+
+  <!-- AOS and Toggle Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+
+    function toggleFAQ(button) {
+      const content = button.nextElementSibling;
+      const icon = button.querySelector('.rotate-icon');
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+      icon.classList.toggle('open');
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scrollTopBtn');
+      btn.classList.toggle('hidden', window.scrollY < 200);
+    });
+  </script>
+
+</body>
+
+</html>

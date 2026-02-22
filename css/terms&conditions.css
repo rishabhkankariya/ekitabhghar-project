@@ -1,0 +1,144 @@
+/* General Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.7;
+  background: linear-gradient(135deg, #f4f4f9, #e0e0f5);
+  margin: 0;
+  padding: 0;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* Container and Row Styling */
+#row-css {
+  background: darkseagreen;
+  padding: 40px 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Section Titles */
+#TC {
+  font-size: 42px;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#center {
+  font-size: 30px;
+  color: #5A1E8D;
+  text-align: center;
+  margin: 25px 0;
+  font-weight: 600;
+}
+
+#text {
+  font-size: 24px;
+  color: #4B0082;
+  text-align: center;
+  margin: 20px 0;
+  font-weight: 500;
+}
+
+/* Content Box for each Section */
+.content-box {
+  background: #fff;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Section Heading and Subheading */
+#h2 {
+  font-size: 34px;
+  color: #5A1E8D;
+  text-align: center;
+  font-weight: 700;
+}
+
+#h3 {
+  font-size: 20px;
+  color: #444;
+  text-align: justify;
+  line-height: 1.9;
+  margin-top: 12px;
+}
+
+/* List Styling */
+ul {
+  list-style-type: square;
+  color: #333;
+  padding-left: 20px;
+}
+
+li {
+  font-size: 18px;
+  margin: 12px 0;
+  transition: color 0.3s ease;
+}
+
+li:hover {
+  color: #5A1E8D;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #TC {
+    font-size: 36px;
+  }
+
+  #center {
+    font-size: 26px;
+  }
+
+  #text {
+    font-size: 22px;
+  }
+
+  #h2 {
+    font-size: 30px;
+  }
+
+  #h3 {
+    font-size: 17px;
+  }
+
+  .content-box {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  #TC {
+    font-size: 32px;
+  }
+
+  #center {
+    font-size: 22px;
+  }
+
+  #text {
+    font-size: 20px;
+  }
+
+  #h2 {
+    font-size: 26px;
+  }
+
+  #h3 {
+    font-size: 15px;
+  }
+
+  .content-box {
+    padding: 12px;
+  }
+}

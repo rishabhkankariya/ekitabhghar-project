@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Third Semester Notes | Kitabghar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Poppins:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- PDF.js and StPageFlip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+
+    <style>
+        :root {
+            --primary: #ea580c;
+            --primary-dark: #c2410c;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Custom Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Modal Transitions */
+        .modal-enter-active {
+            animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Flipbook Styling */
+        .page {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: filter 0.3s ease;
+        }
+
+        /* Theme Active State */
+        .active-theme {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <!-- Simple Background Elements -->
+    <div class="fixed top-0 left-0 w-full h-full bg-[#f8fafc] -z-20"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8 md:py-12">
+
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6" data-aos="fade-down">
+            <div>
+                <button onclick="history.back()"
+                    class="group inline-flex items-center gap-2 text-gray-600 bg-white hover:bg-gray-50 font-semibold py-2.5 px-5 rounded-2xl shadow-sm border border-gray-200 transition-all duration-300 mb-4">
+                    <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                    Go Back
+                </button>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
+                    Third Semester <span class="text-orange-600">Notes</span>
+                </h2>
+                <p class="text-gray-500 mt-2 text-lg">Access your academic journey with professional study materials.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-lg">
+                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center">
+                    <i class="bi bi-person-badge text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Student Portal</p>
+                    <p class="text-sm font-bold text-gray-800">Secure Access Active</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Grid -->
+        <div id="notesContainer"
+            class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-h-[400px]">
+            <div class="col-span-full flex justify-center py-20">
+                <div class="loader"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Download Progress Modal -->
+    <div id="downloadModal"
+        class="fixed inset-0 z-[11000] hidden bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div
+            class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-gray-100 p-8 text-center modal-enter-active">
+            <div class="mb-6 relative h-24 w-24 mx-auto">
+                <div class="absolute inset-0 rounded-full border-4 border-gray-100"></div>
+                <svg class="w-full h-full transform -rotate-90">
+                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent"
+                        class="text-orange-600 transition-all duration-300" id="progressCircle" stroke-dasharray="251.2"
+                        stroke-dashoffset="251.2" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span id="downloadPercent" class="text-xl font-black text-gray-800">0%</span>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Preparing Document</h3>
+            <p id="downloadStatus" class="text-sm text-gray-500 font-medium mb-6">Securing connection...</p>
+
+            <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
+                <div id="progressBar" class="h-full bg-orange-600 transition-all duration-300 w-0"></div>
+            </div>
+
+            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Digital Assets Protected v3.0</p>
+        </div>
+    </div>
+
+    <!-- Login Required Modal -->
+    <div id="loginModal" class="fixed inset-0 z-[10000] hidden bg-black/70 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-gray-100 transform"
+            id="loginModalContent">
+            <div class="relative h-40 bg-orange-600 p-8 flex flex-col justify-end">
+                <button onclick="closeLoginModal()"
+                    class="absolute top-4 right-4 text-white/80 hover:text-white transition-colors">
+                    <i class="bi bi-x-lg text-xl"></i>
+                </button>
+                <div class="bg-white/20 w-14 h-14 rounded-2xl flex items-center justify-center mb-3">
+                    <i class="bi bi-lock-fill text-2xl text-white"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white uppercase tracking-tight">Login Required</h3>
+            </div>
+            <div class="p-8">
+                <p class="text-gray-600 leading-relaxed mb-8 font-medium">
+                    To maintain the privacy and integrity of our academic resources, <span
+                        class="font-bold text-gray-900">downloading notes requires an active student account.</span>
+                </p>
+                <div class="flex flex-col gap-4">
+                    <a href="../student_login.html"
+                        class="flex items-center justify-center gap-3 bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-xl hover:shadow-orange-100 active:scale-95">
+                        <i class="bi bi-box-arrow-in-right text-xl"></i>
+                        Login to Continue
+                    </a>
+                    <button onclick="closeLoginModal()"
+                        class="text-gray-400 hover:text-gray-600 font-bold py-2 transition-colors">
+                        Maybe Later
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Book Reader Modal -->
+    <div id="bookModal"
+        class="fixed inset-0 z-[9999] hidden bg-[#0a0a0c] flex flex-col items-center justify-center transition-colors duration-500">
+        <!-- Reader Header -->
+        <div
+            class="absolute top-0 left-0 right-0 p-3 md:p-5 flex flex-wrap gap-4 justify-between items-center z-[100] bg-black/60 text-white border-b border-white/5 backdrop-blur-md">
+            <!-- Left: Title -->
+            <div class="flex items-center gap-4">
+                <div
+                    class="bg-orange-600 px-3 py-1 rounded text-[10px] font-black uppercase tracking-[0.2em] hidden md:block">
+                    Premium
+                </div>
+                <h4 id="bookTitle" class="text-sm font-semibold opacity-90 truncate max-w-[150px] md:max-w-md">Document
+                    Viewer</h4>
+            </div>
+
+            <!-- Right: Professional Tools -->
+            <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+                <!-- Navigation: Page Input -->
+                <div class="flex items-center bg-white/10 rounded-lg p-1 border border-white/5 order-2 md:order-1">
+                    <input type="number" id="pageInput" min="1" value="1" onchange="goToPage(this.value)"
+                        class="bg-transparent text-white text-center w-10 md:w-12 font-bold focus:outline-none focus:bg-white/20 rounded transition-colors"
+                        title="Jump to Page">
+                    <span id="pageInputTotal" class="text-[10px] opacity-40 px-2 font-black uppercase"></span>
+                </div>
+
+                <!-- Rotation & Zoom Group -->
+                <div class="flex bg-white/10 rounded-lg p-1 border border-white/5 order-3 md:order-2">
+                    <button onclick="rotateBook()"
+                        class="w-8 h-8 rounded flex items-center justify-center hover:bg-white/20 text-white transition-all"
+                        title="Rotate Clockwise">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <div class="w-[1px] h-4 bg-white/10 my-auto mx-1"></div>
+                    <button onclick="changeZoom(-0.1)"
+                        class="w-8 h-8 rounded flex items-center justify-center hover:bg-white/20 text-white transition-all"
+                        title="Zoom Out">
+                        <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <button onclick="changeZoom(0.1)"
+                        class="w-8 h-8 rounded flex items-center justify-center hover:bg-white/20 text-white transition-all"
+                        title="Zoom In">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Hand Tool & Fitting -->
+                <div class="flex bg-white/10 rounded-lg p-1 border border-white/5 order-4 md:order-3">
+                    <button id="handToolBtn" onclick="toggleHandTool()"
+                        class="w-8 h-8 rounded flex items-center justify-center hover:bg-white/20 text-gray-400 transition-all"
+                        title="Hand Tool (Pan)">
+                        <i class="bi bi-hand-index-thumb"></i>
+                    </button>
+                    <button onclick="resetView()"
+                        class="w-8 h-8 rounded flex items-center justify-center hover:bg-white/20 text-white transition-all"
+                        title="Fit to View">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </button>
+                </div>
+
+                <!-- Theme Toggles -->
+                <div class="flex bg-white/10 rounded-lg p-1 border border-white/5 order-5 md:order-4">
+                    <button onclick="setTheme('default')"
+                        class="theme-btn active-theme w-8 h-8 rounded flex items-center justify-center hover:bg-white/20 text-white transition-all"
+                        title="Light Mode">
+                        <i class="bi bi-brightness-high"></i>
+                    </button>
+                    <button onclick="setTheme('sepia')"
+                        class="theme-btn w-8 h-8 rounded flex items-center justify-center hover:bg-amber-900/40 text-amber-200 transition-all"
+                        title="Sepia Mode">
+                        <i class="bi bi-book"></i>
+                    </button>
+                    <button onclick="setTheme('night')"
+                        class="theme-btn w-8 h-8 rounded flex items-center justify-center hover:bg-black/40 text-gray-400 transition-all"
+                        title="Night Mode">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                </div>
+
+                <div class="w-[1px] h-8 bg-white/10 mx-1 order-6"></div>
+
+                <button onclick="closeBook()"
+                    class="order-7 bg-red-500/10 hover:bg-red-600 text-red-500 hover:text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all border border-red-500/20 shadow-lg shadow-red-500/10">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Book Loader -->
+        <div id="bookLoader" class="absolute inset-0 flex flex-col items-center justify-center z-[90] bg-[#0a0a0c]">
+            <div class="loader mb-8 border-t-orange-600"></div>
+            <p class="text-white/30 text-[10px] font-black tracking-[0.4em] animate-pulse uppercase">Optimizing
+                Visuals...</p>
+        </div>
+
+        <!-- The Flipbook Container -->
+        <!-- Added transition and origin for smooth zooming -->
+        <div id="bookCanvasWrapper"
+            class="relative w-full h-full flex items-center justify-center overflow-hidden pt-20 pb-28 perspective-[1500px]">
+            <!-- JS Injects Flipbook here -->
+        </div>
+
+        <!-- Precise Navigation Controls -->
+        <div class="absolute bottom-8 left-0 right-0 flex justify-center z-[100] px-4 pointer-events-none">
+            <div
+                class="flex items-center gap-2 bg-[#1a1a1e]/90 backdrop-blur-md border border-white/10 p-2 rounded-2xl shadow-2xl pointer-events-auto">
+                <button onclick="if(bookFlip) bookFlip.flipPrev()"
+                    class="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white text-white hover:text-black rounded-xl transition-all active:scale-95 group">
+                    <i class="bi bi-chevron-left text-xl group-hover:-translate-x-0.5 transition-transform"></i>
+                </button>
+
+                <div class="flex items-center gap-3 px-6 bg-black/40 rounded-xl h-12 border border-white/5">
+                    <span id="pageInfo" class="text-orange-500 font-black text-xl leading-none">1</span>
+                    <div class="w-[1px] h-4 bg-white/10"></div>
+                    <span id="pageTotal"
+                        class="text-white/40 text-[10px] font-black uppercase tracking-widest">Loading</span>
+                </div>
+
+                <button onclick="if(bookFlip) bookFlip.flipNext()"
+                    class="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white text-white hover:text-black rounded-xl transition-all active:scale-95 group">
+                    <i class="bi bi-chevron-right text-xl group-hover:translate-x-0.5 transition-transform"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Footer -->
+    <div class="max-w-7xl mx-auto px-4 py-16 text-center border-t border-gray-200 mt-12 bg-gray-50">
+        <div class="flex items-center justify-center gap-4 mb-6">
+            <div class="h-[1px] w-16 bg-gray-300"></div>
+            <i class="bi bi-shield-fill-check text-2xl text-orange-600"></i>
+            <div class="h-[1px] w-16 bg-gray-300"></div>
+        </div>
+        <p class="text-[12px] font-black text-gray-900 uppercase tracking-[0.3em] mb-2">Authenticated Educational
+            Resource</p>
+        <div class="flex items-center justify-center gap-2 text-[11px] text-gray-500 font-medium">
+            <span>&copy; 2026 Kitabghar Hub</span>
+            <span class="opacity-30">&bull;</span>
+            <span>Digital Assets Protected</span>
+            <span class="opacity-30">&bull;</span>
+            <span>v3.0 Secure Reader</span>
+        </div>
+    </div>
+
+    <script>
+        let bookFlip = null;
+        let pdfDoc = null;
+        let loadingTask = null;
+        let currentZoom = 1.0;
+        let currentTheme = 'default';
+        let currentRotation = 0;
+        let isHandToolActive = false;
+
+        // --- Reader Tools Logic ---
+        function changeZoom(delta) {
+            const flipbookEl = document.getElementById('flipbook');
+            if (!flipbookEl) return;
+            currentZoom += delta;
+            if (currentZoom < 0.5) currentZoom = 0.5;
+            if (currentZoom > 2.5) currentZoom = 2.5;
+            updateTransform();
+        }
+
+        function rotateBook() {
+            currentRotation = (currentRotation + 90) % 360;
+            updateTransform();
+        }
+
+        function resetView() {
+            currentZoom = 1.0;
+            currentRotation = 0;
+            updateTransform();
+        }
+
+        function updateTransform() {
+            const flipbookEl = document.getElementById('flipbook');
+            if (!flipbookEl) return;
+            flipbookEl.style.transform = `scale(${currentZoom}) rotate(${currentRotation}deg)`;
+            flipbookEl.style.transformOrigin = 'center center';
+            flipbookEl.style.transition = 'transform 0.4s cubic-bezier(0.2, 0, 0.2, 1)';
+
+            const wrapper = document.getElementById('bookCanvasWrapper');
+            if (currentZoom > 1) {
+                wrapper.style.overflow = 'auto';
+                if (isHandToolActive) wrapper.style.cursor = 'grab';
+            } else {
+                wrapper.style.overflow = 'hidden';
+                wrapper.style.cursor = 'default';
+            }
+        }
+
+        function goToPage(val) {
+            const pageNum = parseInt(val);
+            if (bookFlip && pageNum > 0) {
+                bookFlip.flip(pageNum - 1);
+            }
+        }
+
+        function toggleHandTool() {
+            isHandToolActive = !isHandToolActive;
+            const btn = document.getElementById('handToolBtn');
+            const wrapper = document.getElementById('bookCanvasWrapper');
+
+            if (isHandToolActive) {
+                btn.classList.add('bg-white/20', 'text-white');
+                btn.classList.remove('text-gray-400');
+                if (currentZoom > 1) wrapper.style.cursor = 'grab';
+                enablePanning();
+            } else {
+                btn.classList.remove('bg-white/20', 'text-white');
+                btn.classList.add('text-gray-400');
+                wrapper.style.cursor = 'default';
+                disablePanning();
+            }
+        }
+
+        // --- Panning Logic ---
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        function enablePanning() {
+            const wrapper = document.getElementById('bookCanvasWrapper');
+            wrapper.onmousedown = (e) => {
+                if (!isHandToolActive) return;
+                isDragging = true;
+                wrapper.style.cursor = 'grabbing';
+                startX = e.pageX - wrapper.offsetLeft;
+                startY = e.pageY - wrapper.offsetTop;
+                scrollLeft = wrapper.scrollLeft;
+                scrollTop = wrapper.scrollTop;
+            };
+            wrapper.onmouseleave = () => { isDragging = false; };
+            wrapper.onmouseup = () => { isDragging = false; };
+            wrapper.onmousemove = (e) => {
+                if (!isDragging || !isHandToolActive) return;
+                e.preventDefault();
+                const x = e.pageX - wrapper.offsetLeft;
+                const y = e.pageY - wrapper.offsetTop;
+                const walkX = (x - startX) * 2;
+                const walkY = (y - startY) * 2;
+                wrapper.scrollLeft = scrollLeft - walkX;
+                wrapper.scrollTop = scrollTop - walkY;
+            };
+        }
+
+        function disablePanning() {
+            const wrapper = document.getElementById('bookCanvasWrapper');
+            wrapper.onmousedown = null;
+            wrapper.onmousemove = null;
+            wrapper.onmouseup = null;
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+
+            // Update UI buttons active state
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active-theme'));
+            const clickedBtn = event.currentTarget;
+            if (clickedBtn) clickedBtn.classList.add('active-theme');
+
+            // We apply filters ONLY to the pages
+            const pages = document.querySelectorAll('.page');
+
+            // Default State
+            if (theme === 'default') {
+                pages.forEach(page => {
+                    page.style.filter = 'none';
+                    page.style.transition = 'filter 0.5s ease';
+                });
+                return;
+            }
+
+            // Apply Advanced Filters
+            pages.forEach(page => {
+                page.style.transition = 'filter 0.5s ease';
+
+                if (theme === 'night') {
+                    // Deep OLED Black Mode
+                    page.style.filter = 'invert(1) hue-rotate(180deg) grayscale(1) contrast(1.5) brightness(0.7)';
+                }
+                else if (theme === 'sepia') {
+                    // Vintage Paper Mode
+                    page.style.filter = 'sepia(0.6) contrast(1.1) brightness(0.9) saturate(1.4)';
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                url: 'php/fetch_firstsem_notes.php',
+                method: 'GET',
+                data: { semester: 'thirdsem' },
+                success: function (response) {
+                    $('#notesContainer').html(response);
+                    AOS.init();
+                },
+                error: function () {
+                    $('#notesContainer').html('<div class="col-span-full text-center text-red-600 py-32 font-black uppercase tracking-[0.2em]">Connection Failed. Please refresh.</div>');
+                }
+            });
+        });
+
+        AOS.init({ duration: 600, easing: 'ease-out-quart', once: true });
+
+        // --- Download Handler ---
+        function handleDownload(noteId, isLoggedIn) {
+            if (!isLoggedIn) {
+                const modal = document.getElementById('loginModal');
+                const content = document.getElementById('loginModalContent');
+                modal.classList.remove('hidden');
+                content.classList.add('modal-enter-active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                startDownload(noteId);
+            }
+        }
+
+        function startDownload(noteId) {
+            const modal = document.getElementById('downloadModal');
+            const progressCircle = document.getElementById('progressCircle');
+            const progressBar = document.getElementById('progressBar');
+            const percentText = document.getElementById('downloadPercent');
+            const statusText = document.getElementById('downloadStatus');
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Reset state
+            progressCircle.style.strokeDashoffset = 251.2;
+            progressBar.style.width = '0%';
+            percentText.innerText = '0%';
+            statusText.innerText = 'Establishing secure link...';
+            statusText.className = 'text-sm text-gray-500 font-medium mb-6';
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `php/download.php?id=${noteId}`, true);
+            xhr.responseType = 'blob';
+
+            xhr.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    const dashoffset = 251.2 - (251.2 * percent) / 100;
+
+                    progressCircle.style.strokeDashoffset = dashoffset;
+                    progressBar.style.width = percent + '%';
+                    percentText.innerText = percent + '%';
+                    statusText.innerText = percent === 100 ? 'Finalizing encryption...' : `Downloading academic resources... (${(e.loaded / 1024 / 1024).toFixed(1)} MB)`;
+                }
+            };
+
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    const blob = new Blob([xhr.response], { type: 'application/pdf' });
+                    let fileName = 'Notes.pdf';
+
+                    // Try to extract filename from Content-Disposition header
+                    const contentDisp = xhr.getResponseHeader('Content-Disposition');
+                    if (contentDisp && contentDisp.indexOf('filename=') !== -1) {
+                        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        const matches = filenameRegex.exec(contentDisp);
+                        if (matches != null && matches[1]) {
+                            fileName = matches[1].replace(/['"]/g, '');
+                        }
+                    }
+
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = fileName;
+                    link.click();
+
+                    statusText.innerText = 'Verified & Downloaded!';
+                    statusText.className = 'text-sm text-green-600 font-bold mb-6';
+
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }, 1500);
+                } else {
+                    statusText.innerText = 'Download Authorization Failed';
+                    statusText.className = 'text-sm text-red-600 font-bold mb-6';
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }, 2000);
+                }
+            };
+
+            xhr.onerror = function () {
+                statusText.innerText = 'Network connection interrupted';
+                statusText.className = 'text-sm text-red-600 font-bold mb-6';
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }, 2000);
+            };
+
+            xhr.send();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- Enhanced Reader Logic ---
+        async function openBook(url, coverImg) {
+            const modal = document.getElementById('bookModal');
+            if (modal.classList.contains('active-modal')) return;
+
+            const loader = document.getElementById('bookLoader');
+            // Reset wrapper to clean DOM state
+            const wrapper = document.getElementById('bookCanvasWrapper');
+            wrapper.innerHTML = `
+                <div id="bookShadow" class="absolute inset-0 z-10 pointer-events-none hidden">
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[2px] h-full bg-black/20 blur-[4px]"></div>
+                </div>
+                <div id="flipbook" class="hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] bg-white origin-center"></div>
+            `;
+
+            const container = document.getElementById('flipbook');
+            const shadow = document.getElementById('bookShadow');
+
+            modal.classList.remove('hidden');
+            modal.classList.add('active-modal');
+            loader.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Clean previous instance if any
+            if (bookFlip) { try { bookFlip.destroy(); } catch (e) { } bookFlip = null; }
+            if (pdfDoc) { try { pdfDoc.destroy(); } catch (e) { } pdfDoc = null; }
+
+            try {
+                loadingTask = pdfjsLib.getDocument(url);
+                pdfDoc = await loadingTask.promise;
+
+                if (!modal.classList.contains('active-modal')) return;
+
+                const totalPages = pdfDoc.numPages;
+                const totalDisplayPages = totalPages + 1;
+                document.getElementById('pageTotal').innerText = `OF ${totalDisplayPages}`;
+                document.getElementById('pageInputTotal').innerText = `/ ${totalDisplayPages}`;
+                document.getElementById('pageInput').max = totalDisplayPages;
+                document.getElementById('pageInput').value = 1;
+
+                const page1 = await pdfDoc.getPage(1);
+                const v1 = page1.getViewport({ scale: 1 });
+                const aspectRatio = v1.width / v1.height;
+
+                const screenH = window.innerHeight;
+                const screenW = window.innerWidth;
+                const isMobile = screenW < 768;
+
+                let bookHeight = screenH * (isMobile ? 0.7 : 0.85);
+                let bookWidth = bookHeight * aspectRatio;
+
+                if (isMobile && bookWidth > screenW * 0.95) {
+                    bookWidth = screenW * 0.95;
+                    bookHeight = bookWidth / aspectRatio;
+                }
+
+                // --- 1. Add Cover ---
+                const coverDiv = document.createElement('div');
+                coverDiv.className = "page bg-white overflow-hidden flex items-center justify-center";
+                const img = document.createElement('img');
+                img.src = coverImg;
+                img.className = "w-full h-full object-cover";
+                coverDiv.appendChild(img);
+                container.appendChild(coverDiv);
+
+                // --- 2. Render Pages ---
+                for (let num = 1; num <= totalPages; num++) {
+                    if (!modal.classList.contains('active-modal')) return;
+                    const page = await pdfDoc.getPage(num);
+                    const viewport = page.getViewport({ scale: 3.0 });
+
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = "page bg-white overflow-hidden";
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d', { alpha: false });
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    canvas.style.width = "100%";
+                    const renderContext = { canvasContext: context, viewport: viewport };
+                    await page.render(renderContext).promise;
+                    pageDiv.appendChild(canvas);
+                    container.appendChild(pageDiv);
+                }
+
+                if (!modal.classList.contains('active-modal')) return;
+
+                container.classList.remove('hidden');
+                loader.classList.add('hidden');
+                if (!isMobile) shadow.classList.remove('hidden');
+
+                bookFlip = new St.PageFlip(container, {
+                    width: bookWidth,
+                    height: bookHeight,
+                    size: 'fixed',
+                    minWidth: 200,
+                    maxWidth: 2500,
+                    minHeight: 400,
+                    maxHeight: 3000,
+                    maxShadowOpacity: 0.4,
+                    showCover: true,
+                    mobileScrollSupport: true,
+                    clickEventForward: false,
+                    usePortrait: isMobile,
+                    flippingTime: 1000,
+                    swipeDistance: 30,
+                    showPageCorners: true
+                });
+
+                bookFlip.loadFromHTML(document.querySelectorAll('.page'));
+                bookFlip.on('flip', (e) => {
+                    const pageNum = e.data + 1;
+                    document.getElementById('pageInfo').innerText = pageNum;
+                    document.getElementById('pageInput').value = pageNum;
+                });
+
+            } catch (error) {
+                console.error("Reader Error:", error);
+                if (modal.classList.contains('active-modal')) {
+                    window.open(url, '_blank');
+                    closeBook();
+                }
+            }
+        }
+
+        function closeBook() {
+            const modal = document.getElementById('bookModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('active-modal');
+
+            if (bookFlip) { try { bookFlip.destroy(); } catch (e) { } bookFlip = null; }
+            if (loadingTask) { try { loadingTask.destroy(); } catch (e) { } loadingTask = null; }
+            if (pdfDoc) { try { pdfDoc.destroy(); } catch (e) { } pdfDoc = null; }
+
+            document.body.style.overflow = 'auto';
+            document.getElementById('bookCanvasWrapper').innerHTML = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (bookFlip) {
+                if (e.key === "ArrowRight") bookFlip.flipNext();
+                if (e.key === "ArrowLeft") bookFlip.flipPrev();
+            }
+            if (e.key === "Escape") { closeBook(); closeLoginModal(); }
+        });
+    </script>
+    <script src="/website/js/connectivity.js"></script>
+</body>
+
+</html>

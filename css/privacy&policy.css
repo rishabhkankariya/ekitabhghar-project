@@ -1,0 +1,144 @@
+/* Privacy Section Container */
+.container-fluid {
+    background-color: #f8f9fa; /* Light gray for the container */
+    border-radius: 10px;
+    padding: 20px 40px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+}
+
+/* Headings Styling */
+#h1 {
+    font-size: 2.8rem;
+    color: #2c3e50; /* Dark Blue */
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #3498db; /* Underline with blue */
+    padding-bottom: 8px;
+    text-align: left;
+}
+
+
+#h3 {
+    font-size: 1.6rem;
+    color: #34495e; /* Grayish Blue */
+    font-weight: 400;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#h3 u {
+    color: #3498db; /* Highlighted Blue */
+    text-decoration: underline;
+}
+
+/* Image Styling */
+.image {
+    width: 80%;
+    height: auto;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Softer shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-left: 10% ;
+}
+
+
+/* Contact Section */
+.contact-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.contact-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 30px;
+    flex: 1 1 calc(50% - 20px); /* Two cards per row */
+    text-align: center;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.developer-name {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.contact-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    margin: 10px 5px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+}
+
+.email-btn {
+    background-color: #3498db;
+    color: #ffffff;
+}
+
+.phone-btn {
+    background-color: #27ae60;
+    color: #ffffff;
+}
+
+.email-btn:hover,
+.phone-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+
+/* Large Screens (2560px and above) */
+@media (min-width: 2560px) {
+    .contact-card {
+        padding: 25px 35px;
+    }
+}
+
+/* Tablets and Medium Screens (768px - 1140px) */
+@media (max-width: 1140px) and (min-width: 768px) {
+    .contact-card {
+        flex: 1 1 calc(50% - 15px); /* Slightly narrower cards */
+    }
+}
+
+/* Small Tablets and Large Phones (425px - 768px) */
+@media (max-width: 768px) and (min-width: 425px) {
+    .contact-card {
+        flex: 1 1 100%; /* Full width cards */
+        padding: 20px;
+    }
+}
+
+/* Small Phones (375px - 425px) */
+@media (max-width: 425px) and (min-width: 375px) {
+    .contact-btn {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
+/* Extra Small Phones (320px - 375px) */
+@media (max-width: 375px) {
+    .contact-btn {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+}

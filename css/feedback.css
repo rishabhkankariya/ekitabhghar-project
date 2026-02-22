@@ -1,0 +1,260 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #bbdefb);
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Feedback Container */
+.feedback-container {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    padding: 20px 40px;
+    max-width: 600px;
+    margin: 50px auto;
+    animation: fadeIn 1s ease-in-out;
+    border: 2px solid #4caf50; /* Green border for subtle highlight */
+}
+
+.feedback-container h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #1e88e5; /* Bright blue */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.feedback-container p {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #666;
+    text-align: center;
+}
+
+/* Form Styling */
+.feedback-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.feedback-form input,
+.feedback-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #90caf9; /* Light blue border */
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feedback-form input:focus,
+.feedback-form textarea:focus {
+    border-color: #4caf50; /* Green focus effect */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+}
+
+/* Star Rating */
+.star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-direction: row-reverse; /* Reverse the order */
+    margin-bottom: 15px;
+}
+
+.star-rating label {
+    font-size: 24px;
+    color: #cfd8dc; /* Light gray for unselected stars */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.star-rating input {
+    display: none;
+}
+
+/* Hover and Checked Effects */
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #1e88e5; /* Blue for selected or hovered stars */
+}
+
+/* Submit Button */
+.feedback-form button {
+    width: 100%;
+    background: linear-gradient(45deg, #1e88e5, #4caf50);
+    border: none;
+    padding: 12px 20px;
+    color: #ffffff;
+    font-size: 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feedback-form button:hover {
+    background: linear-gradient(45deg, #4caf50, #1e88e5);
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+
+/* Large screens (2560px and above) */
+@media (min-width: 2560px) {
+    .feedback-container {
+        max-width: 800px;
+        padding: 30px 50px;
+    }
+
+    .feedback-container h1 {
+        font-size: 32px;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        padding: 15px;
+        font-size: 18px;
+    }
+}
+
+/* Desktop screens (1140px - 2560px) */
+@media (max-width: 2560px) and (min-width: 1140px) {
+    .feedback-container {
+        max-width: 700px;
+        padding: 25px 45px;
+    }
+
+    .feedback-container h1 {
+        font-size: 30px;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        padding: 14px;
+        font-size: 17px;
+    }
+}
+
+/* Laptops (1024px - 1140px) */
+@media (max-width: 1140px) and (min-width: 1024px) {
+    .feedback-container {
+        max-width: 600px;
+        padding: 20px 40px;
+    }
+
+    .feedback-container h1 {
+        font-size: 28px;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        padding: 12px;
+        font-size: 16px;
+    }
+}
+
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 768px) {
+    .feedback-container {
+        max-width: 500px;
+        padding: 20px 30px;
+    }
+
+    .feedback-container h1 {
+        font-size: 26px;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+/* Small Tablets and Large Phones (425px - 768px) */
+@media (max-width: 768px) and (min-width: 425px) {
+    .feedback-container {
+        max-width: 400px;
+        padding: 15px 25px;
+    }
+
+    .feedback-container h1 {
+        font-size: 24px;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+/* Small Phones (375px - 425px) */
+@media (max-width: 425px) and (min-width: 375px) {
+    .feedback-container {
+        max-width: 350px;
+        padding: 15px 20px;
+    }
+
+    .feedback-container h1 {
+        font-size: 22px;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+/* Extra Small Phones (320px - 375px) */
+@media (max-width: 375px) {
+    .feedback-container {
+        max-width: 300px;
+        padding: 10px 15px;
+    }
+
+    .feedback-container h1 {
+        font-size: 20px;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .feedback-form button {
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+}

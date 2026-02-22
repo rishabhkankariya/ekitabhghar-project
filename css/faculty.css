@@ -1,0 +1,224 @@
+ /* ================= Faculty Section ================= */
+
+.faculty-container {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+/* Section Title */
+.section-title {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #004080;
+    position: relative;
+}
+
+.section-title::after {
+    content: "";
+    display: block;
+    width: 160px;
+    height: 4px;
+    margin: 10px auto 0;
+    border-radius: 2px;
+    background-color: #004080;
+}
+
+/* ================= Faculty Cards ================= */
+.faculty-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    gap: 25px;
+    padding: 20px;
+}
+
+/* Faculty Card */
+.faculty-card {
+    display: flex;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.faculty-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Faculty Image */
+.faculty-img-container {
+    width: 280px;
+    height: 250px;
+    overflow: hidden;
+    background: #eee;
+}
+
+.faculty-img {
+    width: 100%;
+    height: 140%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.faculty-card:hover .faculty-img {
+    transform: scale(1.1);
+}
+
+/* Faculty Info */
+.faculty-info {
+    padding: 20px;
+    flex: 1;
+    text-align: left;
+}
+
+.faculty-info h3 {
+    font-size: 1.7rem;
+    margin-bottom: 10px;
+    color: #004080;
+}
+
+.faculty-info p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.faculty-bio {
+    font-size: 0.95rem;
+    color: #444;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+/* Contact Button */
+.faculty-contact {
+    display: inline-block;
+    font-size: 1rem;
+    color: #004080;
+    background-color: #fff;
+    padding: 10px 20px;
+    border: 2px solid #004080;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.faculty-contact i {
+    margin-right: 10px;
+}
+
+.faculty-contact:hover {
+    background-color: #004080;
+    color: #fff;
+}
+
+/* ================= Text Selection Effect ================= */
+::selection {
+    background-color: #20b2aa;
+    color: white;
+}
+
+/* ================= Responsive Design ================= */
+
+/* Large Screens (1440px & Above) */
+@media (min-width: 1440px) {
+    .faculty-container {
+        max-width: 1200px;
+        margin: auto;
+    }
+}
+
+/* Medium Screens (1024px - 1439px) */
+@media (max-width: 1439px) {
+    .faculty-cards {
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    }
+}
+
+/* Tablet Screens (768px - 1023px) */
+@media (max-width: 1023px) {
+    .faculty-cards {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+    }
+    
+    .faculty-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .faculty-img-container {
+        width: 100%;
+        height: 300px;
+    }
+
+    .faculty-info {
+        padding: 15px;
+    }
+}
+
+/* Mobile Screens (425px - 767px) */
+@media (max-width: 767px) {
+    .faculty-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .section-title {
+        font-size: 2.3rem;
+    }
+
+    .faculty-img-container {
+        height: 250px;
+    }
+
+    .faculty-info h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Small Mobile Screens (375px - 424px) */
+@media (max-width: 424px) {
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    .faculty-img-container {
+        height: 200px;
+    }
+
+    .faculty-info h3 {
+        font-size: 1.3rem;
+    }
+
+    .faculty-contact {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+}
+
+/* Extra Small Screens (320px - 374px) */
+@media (max-width: 374px) {
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .faculty-img-container {
+        height: 230px;
+    }
+
+    .faculty-info {
+        padding: 10px;
+    }
+
+    .faculty-info h3 {
+        font-size: 1.2rem;
+    }
+
+    .faculty-contact {
+        font-size: 0.85rem;
+        padding: 7px 12px;
+    }
+}

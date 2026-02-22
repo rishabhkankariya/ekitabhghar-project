@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-KITABGHAR | Library Login</title>
+  <link rel="icon" href="img/kitabghar.png" type="image/x-icon">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          animation: {
+            'float': "float 6s ease-in-out infinite",
+          },
+          keyframes: {
+            float: {
+              "0%, 100%": { transform: "translateY(0)" },
+              "50%": { transform: "translateY(-10px)" }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body
+  class="bg-blue-50/50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center p-4 transition-colors duration-300 relative overflow-hidden">
+
+  <!-- Pattern Background -->
+  <div
+    class="absolute inset-0 bg-[radial-gradient(#4b5563_1px,transparent_1px)] [background-size:16px_16px] opacity-10">
+  </div>
+  <!-- Floating Books (Abstract Circles) -->
+  <div class="absolute top-20 left-20 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl animate-float"></div>
+  <div class="absolute bottom-20 right-20 w-48 h-48 bg-indigo-400/20 rounded-full blur-2xl animate-float"
+    style="animation-delay: 2s;"></div>
+
+  <!-- Card -->
+  <div
+    class="relative z-10 max-w-4xl w-full bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 ring-1 ring-slate-900/5 backdrop-blur-sm">
+
+    <!-- Left Banner -->
+    <div class="relative hidden md:flex flex-col justify-between bg-blue-600 p-12 overflow-hidden">
+      <!-- Background Art -->
+      <div
+        class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/clean-gray-paper.png')] opacity-10 mix-blend-overlay">
+      </div>
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-black/20 rounded-full blur-3xl"></div>
+
+      <div class="relative z-10">
+        <div class="flex items-center gap-3 text-white mb-12">
+          <img src="img/kitabghar.png" class="w-10 h-10 object-contain rounded-lg drop-shadow-md">
+          <span class="font-bold text-xl tracking-tight">Kitabghar</span>
+        </div>
+        <h2 class="text-4xl font-black text-white leading-tight mb-4">Digital <br /> <span
+            class="text-blue-200">Library</span> Access</h2>
+        <p class="text-blue-100 font-medium max-w-xs">Authorized access for librarians and administrative staff.</p>
+      </div>
+
+      <div class="relative z-10">
+        <div
+          class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white text-xs font-bold border border-white/20 shadow-lg">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+          </span>
+          System Online
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form -->
+    <div class="p-8 md:p-12 md:py-16 bg-white dark:bg-slate-900 flex flex-col justify-center relative">
+      <div class="absolute top-6 right-6">
+        <a href="index.php"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-all">
+          <i class="bi bi-x-lg"></i>
+        </a>
+      </div>
+
+      <div class="mb-8">
+        <span class="inline-block text-blue-600 font-bold tracking-widest text-xs uppercase mb-2">Login</span>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Welcome Back!</h1>
+      </div>
+
+      <form action="php/library_login.php" method="POST" class="space-y-6">
+
+        <!-- Username -->
+        <div>
+          <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Username</label>
+          <input type="text" name="username" required
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-slate-400"
+            placeholder="Enter library ID">
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Password</label>
+          <div class="relative">
+            <input type="password" id="lib_password" name="password" required
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-slate-400"
+              placeholder="Enter password">
+            <button type="button" id="togglePassword"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+              <i class="bi bi-eye-slash-fill"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Captcha -->
+        <div
+          class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img id="captcha-img" src="php/captcha.php"
+              class="h-10 rounded-lg border border-slate-200 dark:border-slate-700">
+            <button type="button" id="refresh-captcha"
+              class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-400 transition-all">
+              <i class="bi bi-arrow-repeat text-lg"></i>
+            </button>
+          </div>
+          <input type="text" name="captcha" required placeholder="Captcha"
+            class="w-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg py-2 px-3 text-center font-bold tracking-widest text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="loginBtn"
+          class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-4 rounded-xl shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 group">
+          <span id="btnText">Access Library</span>
+          <i id="btnIcon" class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          <div id="btnSpinner"
+            class="hidden w-5 h-5 border-2 border-white/30 border-t-white dark:border-slate-900/30 dark:border-t-slate-900 rounded-full animate-spin">
+          </div>
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- PHP Toast Loader Dummy -->
+  <div id="toastContainer"></div>
+
+  <script>
+    // Password Toggle
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const input = document.getElementById('lib_password');
+      const icon = this.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('bi-eye-slash-fill', 'bi-eye-fill');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
+      }
+    });
+
+    // Captcha
+    document.getElementById('refresh-captcha').addEventListener('click', function () {
+      document.getElementById('captcha-img').src = 'php/captcha.php?' + Date.now();
+    });
+
+    // Login Submission
+    document.querySelector('form').addEventListener('submit', function () {
+      const btn = document.getElementById('loginBtn');
+      const txt = document.getElementById('btnText');
+      const icon = document.getElementById('btnIcon');
+      const spin = document.getElementById('btnSpinner');
+      btn.disabled = true;
+      txt.textContent = "Verifying...";
+      icon.classList.add('hidden');
+      spin.classList.remove('hidden');
+    });
+
+    // Load Toasts
+    fetch('php/toast_loader.php')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('toastContainer').innerHTML = html;
+      }).catch(console.error);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,341 @@
+/*//////////////////////////////////////////////////////
+// FONT
+//////////////////////////////////////////////////////*/
+
+@font-face {
+  font-family: 'Poppins-Regular';
+  src: url('../fonts/poppins/Poppins-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Poppins-Bold';
+  src: url('../fonts/poppins/Poppins-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Poppins-Medium';
+  src: url('../fonts/poppins/Poppins-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('../fonts/montserrat/Montserrat-Bold.ttf');
+}
+
+/*//////////////////////////////////////////////////////
+// GLOBAL RESET
+//////////////////////////////////////////////////////*/
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: 'Poppins-Regular', sans-serif;
+  background: #f9f9f9;
+}
+
+/*//////////////////////////////////////////////////////
+// TYPOGRAPHY & LINKS
+//////////////////////////////////////////////////////*/
+
+a {
+  font-size: 14px;
+  color: #666;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #4CAF50;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
+
+p {
+  font-size: 14px;
+  line-height: 1.7;
+  padding: 15px 35px;
+  color: #444;
+}
+
+/*//////////////////////////////////////////////////////
+// RESPONSIVE PARAGRAPH PADDING
+//////////////////////////////////////////////////////*/
+
+@media (max-width: 768px) {
+  p {
+    padding: 15px 20px;
+    font-size: 13.5px;
+  }
+}
+
+@media (max-width: 420px) {
+  p {
+    font-size: 13px;
+    padding: 12px 30px;
+  }
+}
+
+@media (max-width: 375px) {
+  p {
+    font-size: 12.5px;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 320px) {
+  p {
+    font-size: 12px;
+    padding: 8px 15px;
+  }
+}
+
+/*//////////////////////////////////////////////////////
+// LIST, INPUTS & TEXTAREAS
+//////////////////////////////////////////////////////*/
+
+ul, li {
+  list-style: none;
+}
+
+input, textarea {
+  outline: none;
+  border: none;
+  font-family: inherit;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+  color: transparent;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #aaa;
+}
+
+/*//////////////////////////////////////////////////////
+// UTILITY CLASSES
+//////////////////////////////////////////////////////*/
+
+.txt1 {
+  font-size: 13px;
+  color: #999;
+}
+
+.txt2 {
+  font-size: 13px;
+  color: #555;
+}
+
+/*//////////////////////////////////////////////////////
+// CONTAINER STYLES
+//////////////////////////////////////////////////////*/
+
+.limiter {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.container-login100 {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.wrap-login100 {
+  max-width: 960px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  padding: 100px 90px 50px 90px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+  transition: 0.3s ease;
+  border: 1px solid #eee;
+}
+
+/*//////////////////////////////////////////////////////
+// IMAGE
+//////////////////////////////////////////////////////*/
+
+.login100-pic {
+  width: 320px;
+  margin: auto;
+}
+
+.login100-pic img {
+  width: 100%;
+  object-fit: contain;
+}
+
+/*//////////////////////////////////////////////////////
+// FORM
+//////////////////////////////////////////////////////*/
+
+.login100-form {
+  width: 320px;
+}
+
+.login100-form-title {
+  font-family: 'Poppins-Bold';
+  font-size: 36px;
+  text-align: center;
+  color: white;
+  padding-bottom: 40px;
+}
+
+/*//////////////////////////////////////////////////////
+// INPUT FIELD
+//////////////////////////////////////////////////////*/
+
+.wrap-input100 {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.input100 {
+  width: 100%;
+  padding: 0 30px 0 60px;
+  height: 50px;
+  background: #f1f1f1;
+  border-radius: 30px;
+  font-size: 16px;
+  color: #333;
+}
+
+.focus-input100 {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border-radius: 30px;
+  z-index: -1;
+  transition: 0.4s ease-in-out;
+}
+
+.input100:focus + .focus-input100 {
+  box-shadow: 0 0 15px rgba(0, 200, 83, 0.3);
+}
+
+.symbol-input100 {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #888;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+.input100:focus + .focus-input100 + .symbol-input100 {
+  color: #4CAF50;
+  left: 16px;
+}
+
+/*//////////////////////////////////////////////////////
+// BUTTONS
+//////////////////////////////////////////////////////*/
+
+.container-login100-form-btn {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.login100-form-btn {
+  width: 65%;
+  height: 50px;
+  border-radius: 30px;
+  background: #4CAF50;
+  color: #fff;
+  text-transform: uppercase;
+  font-family: 'Montserrat-Bold';
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.3s;
+  margin: auto;
+}
+
+.login100-form-btn:hover {
+  background: #333;
+}
+
+/*//////////////////////////////////////////////////////
+// VALIDATION
+//////////////////////////////////////////////////////*/
+
+.validate-input {
+  position: relative;
+}
+
+.alert-validate::before {
+  content: attr(data-validate);
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: #fff;
+  border: 1px solid #f44336;
+  border-radius: 10px;
+  padding: 5px 15px;
+  color: #f44336;
+  font-size: 12px;
+  font-family: 'Poppins-Medium';
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.alert-validate::after {
+  content: "\f06a";
+  font-family: FontAwesome;
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  transform: translateY(-50%);
+  color: #f44336;
+  font-size: 16px;
+}
+
+.alert-validate:hover:before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/*//////////////////////////////////////////////////////
+// RESPONSIVE
+//////////////////////////////////////////////////////*/
+
+@media (max-width: 992px) {
+  .wrap-login100 {
+    flex-direction: column;
+    padding: 60px 40px;
+  }
+
+  .login100-pic {
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .login100-form {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .wrap-login100 {
+    padding: 50px 20px;
+  }
+}

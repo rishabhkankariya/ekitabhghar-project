@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-KITABGHAR | Verify OTP</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+
+  <!-- AOS Animation CDN -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-blue-900 to-blue-600 min-h-screen flex items-center justify-center font-[Poppins]">
+
+  <div class="bg-white shadow-xl rounded-xl p-8 w-full max-w-md mx-4 text-center" data-aos="zoom-in">
+    <h2 class="text-2xl font-bold text-blue-800 mb-2">Verify Your Email</h2>
+    <p class="text-gray-600 mb-4 text-sm">Enter the OTP sent to your email.</p>
+
+    <input type="text" id="otp" placeholder="Enter OTP"
+      class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-700 text-center text-lg mb-4 transition"
+      required />
+
+    <p id="error-message" class="text-red-600 text-sm mb-3"></p>
+
+    <button id="verify-otp-btn"
+      class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+      <i class="bi bi-shield-check"></i> <span>Verify OTP</span>
+      <span class="hidden spinner-border animate-spin border-t-2 border-white border-solid rounded-full w-4 h-4"
+        id="verify-spinner"></span>
+    </button>
+
+    <button id="resend-otp-btn"
+      class="w-full mt-3 bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition flex items-center justify-center gap-2">
+      <i class="bi bi-arrow-repeat"></i> <span>Resend OTP</span>
+      <span class="hidden spinner-border animate-spin border-t-2 border-white border-solid rounded-full w-4 h-4"
+        id="resend-spinner"></span>
+    </button>
+
+    <p class="mt-4 text-sm">
+      Back to Sign Up?
+      <a href="student_sign.html" class="text-blue-700 font-bold hover:underline">
+        Click Here
+      </a>
+    </p>
+  </div>
+
+  <!-- AOS Animation Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+
+  <script>
+    const verifyBtn = document.getElementById("verify-otp-btn");
+    const resendBtn = document.getElementById("resend-otp-btn");
+    const verifySpinner = document.getElementById("verify-spinner");
+    const resendSpinner = document.getElementById("resend-spinner");
+    const errorMsg = document.getElementById("error-message");
+
+    verifyBtn.addEventListener("click", () => {
+      const otp = document.getElementById("otp").value.trim();
+      if (otp === "") {
+        errorMsg.innerText = "⚠️ Please enter OTP.";
+        return;
+      }
+
+      verifySpinner.classList.remove("hidden");
+      verifyBtn.disabled = true;
+
+      fetch("php/verify_otp.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "otp=" + otp
+      })
+        .then(res => res.json())
+        .then(data => {
+          verifySpinner.classList.add("hidden");
+          verifyBtn.disabled = false;
+
+          if (data.success) {
+            alert("✅ " + data.message);
+            window.location.href = data.redirect;
+          } else {
+            errorMsg.innerText = "❌ " + data.message;
+          }
+        })
+        .catch(err => {
+          console.error("Error:", err);
+          verifySpinner.classList.add("hidden");
+          verifyBtn.disabled = false;
+          errorMsg.innerText = "❌ Something went wrong.";
+        });
+    });
+
+    resendBtn.addEventListener("click", () => {
+      resendSpinner.classList.remove("hidden");
+      resendBtn.disabled = true;
+
+      fetch("php/resend_otp.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "resend=true"
+      })
+        .then(res => res.json())
+        .then(data => {
+          resendSpinner.classList.add("hidden");
+          resendBtn.disabled = false;
+          alert("📩 " + data.message);
+        })
+        .catch(err => {
+          console.error("Error:", err);
+          resendSpinner.classList.add("hidden");
+          resendBtn.disabled = false;
+          alert("❌ Failed to resend OTP.");
+        });
+    });
+  </script>
+</body>
+
+</html>

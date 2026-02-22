@@ -1,0 +1,144 @@
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.footer {
+    background-color: #0B0B45;
+    color: #FFFFFF;
+    padding: 30px 20px;
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-column {
+    flex: 1;
+    min-width: 200px;
+    text-align: left;
+}
+
+.footer-column h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.footer-column ul {
+    list-style: none;
+}
+
+.footer-column ul li {
+    margin-bottom: 9px;
+}
+
+.footer-column ul li a {
+    color: #A9A9A9;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.footer-column ul li a:hover {
+    color: #FFFFFF;
+    text-decoration: none !important;
+}
+
+/* New styles for footer column links with effects */
+.footer-column li {
+    list-style: none;
+    text-decoration: none;
+}
+
+.footer-column li a {
+    position: relative;
+    color: #A9A9A9;
+    font-size: 20px;
+    font-weight: 500;
+    padding: 6px 0;
+    text-decoration: none;
+}
+
+.footer-column li a:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: #34efdf;
+    border-radius: 12px;
+    transition: all 0.4s ease;
+    text-decoration: none !important;
+}
+
+.footer-column li a:hover:before {
+    width: 100%;
+}
+
+.footer-column li.upward a:hover:before {
+    bottom: 0px;
+    opacity: 1;
+}
+
+.footer-column li.forward a:before {
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s ease;
+}
+
+.footer-column li.forward a:hover:before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Contact section styles */
+.contact p {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.contact p:hover {
+    color: #FFFFFF;
+}
+
+.contact-icon {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+/* Footer bottom */
+.footer-bottom {
+    text-align: center;
+    padding-top: 10px;
+    border-top: 1px solid #A9A9A9;
+    font-size: 12px;
+    color: #A9A9A9;
+}
+
+.footer-bottom p {
+    margin: 5px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-column {
+        text-align: center;
+        margin: 20px;
+    }
+}

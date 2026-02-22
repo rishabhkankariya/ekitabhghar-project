@@ -1,0 +1,248 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    background-image: url(../img/sys-login-bg.jpg); /* Replace with your image URL */
+    background-size: cover; /* Ensures the image covers the entire background */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-position: center; /* Centers the image */
+    background-attachment: fixed; /* Keeps the image fixed while scrolling */
+    min-height: 100vh; /* Ensures it covers the full viewport height */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px 0; /* Added padding to create gap from top and bottom */
+}
+
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4); /* Black with transparency */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 8px;
+    text-align: center;
+    position: relative; /* Allow the close button to be positioned in relation to the modal */
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute; /* Position relative to .modal-content */
+    top: 10px; /* Adjust top space */
+    right: 15px; /* Adjust right space */
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.modal-button:hover {
+    background-color: #45a049;
+}
+
+/* Form container */
+.form-container {
+    display: flex;
+    flex-direction: row;
+    max-width: 1100px;
+    height: auto;
+    background: var(--form-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin: 20px 0; /* Added margin to create a gap from top and bottom */
+}
+
+/* Left Image Section */
+.image-section {
+    width: 65%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: linear-gradient(to top right, rgba(191, 226, 246, 1), rgba(0, 149, 255, 1));
+}
+
+
+.image-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease, filter 0.5s ease;
+}
+
+.image-section:hover img {
+    transform: scale(1.05);
+    filter: brightness(0.9);
+}
+
+/* Right Form Section */
+.form-section {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 1), rgba(238, 245, 255, 1)); /* Light gradient */
+}
+
+.form-section h1 {
+    font-size: 20px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: #444;
+}
+
+/* Form Fields */
+.field-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+label {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: rgba(250, 250, 250, 1); /* Light input background */
+    font-size: 18px;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: rgba(72, 154, 255, 1); /* Light blue focus */
+    box-shadow: 0 0 5px rgba(72, 154, 255, 0.4);
+}
+
+/* Password Field and Toggle Button Styles */
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: rgba(250, 250, 250, 1); /* Light input background */
+    font-size: 16px;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Make the eye icon smaller and position it */
+.password-container .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 20px;  /* Reduced size for the icon */
+    height: 20px; /* Reduced size for the icon */
+    object-fit: contain; /* Ensures image maintains aspect ratio */
+}
+
+/* Focus state for input */
+.password-container input:focus {
+    outline: none;
+    border-color: rgba(72, 154, 255, 1); /* Light blue focus */
+    box-shadow: 0 0 5px rgba(72, 154, 255, 0.4);
+}
+
+/* Submit Button */
+.submit-button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(to right, #3e8e41, #46a049); /* Gradient button */
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.submit-button:hover {
+    background: linear-gradient(to right, #3b7a33, #41973e);
+}
+
+.forgot-password {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.forgot-password a {
+    color: #3e8e41;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+.Home-link {
+    margin-top: 20px;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.Home-link a {
+    color: #3e8e41;
+    text-decoration: none;
+}
+
+.Home-link a:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,109 @@
+1.  AICTE BOOKS 
+2.  NOTES ALL SET
+3.  QUESTION PAPER ALL  TO BE SET
+4.  DOWNLOAD AND PRINT LIST USING FPDF
+5.  REVIEW EXAM FORM 
+6.  
+  html:-
+      <section class="friends-section" data-aos="fade-up">
+        <h2 class="friends-title">Our Group</h2>
+        
+        <!-- Slideshow Container -->
+        <div class="friends-slider">
+            <div class="slide">
+            <img src="img/show1.jpg" alt="Friend 1" />
+            </div>
+            <div class="slide">
+            <img src="img/show2.jpg" alt="Friend 2" />
+            </div>
+            <div class="slide">
+            <img src="img/show3.jpg" alt="Friend 3" />
+            </div>
+            <div class="slide">
+            <img src="img/show4.jpg" alt="Friend 4" />
+            </div>
+        </div>
+      </section>
+    js:-       // Slideshow JS Logic
+        let slideIndex = 0;
+
+        function showSlides() {
+        let slides = document.getElementsByClassName("slide");
+
+        // Hide all slides
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+
+        // Increment slideIndex, and loop back to 0 after reaching the last slide
+        slideIndex++;
+        if (slideIndex > slides.length) { slideIndex = 1; }
+
+        // Show the current slide
+        slides[slideIndex - 1].style.display = "block";
+
+        // Change slide every 3 seconds
+        setTimeout(showSlides, 3000);
+        }
+
+        // Initialize the slideshow
+        showSlides();  
+
+        css:- .friends-section {
+  padding: 50px 20px;
+  background-color: #f4f9ff;
+  text-align: center;
+  position: relative;
+}
+
+.friends-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  color: #222;
+  margin-bottom: 30px;
+  animation: fadeInUp 1s ease forwards;
+}
+
+.friends-slider {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.slide {
+  display: none;
+}
+
+.friends-slider img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.5s ease;
+}
+
+.friends-slider img:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .friends-title {
+    font-size: 24px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .friends-title {
+    font-size: 20px;
+  }
+
+  .friends-section {
+    padding: 40px 15px;
+  }
+}
+
+

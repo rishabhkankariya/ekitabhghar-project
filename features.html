@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KITABGHAR | Features</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    /* Custom CSS */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8fafc;
+    }
+
+    .feature-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .feature-icon:hover {
+      transform: translateY(-5px);
+    }
+
+    .content-section {
+      padding: 4rem 0;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #4f46e5;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .feature-text {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 2rem;
+      justify-items: center;
+    }
+
+    /* AOS animations for smooth effects */
+    .aos-animate {
+      transition: opacity 0.3s ease;
+    }
+
+    /* Responsive typography and layout */
+    @media (max-width: 768px) {
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .feature-text {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .feature-card {
+        width: 90%;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+  <!-- Back Button -->
+  <div class="fixed top-5 left-5 z-50">
+    <button onclick="window.history.back()"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full shadow-lg transition-all duration-300">
+      <i class="bi bi-arrow-left-circle-fill mr-2"></i> Back to Home
+    </button>
+
+  </div>
+
+  <!-- Features Section -->
+  <section class="max-w-6xl mx-auto px-6 sm:px-8 py-20" data-aos="fade-up">
+    <img src="img/kitabghar.png" alt="Kitabghar Logo" class="h-20 mx-auto mb-6 rounded-2xl shadow-xl">
+    <h2
+      class="text-2xl sm:text-4xl font-bold text-center text-indigo-600 underline decoration-2 underline-offset-4 mb-12 transition-all duration-300">
+      KITABGHAR FEATURES
+    </h2>
+
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- Feature 1: Course Notes -->
+      <div
+        class="group bg-white rounded-lg p-6 text-center shadow-md border border-transparent hover:border-indigo-500 hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-[1.03]"
+        data-aos="zoom-in" data-aos-delay="100">
+        <div class="text-indigo-600 mb-4 text-4xl transition-transform duration-500 group-hover:rotate-12">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-indigo-600">Course Notes</h3>
+        <p class="mt-4">Access comprehensive course notes. Access is restricted to students of the polytechnic college
+          with a valid ID.</p>
+      </div>
+
+      <!-- Feature 2: Digital Library -->
+      <div
+        class="group bg-white rounded-lg p-6 text-center shadow-md border border-transparent hover:border-green-500 hover:shadow-green-500/50 transition-all duration-300 hover:scale-[1.03]"
+        data-aos="zoom-in" data-aos-delay="200">
+        <div class="text-green-600 mb-4 text-4xl transition-transform duration-500 group-hover:rotate-12">
+          <i class="bi bi-book"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-green-600">Digital Library</h3>
+        <p class="mt-4">Download textbooks and reference books. Access is restricted to students of the polytechnic
+          college with a valid ID.</p>
+      </div>
+
+      <!-- Feature 3: Syllabus -->
+      <div
+        class="group bg-white rounded-lg p-6 text-center shadow-md border border-transparent hover:border-blue-500 hover:shadow-blue-500/50 transition-all duration-300 hover:scale-[1.03]"
+        data-aos="zoom-in" data-aos-delay="300">
+        <div class="text-blue-600 mb-4 text-4xl transition-transform duration-500 group-hover:rotate-12">
+          <i class="bi bi-calendar-check"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-blue-600">Syllabus</h3>
+        <p class="mt-4">Stay updated with the latest syllabus for all your CSE courses. Plan your studies effectively.
+        </p>
+      </div>
+
+      <!-- Feature 4: Question Papers -->
+      <div
+        class="group bg-white rounded-lg p-6 text-center shadow-md border border-transparent hover:border-yellow-500 hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-[1.03]"
+        data-aos="zoom-in" data-aos-delay="400">
+        <div class="text-yellow-600 mb-4 text-4xl transition-transform duration-500 group-hover:rotate-12">
+          <i class="bi bi-file-earmark-post"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-yellow-600">Question Papers</h3>
+        <p class="mt-4">Access previous years' question papers and practice for upcoming exams with real-time data
+          updates.</p>
+      </div>
+
+      <!-- Feature 5: Exam Form -->
+      <div
+        class="group bg-white rounded-lg p-6 text-center shadow-md border border-transparent hover:border-red-500 hover:shadow-red-500/50 transition-all duration-300 hover:scale-[1.03]"
+        data-aos="zoom-in" data-aos-delay="500">
+        <div class="text-red-600 mb-4 text-4xl transition-transform duration-500 group-hover:rotate-12">
+          <i class="bi bi-pencil-square"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-red-600">Exam Form</h3>
+        <p class="mt-4">Easily fill out and submit your exam forms online for a smooth experience every semester.</p>
+      </div>
+
+      <!-- Feature 6: CSE Specific Updates -->
+      <div
+        class="group bg-white rounded-lg p-6 text-center shadow-md border border-transparent hover:border-purple-500 hover:shadow-purple-500/50 transition-all duration-300 hover:scale-[1.03]"
+        data-aos="zoom-in" data-aos-delay="600">
+        <div class="text-purple-600 mb-4 text-4xl transition-transform duration-500 group-hover:rotate-12">
+          <i class="bi bi-puzzle"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-purple-600">CSE Updates</h3>
+        <p class="mt-4">Get real-time updates on CSE department news, events, and workshops directly on your dashboard.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+
+
+  <!-- Scroll to Top Button -->
+  <button id="scrollTopBtn"
+    class="hidden fixed bottom-5 right-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full shadow-lg text-lg transition-all"
+    onclick="scrollToTop()">
+    <i class="bi bi-arrow-up-circle-fill"></i>
+  </button>
+
+  <!-- AOS + Animation Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      once: true,
+    });
+
+    // Scroll to Top Button
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scrollTopBtn');
+      btn.classList.toggle('hidden', window.scrollY < 200);
+    });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+
+</html>
