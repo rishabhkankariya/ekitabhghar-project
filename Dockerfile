@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y \
 
 RUN a2enmod rewrite
 
-# Explicitly allow access
-RUN echo '<Directory /var/www/html>\
-    AllowOverride All\
-    Require all granted\
-</Directory>' >> /etc/apache2/apache2.conf
+# Proper Apache directory config
+RUN printf "<Directory /var/www/html>\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>\n" >> /etc/apache2/apache2.conf
