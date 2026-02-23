@@ -1812,7 +1812,7 @@ require_once 'admin/php/fetch.php';
   </div>
 
   <!-- 🎠 Hero Carousel Section -->
-  <div class="relative w-full h-[350px] sm:h-[450px] lg:h-[600px] overflow-hidden bg-slate-900">
+  <div class="relative w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[600px] overflow-hidden bg-slate-900">
     <div class="swiper main-slider w-full h-full">
       <div class="swiper-wrapper">
         <?php foreach ($slides as $slide): ?>
@@ -1838,12 +1838,14 @@ require_once 'admin/php/fetch.php';
       <div class="swiper-pagination !bottom-8"></div>
     </div>
 
-    <div class="absolute inset-0 z-20 pointer-events-none px-4 md:px-12 flex items-end pb-12 sm:pb-20">
+    <div class="absolute inset-0 z-20 pointer-events-none px-4 md:px-12 flex items-end pb-6 sm:pb-12 md:pb-20">
       <div class="max-w-7xl mx-auto w-full">
         <div class="animate-fade-in-up">
-          <h2 class="text-white font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl drop-shadow-2xl mb-2 sm:mb-4">
+          <h2
+            class="text-white font-black text-xl sm:text-3xl md:text-5xl lg:text-6xl drop-shadow-2xl mb-1 sm:mb-2 md:mb-4">
             Welcome to Kitabghar</h2>
-          <p class="text-blue-100 font-bold text-[13px] sm:text-lg md:text-xl drop-shadow-lg max-w-2xl leading-relaxed">
+          <p
+            class="text-blue-100 font-bold text-[11px] sm:text-base md:text-xl drop-shadow-lg max-w-2xl leading-relaxed">
             Your Digital Gateway to Academic Knowledge & Engineering Excellence
           </p>
         </div>
@@ -2278,60 +2280,68 @@ require_once 'admin/php/fetch.php';
     </div>
   </section>
   <!-- 🎓 Principal's Message Section -->
-  <section class="py-24 bg-[#050b18] relative overflow-hidden">
+  <section class="py-12 sm:py-16 md:py-24 bg-[#050b18] relative overflow-hidden">
     <!-- Background Glows -->
     <div
-      class="absolute top-0 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2">
+      class="absolute top-0 left-0 w-48 h-48 sm:w-96 sm:h-96 bg-blue-600/10 rounded-full blur-[80px] sm:blur-[120px] -translate-x-1/2 -translate-y-1/2">
     </div>
     <div
-      class="absolute bottom-0 right-0 w-96 h-96 bg-orange-600/10 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2">
+      class="absolute bottom-0 right-0 w-48 h-48 sm:w-96 sm:h-96 bg-orange-600/10 rounded-full blur-[80px] sm:blur-[120px] translate-x-1/2 translate-y-1/2">
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 relative z-10">
-      <div class="grid lg:grid-cols-2 gap-16 items-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
 
         <!-- Image Container -->
         <div class="relative" data-aos="fade-right">
           <div
-            class="relative z-10 rounded-[3rem] overflow-hidden border-8 border-white/5 shadow-2xl transform  hover:rotate-0 transition-transform duration-700 bg-slate-800">
+            class="relative z-10 rounded-2xl sm:rounded-[2rem] lg:rounded-[3rem] overflow-hidden border-4 sm:border-8 border-white/5 shadow-2xl transform hover:rotate-0 transition-transform duration-700 bg-slate-800">
             <img src="img/Dr. R. C. Gupta.jpg" alt="Principal"
-              class="w-full h-[400px] md:h-[500px] object-cover hover:scale-105 transition-transform duration-700">
+              class="w-full h-[280px] sm:h-[350px] md:h-[450px] lg:h-[500px] object-cover hover:scale-105 transition-transform duration-700">
           </div>
           <!-- Decorative Elements -->
           <div
-            class="absolute -bottom-6 -right-6 w-32 h-32 bg-orange-500 rounded-3xl -z-10 rotate-12 opacity-20 blur-2xl">
+            class="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 w-20 h-20 sm:w-32 sm:h-32 bg-orange-500 rounded-3xl -z-10 rotate-12 opacity-20 blur-2xl">
           </div>
-          <div class="absolute -top-6 -left-6 w-32 h-32 bg-blue-500 rounded-full -z-10 opacity-20 blur-2xl"></div>
+          <div
+            class="absolute -top-4 -left-4 sm:-top-6 sm:-left-6 w-20 h-20 sm:w-32 sm:h-32 bg-blue-500 rounded-full -z-10 opacity-20 blur-2xl">
+          </div>
 
           <!-- Status Badge -->
           <div
-            class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-2xl border border-white/20 px-8 py-4 rounded-2xl shadow-2xl z-20 whitespace-nowrap"
+            class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-2xl border border-white/20 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-xl sm:rounded-2xl shadow-2xl z-20 whitespace-nowrap"
             data-aos="zoom-in" data-aos-delay="400">
-            <p class="text-[10px] text-orange-400 font-bold uppercase tracking-[0.3em] mb-1">Inspiration & Leadership
+            <p
+              class="text-[8px] sm:text-[10px] text-orange-400 font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-0.5 sm:mb-1">
+              Inspiration & Leadership
             </p>
-            <h4 class="text-white font-black text-xl uppercase tracking-tighter">Leading GPC Ujjain</h4>
+            <h4 class="text-white font-black text-sm sm:text-lg md:text-xl uppercase tracking-tighter">Leading GPC
+              Ujjain</h4>
           </div>
         </div>
 
         <!-- Content Area -->
-        <div class="space-y-8" data-aos="fade-left">
-          <div class="inline-block px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
-            <span class="text-blue-400 font-bold text-xs uppercase tracking-[0.3em]">From the Principal's Desk</span>
+        <div class="space-y-5 sm:space-y-6 md:space-y-8" data-aos="fade-left">
+          <div class="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
+            <span
+              class="text-blue-400 font-bold text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em]">From
+              the Principal's Desk</span>
           </div>
 
-          <h2 class="text-4xl md:text-5xl font-black text-white leading-tight">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
             Empowering <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Skilled
               Technocrats</span> for a Brighter Future
           </h2>
 
           <div class="relative">
-            <blockquote class="text-xl text-slate-200 leading-relaxed font-black italic tracking-tight font-serif pt-4">
+            <blockquote
+              class="text-base sm:text-lg md:text-xl text-slate-200 leading-relaxed font-black italic tracking-tight font-serif pt-2 sm:pt-4">
               " Technical education equips students with the practical skills and knowledge needed to work in industries
               that require specialized skills."
             </blockquote>
           </div>
 
-          <div class="space-y-4 text-slate-400 leading-relaxed text-[15px] sm:text-base">
+          <div class="space-y-3 sm:space-y-4 text-slate-400 leading-relaxed text-[13px] sm:text-[15px] md:text-base">
             <p>
               Dear students, as the Principal of this technical college, I want to take this opportunity to remind you
               of the importance of technical education and how it can benefit your career prospects. Technical education
@@ -2350,11 +2360,14 @@ require_once 'admin/php/fetch.php';
             </p>
           </div>
 
-          <div class="pt-10 flex items-center gap-6">
+          <div class="pt-6 sm:pt-8 md:pt-10 flex items-center gap-4 sm:gap-6">
             <div class="h-px bg-white/10 flex-grow"></div>
             <div class="text-right">
-              <h4 class="text-2xl font-black text-white uppercase tracking-tighter">Dr. R. C. Gupta</h4>
-              <p class="text-orange-500 font-bold text-xs uppercase tracking-widest mt-1">Principal • Government
+              <h4 class="text-lg sm:text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Dr. R. C.
+                Gupta</h4>
+              <p
+                class="text-orange-500 font-bold text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest mt-1">
+                Principal • Government
                 Polytechnic College Ujjain</p>
             </div>
           </div>
