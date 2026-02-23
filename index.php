@@ -1483,8 +1483,6 @@ require_once 'admin/php/fetch.php';
         <div class="flex items-center gap-4 text-slate-600 dark:text-slate-300 font-medium">
           <a href="mailto:ekitabghar@gmail.com" class="flex items-center gap-2 hover:text-blue-600"><i
               class="fa-solid fa-envelope text-blue-500"></i> ekitabghar[at]gmail[dot]com</a>
-          <a href="tel:+917697164221" class="flex items-center gap-2 hover:text-blue-600"><i
-              class="fa-solid fa-phone text-blue-500"></i> +91 7697164221</a>
         </div>
       </div>
     </div>
@@ -1610,9 +1608,6 @@ require_once 'admin/php/fetch.php';
                   <a href="mailto:rishabhkankariya69@gmail.com"
                     class="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition-colors"><i
                       class="bi bi-envelope-fill"></i> Email</a>
-                  <a href="tel:+917014834315"
-                    class="flex-1 py-2 bg-green-50 text-green-600 rounded-lg text-[10px] font-bold hover:bg-green-100 transition-colors"><i
-                      class="bi bi-telephone-fill"></i> Call</a>
                 </div>
                 <a href="https://www.linkedin.com/in/rishabh-kankariya-202a93252/" target="_blank"
                   class="w-full py-2 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
@@ -1643,9 +1638,6 @@ require_once 'admin/php/fetch.php';
                   <a href="mailto:gsen5448@gmail.com"
                     class="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition-colors"><i
                       class="bi bi-envelope-fill"></i> Email</a>
-                  <a href="tel:+917772834736"
-                    class="flex-1 py-2 bg-green-50 text-green-600 rounded-lg text-[10px] font-bold hover:bg-green-100 transition-colors"><i
-                      class="bi bi-telephone-fill"></i> Call</a>
                 </div>
                 <a href="https://www.linkedin.com/in/gourav-sen-614b62375/" target="_blank"
                   class="w-full py-2 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
@@ -2387,14 +2379,14 @@ require_once 'admin/php/fetch.php';
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <?php
         $faculties = [
-          ['name' => 'Shri M. Munshi', 'role' => 'HEAD OF DEPARTMENT', 'bio' => 'Leading advancements in computer science education', 'img' => 'img/hod-computer.jpg', 'email' => 'm.munshi@nic.in', 'phone' => '+918319971084'],
-          ['name' => 'Shri R. Kumar', 'role' => 'SELECTION GRADE LECTURER', 'bio' => 'Specialist in C, C++, and Java education', 'img' => 'img/Shri R Kumar.jpg', 'email' => 'kumarpolyujn@gmail.com', 'phone' => '+919009873151'],
-          ['name' => 'Shri Thomas Meda', 'role' => 'SENIOR GRADE LECTURER', 'bio' => 'Passionate educator in computing systems', 'img' => 'img/Thomas_sir.jpg', 'email' => 'tom.upcu@gmail.com', 'phone' => '+919407126618'],
-          ['name' => 'Shri. Ramlal Agrawal', 'role' => 'FACULTY LECTURER', 'bio' => 'Dedicated to software development education', 'img' => 'img/Ram_Sir.jpg', 'email' => 'ramsirg.edu@gmail.com', 'phone' => '+918224015098'],
-          ['name' => 'Smt. Rashi Saxena', 'role' => 'SENIOR GRADE LECTURER', 'bio' => 'Passionate about databases and data structures', 'img' => 'img/dummy.png', 'email' => 'rashi8808@gmail.com', 'phone' => '+917000174175'],
-          ['name' => 'Smt. Megha Malviya', 'role' => 'FACULTY LECTURER', 'bio' => 'Focus on problem-solving for engineers', 'img' => 'img/faculty-2.jpg', 'email' => 'meghamalviya92@gmail.com', 'phone' => '+917828068048'],
-          ['name' => 'Shri. Ishak Ansari', 'role' => 'FACULTY CSE', 'bio' => 'Committed to fostering software excellence', 'img' => 'img/Ansari_Sir.jpg', 'email' => 'ansari@gmail.com', 'phone' => '+917697164221'],
-          ['name' => 'Shri. Dharmendra', 'role' => 'LAB TECHNICIAN', 'bio' => 'Expertise in computer maintenance and support', 'img' => 'img/Dharmendra_Sir.jpg', 'email' => 'dharmend@gmail.com', 'phone' => '+911234567890'],
+          ['name' => 'Shri M. Munshi', 'role' => 'HEAD OF DEPARTMENT', 'bio' => 'Leading advancements in computer science education', 'img' => 'img/hod-computer.jpg', 'email' => 'm.munshi@nic.in'],
+          ['name' => 'Shri R. Kumar', 'role' => 'SELECTION GRADE LECTURER', 'bio' => 'Specialist in C, C++, and Java education', 'img' => 'img/Shri R Kumar.jpg', 'email' => 'kumarpolyujn@gmail.com'],
+          ['name' => 'Shri Thomas Meda', 'role' => 'SENIOR GRADE LECTURER', 'bio' => 'Passionate educator in computing systems', 'img' => 'img/Thomas_sir.jpg', 'email' => 'tom.upcu@gmail.com'],
+          ['name' => 'Shri. Ramlal Agrawal', 'role' => 'FACULTY LECTURER', 'bio' => 'Dedicated to software development education', 'img' => 'img/Ram_Sir.jpg', 'email' => 'ramsirg.edu@gmail.com'],
+          ['name' => 'Smt. Rashi Saxena', 'role' => 'SENIOR GRADE LECTURER', 'bio' => 'Passionate about databases and data structures', 'img' => 'img/dummy.png', 'email' => 'rashi8808@gmail.com'],
+          ['name' => 'Smt. Megha Malviya', 'role' => 'FACULTY LECTURER', 'bio' => 'Focus on problem-solving for engineers', 'img' => 'img/faculty-2.jpg', 'email' => 'meghamalviya92@gmail.com'],
+          ['name' => 'Shri. Ishak Ansari', 'role' => 'FACULTY CSE', 'bio' => 'Committed to fostering software excellence', 'img' => 'img/Ansari_Sir.jpg', 'email' => 'ansari@gmail.com'],
+          ['name' => 'Shri. Dharmendra', 'role' => 'LAB TECHNICIAN', 'bio' => 'Expertise in computer maintenance and support', 'img' => 'img/Dharmendra_Sir.jpg', 'email' => 'dharmend@gmail.com'],
         ];
         foreach ($faculties as $f):
           ?>
@@ -2411,9 +2403,7 @@ require_once 'admin/php/fetch.php';
                 <a href="mailto:<?php echo $f['email']; ?>"
                   class="p-3 bg-white dark:bg-slate-800 text-blue-600 rounded-xl shadow-lg hover:bg-blue-600 hover:text-white transition-all"><i
                     class="bi bi-envelope-fill"></i></a>
-                <a href="tel:<?php echo $f['phone']; ?>"
-                  class="p-3 bg-white dark:bg-slate-800 text-green-600 rounded-xl shadow-lg hover:bg-green-600 hover:text-white transition-all"><i
-                    class="bi bi-telephone-fill"></i></a>
+
               </div>
             </div>
             <div class="text-center px-2">
@@ -2819,10 +2809,7 @@ require_once 'admin/php/fetch.php';
               <i class="fa-solid fa-location-dot mt-1 text-blue-500"></i>
               <span>Govt Polytechnic College,<br>Dewas Road, Ujjain - 456001 (M.P)</span>
             </li>
-            <li class="flex items-center gap-3">
-              <i class="fa-solid fa-phone text-blue-500"></i>
-              <span>+91 7697164221</span>
-            </li>
+
             <li class="flex items-center gap-3">
               <i class="fa-solid fa-envelope text-blue-500"></i>
               <span>ekitabghar[at]gmail[dot]com</span>

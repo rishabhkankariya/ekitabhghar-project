@@ -39,7 +39,6 @@ function getWebsiteContext($conn)
         "website_name" => "Kitabghar",
         "college" => "Govt. Polytechnic College Ujjain",
         "contact_email" => "ekitabghar@gmail.com",
-        "contact_phone" => "+91 7697164221",
         "address" => "Dewas Road, Ujjain - 456001 (M.P)",
         "nav_links" => [
             "Home" => "index.php",
@@ -81,7 +80,7 @@ $commands = [
     "home" => "🏠 <b>Welcome to Kitabghar!</b>" . formatLink('index.php', 'Go to Homepage', '🏠'),
     "about" => "ℹ️ <b>About Our System</b>" . formatLink('about.html', 'Learn More', '📖'),
     "feedback" => "✍️ <b>Your feedback matters!</b>" . formatLink('index.php#contact', 'Submit Feedback', '📝'),
-    "contact" => "📞 <b>Support Hub</b><br>📧 <a href='mailto:ekitabghar@gmail.com' class='text-blue-400 underline'>ekitabghar@gmail.com</a><br>📱 <a href='tel:7697164221' class='text-blue-400 underline'>+91 7697164221</a>",
+    "contact" => "📞 <b>Support Hub</b><br>📧 <a href='mailto:ekitabghar@gmail.com' class='text-blue-400 underline'>ekitabghar@gmail.com</a>",
     "syllabus" => "📚 <b>Syllabus Portal</b>" . formatLink('syllabus.html', 'View Syllabus', '📑'),
     "question papers" => "📝 <b>Archive Papers</b>" . formatLink('question.html', 'Browse Archive', '📄'),
     "faculty" => "👨‍🏫 <b>Faculty Directory</b><br>Meet our distinguished professors and lecturers." . formatLink('faculty.html', 'Meet Faculty', '👨‍🏫'),
