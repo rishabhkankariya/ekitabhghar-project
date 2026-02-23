@@ -1744,7 +1744,7 @@ require_once 'admin/php/fetch.php';
         <div class="flex flex-col gap-4">
           <!-- Developer 1 -->
           <div class="flex items-center gap-3">
-            <img src="img/rishabh.jpeg" class="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500/20 shadow-sm">
+            <img src="img/rishabh.png" class="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500/20 shadow-sm">
             <div>
               <p class="text-xs font-bold text-slate-900 dark:text-white">Rishabh Kankariya</p>
               <p class="text-[9px] text-blue-600 font-bold tracking-wider uppercase">Lead Developer</p>
