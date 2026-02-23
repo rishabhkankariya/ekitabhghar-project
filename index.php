@@ -1592,7 +1592,7 @@ require_once 'admin/php/fetch.php';
           <!-- Developer 1 Group -->
           <div class="relative group hidden lg:flex">
             <div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700 cursor-pointer">
-              <img src="img/rishabh.jpeg" alt="Rishabh"
+              <img src="img/rishabh.png" alt="Rishabh"
                 class="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-blue-500 transition-all">
               <div class="text-left">
                 <p class="text-xs font-bold text-slate-900 dark:text-white">Rishabh K.</p>
@@ -1603,7 +1603,7 @@ require_once 'admin/php/fetch.php';
             <div
               class="absolute top-full right-0 mt-4 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
               <div class="flex flex-col items-center text-center">
-                <img src="img/rishabh.jpeg" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md">
+                <img src="img/rishabh.png" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md">
                 <h4 class="font-bold text-slate-900 dark:text-white">Rishabh Kankariya</h4>
                 <p class="text-xs text-slate-500 mb-4">Full Stack Developer</p>
                 <div class="flex gap-2 w-full mb-2">
@@ -2587,7 +2587,7 @@ require_once 'admin/php/fetch.php';
         <form action="php/contact.php" method="POST" class="space-y-6">
           <!-- Honeypot -->
           <input type="text" name="website" style="display:none !important" tabindex="-1" autocomplete="off">
-          
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
               <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
