@@ -173,7 +173,8 @@
                Read</span>
          </h1>
          <p class="text-lg text-blue-100/80 mb-10 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s">
-            Access thousands of computer science books, references, and educational resources. Access is restricted to students of the polytechnic college with a valid ID.
+            Access thousands of computer science books, references, and educational resources. Access is restricted to
+            students of the polytechnic college with a valid ID.
          </p>
 
          <!-- Search Box -->
@@ -260,8 +261,9 @@
          document.getElementById("results").innerHTML = "";
 
          $.ajax({
-            url: `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=12`,
+            url: `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=12`,
             type: "GET",
+            dataType: "json",
             success: function (data) {
                document.getElementById("loader").classList.add("hidden");
 
@@ -302,9 +304,10 @@
                       `;
                });
             },
-            error: function () {
+            error: function (xhr, status, error) {
                document.getElementById("loader").classList.add("hidden");
-               alert("Error fetching data. Please try again.");
+               console.error("Ajax Error:", status, error);
+               alert("Error fetching data: " + (xhr.statusText || "Connection failed") + ". Please try again.");
             }
          });
       }

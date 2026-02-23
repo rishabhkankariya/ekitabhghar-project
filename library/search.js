@@ -1,13 +1,13 @@
 function searchBooks() {
     let query = $("#search").val().trim();
-    
+
     if (query === "") return; // ✅ No alert, just ignore empty searches
 
     $("#results").html(""); // ✅ Clear previous results
     $("#loader").show(); // ✅ Show loader while searching
 
     $.ajax({
-        url: `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10`,
+        url: `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=10`,
         type: "GET",
         success: function (data) {
             $("#loader").hide(); // ✅ Hide loader when done
@@ -23,9 +23,9 @@ function searchBooks() {
                 let link = book.volumeInfo.previewLink || "#";
 
                 // ✅ Ensure book cover is always available
-                let thumbnail = book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail 
-                    ? book.volumeInfo.imageLinks.thumbnail 
-                    : "placeholder.jpg"; 
+                let thumbnail = book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail
+                    ? book.volumeInfo.imageLinks.thumbnail
+                    : "placeholder.jpg";
 
                 $("#results").append(`
                     <div class="book">
