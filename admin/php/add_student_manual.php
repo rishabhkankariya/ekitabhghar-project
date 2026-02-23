@@ -101,12 +101,9 @@ if ($stmt->execute()) {
         </div>
     </div>";
 
-    $res = sendEmail($email, $full_name, $subject, $body);
-    if ($res === true) {
-        echo json_encode(['status' => 'success', 'message' => 'Student account created and credentials emailed!']);
-    } else {
-        echo json_encode(['status' => 'success', 'message' => 'Account created, but email failed: ' . $res]);
-    }
+    // [TESTING MODE] Skip credential email
+    // $res = sendEmail($email, $full_name, $subject, $body);
+    echo json_encode(['status' => 'success', 'message' => 'Student account created successfully! (Email disabled in test mode)']);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $conn->error]);
 }

@@ -33,8 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['message'])) {
   $stmt_insert->bind_param("sss", $admin_id, $admin_name, $message);
 
   if ($stmt_insert->execute()) {
-    // Send Notification Email to All Students
-    sendNotificationEmail($message);
+    // [TESTING MODE] Skip email notification to all students
+    // sendNotificationEmail($message);
     $_SESSION['toast'] = ['type' => 'success', 'message' => 'Message successfully broadcasted!'];
     header("Location: admin_message.php");
     exit();
@@ -169,8 +169,9 @@ function sendNotificationEmail($messageContent)
             <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest flex items-center gap-2 mb-1">
               <i class="bi bi-info-circle-fill"></i> System Note
             </p>
-            <p class="text-[11px] text-blue-500 leading-relaxed font-medium">Sending a message will trigger automated
-              email notifications to all active student accounts in the registry.</p>
+            <p class="text-[11px] text-blue-500 leading-relaxed font-medium">[TEST MODE] Email notifications are
+              disabled.
+              Messages will be saved and visible on student dashboards.</p>
           </div>
         </div>
       </div>

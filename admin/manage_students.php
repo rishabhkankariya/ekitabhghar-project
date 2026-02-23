@@ -51,7 +51,8 @@ if (isset($_POST['upload_csv']) && $_FILES['student_csv']['name']) {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sssssssii", $roll, $name, $email, $dob, $phone, $hash, $course, $admY, $passY);
         if ($stmt->execute()) {
-            sendCredentialEmail($email, $name, $roll, $tempPass);
+            // [TESTING MODE] Skip credential email
+            // sendCredentialEmail($email, $name, $roll, $tempPass);
             $count++;
         }
     }
@@ -86,8 +87,9 @@ if (isset($_POST['add_student'])) {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sssssssii", $roll, $name, $email, $dob, $phone, $hash, $course, $admY, $passY);
         if ($stmt->execute()) {
-            sendCredentialEmail($email, $name, $roll, $tempPass);
-            $_SESSION['success_msg'] = "Student added and credentials emailed.";
+            // [TESTING MODE] Skip credential email
+            // sendCredentialEmail($email, $name, $roll, $tempPass);
+            $_SESSION['success_msg'] = "Student added successfully. (Email disabled in test mode)";
         } else {
             $_SESSION['error_msg'] = "Error: " . $conn->error;
         }
@@ -317,7 +319,7 @@ $branches = [
                     <div class="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
                         <p class="text-[10px] text-slate-400 font-medium leading-relaxed">
                             <span class="text-slate-600 font-bold">INFO:</span> Passwords format is name initials + DOB
-                            digits. Emails are sent instantly.
+                            digits. [TEST MODE] Emails are disabled.
                         </p>
                     </div>
                 </div>

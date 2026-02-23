@@ -48,20 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['login_otp'] = $otp;
                 $_SESSION['login_otp_expiry'] = time() + 300;
 
-                $subject = 'Login Verification Code';
-                $body = "<div style='font-family: Arial; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
-                    <h2>Login Verification</h2>
-                    <p>Hello <strong>{$row['full_name']}</strong>,</p>
-                    <p>Your OTP for login is: <span style='font-size: 24px; font-weight: bold; color: #4F46E5;'>$otp</span></p>
-                    <p>This code expires in 5 minutes.</p>
-                </div>";
-
-                $res = sendEmail($row['email'], $row['full_name'], $subject, $body);
-                if ($res === true) {
-                    header("Location: ../verify_login_otp.html");
-                } else {
-                    header("Location: ../student_login.html?error=Failed to send OTP. Try again.");
-                }
+                // [TESTING MODE] Skip email, show OTP on screen via URL param
+                header("Location: ../verify_login_otp.html?debug_otp=" . $otp);
                 exit;
             } else {
                 // Permanent Login

@@ -47,13 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>';
 
-        $res = sendEmail($email, "User", $subject, $htmlBody);
-
-        if ($res === true) {
-            echo json_encode(['status' => 'success', 'message' => ucfirst($action) . ' sent successfully!']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Email failed: ' . $res]);
-        }
+        // [TESTING MODE] Skip sending email
+        // $res = sendEmail($email, "User", $subject, $htmlBody);
+        echo json_encode(['status' => 'success', 'message' => ucfirst($action) . ' logged successfully! (Email disabled in test mode)']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Invalid action type specified.']);
     }

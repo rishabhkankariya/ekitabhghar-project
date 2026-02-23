@@ -36,31 +36,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $_SESSION["reset_name"] = $full_name;
       $_SESSION["otp_expiry"] = time() + 300; // OTP expires in 5 minutes
 
-      $subject = 'Password Reset OTP - Kitabghar';
-      $body = "
-              <div style='font-family: sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; background: #f8fafc; border-radius: 20px;'>
-                  <div style='text-align: center; margin-bottom: 25px;'>
-                      <h1 style='color: #1e40af; margin: 0; font-size: 24px;'>Kitabghar</h1>
-                      <p style='color: #64748b; font-size: 14px;'>Secure Password Reset</p>
-                  </div>
-                  <div style='background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);'>
-                      <p style='font-size: 15px; color: #1e293b; margin-bottom: 20px;'>Hello <strong>$full_name</strong>,</p>
-                      <p style='font-size: 15px; color: #475569; line-height: 1.5;'>Please use the following verification code to reset your password:</p>
-                      <div style='text-align: center; margin: 25px 0;'>
-                          <span style='font-family: monospace; font-size: 32px; font-weight: 800; color: #2563eb; letter-spacing: 4px; background: #eff6ff; padding: 12px 24px; border-radius: 10px; border: 2px dashed #bfdbfe; display: inline-block;'>$otp</span>
-                      </div>
-                      <p style='font-size: 13px; color: #ef4444; text-align: center; margin-bottom: 0;'>This code will expire in 5 minutes.</p>
-                      <hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;'>
-                      <p style='font-size: 12px; color: #94a3b8; text-align: center; line-height: 1.4; margin: 0;'>If you didn't request this, please ignore this email or contact support.</p>
-                  </div>
-              </div>";
-
-      $res = sendEmail($email, $full_name, $subject, $body);
-      if ($res === true) {
-        $message = "Code sent to your email! Don't forget to check spam.";
-        $messageType = "success";
-        $_SESSION["show_otp_form"] = true;
-      }
+      // [TESTING MODE] Skip email, show OTP on screen
+      $message = "🔑 [TEST MODE] Your OTP is: <strong>$otp</strong>";
+      $messageType = "success";
+      $_SESSION["show_otp_form"] = true;
     } else {
       $message = "No student account found with this Email/Roll No.";
       $messageType = "error";
@@ -95,18 +74,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message = "Success! Your password has been updated.";
         $resetType = "success";
 
-        // Send Confirmation
-        $subject = 'Password Security Alert';
-        $body = "
-                  <div style='font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; background: #f8fafc; border-radius: 24px;'>
-                      <div style='background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); text-align: center;'>
-                          <div style='font-size: 50px; margin-bottom: 20px;'>✅</div>
-                          <h2 style='color: #059669; margin-bottom: 16px;'>Password Updated</h2>
-                          <p style='color: #475569; font-size: 16px; line-height: 1.6;'>The password for your Kitabghar account has been successfully changed.</p>
-                          <p style='color: #64748b; font-size: 14px; margin-top: 24px;'>If you didn't do this, contact us immediately.</p>
-                      </div>
-                  </div>";
-        sendEmail($email, $_SESSION['reset_name'], $subject, $body);
+        // [TESTING MODE] Skip confirmation email
+        // sendEmail($email, $_SESSION['reset_name'], $subject, $body);
 
         session_destroy();
       } else {

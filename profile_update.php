@@ -129,30 +129,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                   'changing_email' => $changingEmail
                 ];
 
-                // Send OTP to OLD/Current email for verification
-                $subject = 'Security Verification - Profile Update';
-                $body = "
-                  <div style='font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; background: #f8fafc; border-radius: 20px;'>
-                    <h2 style='color: #1e40af; text-align: center;'>Email Verification</h2>
-                    <p>Hello <strong>{$user['full_name']}</strong>,</p>
-                    <p>To finalize your profile update" . ($changingEmail ? " and verify your new email" : "") . ", please use the code below:</p>
-                    <div style='text-align: center; margin: 30px 0;'>
-                      <span style='font-size: 32px; font-weight: bold; color: #2563eb; background: #eff6ff; padding: 15px 30px; border-radius: 10px; border: 2px dashed #bfdbfe;'>$otp</span>
-                    </div>
-                    <p style='text-align: center; color: #ef4444; font-size: 13px;'>If you didn't request this, please ignore this email.</p>
-                  </div>";
-
-                $res = sendEmail($new_email, $user['full_name'], $subject, $body);
-
-                if ($res === true) {
-                  $_SESSION['profile_update_otp_sent'] = true;
-                  $showOtpForm = true;
-                  $message = "Verification code sent to your current email.";
-                  $messageType = "success";
-                } else {
-                  $message = "Failed to send verification code.";
-                  $messageType = "error";
-                }
+                // [TESTING MODE] Skip email, show OTP on screen
+                $_SESSION['profile_update_otp_sent'] = true;
+                $showOtpForm = true;
+                $message = "🔑 [TEST MODE] Your OTP is: $otp";
+                $messageType = "success";
               } else {
                 // Just update Name or Image
                 $stmt = $conn->prepare("UPDATE student_accounts SET full_name=?, profile_image=? WHERE email=?");

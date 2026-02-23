@@ -42,7 +42,8 @@ if ($input && isset($input['action']) && isset($input['ids'])) {
             $update = $conn->prepare("UPDATE students SET status = 'approved' WHERE id = ?");
             $update->bind_param("i", $id);
             if ($update->execute()) {
-                sendEmail($student['email_id'], $student['student_name'], "Exam Form Approved", prepareHtml($student['student_name'], "Your exam form has been approved ✅."));
+                // [TESTING MODE] Skip email
+                // sendEmail($student['email_id'], $student['student_name'], "Exam Form Approved", prepareHtml($student['student_name'], "Your exam form has been approved ✅."));
             }
             $update->close();
         } elseif ($action === 'reject') {
@@ -57,7 +58,8 @@ if ($input && isset($input['action']) && isset($input['ids'])) {
                 $delete->execute();
 
                 $conn->commit();
-                sendEmail($student['email_id'], $student['student_name'], "Exam Form Rejected", prepareHtml($student['student_name'], "Your exam form has been rejected ❌. Reason: $reason"));
+                // [TESTING MODE] Skip email
+                // sendEmail($student['email_id'], $student['student_name'], "Exam Form Rejected", prepareHtml($student['student_name'], "Your exam form has been rejected ❌. Reason: $reason"));
             } catch (Exception $e) {
                 $conn->rollback();
             }
@@ -116,7 +118,8 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $update->close();
 
         if ($success) {
-            if (sendEmail($email, $name, $subject, prepareHtml($name, $message)) === true) {
+            if (true) { // [TESTING MODE] Skip email, always succeed
+                // sendEmail($email, $name, $subject, prepareHtml($name, $message));
                 $_SESSION['message'] = "<i class='bi bi-check-circle-fill text-success'></i> Student approved and email sent.";
                 $_SESSION['message_type'] = "success";
             } else {
@@ -170,7 +173,8 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             $conn->commit();
 
             // Only attempt email after successful DB transaction
-            if (sendEmail($email, $name, $subject, prepareHtml($name, $message)) === true) {
+            if (true) { // [TESTING MODE] Skip email, always succeed
+                // sendEmail($email, $name, $subject, prepareHtml($name, $message));
                 $_SESSION['message'] = "<i class='bi bi-trash-fill text-danger'></i> Student rejected, archived & email sent.";
                 $_SESSION['message_type'] = "danger";
             } else {
@@ -195,7 +199,8 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $update->close();
 
         if ($success) {
-            if (sendEmail($email, $name, $subject, prepareHtml($name, $message)) === true) {
+            if (true) { // [TESTING MODE] Skip email, always succeed
+                // sendEmail($email, $name, $subject, prepareHtml($name, $message));
                 $_SESSION['message'] = "<i class='bi bi-check-circle-fill text-primary'></i> Student can now edit their form. Email sent.";
                 $_SESSION['message_type'] = "primary";
             } else {

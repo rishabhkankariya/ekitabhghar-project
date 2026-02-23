@@ -51,14 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute()) {
             $response_message = ($action === 'enable') ? 'Access enabled' : 'Access disabled';
 
-            // Send Email if Enabled
+            // [TESTING MODE] Skip email notification
             if ($action === 'enable') {
-                $email_sent = sendAccessEmail($student_email, $student_name);
-                if ($email_sent) {
-                    $response_message .= ' and email notification sent.';
-                } else {
-                    $response_message .= ', but email failed to send.';
-                }
+                $response_message .= '. (Email notification disabled in test mode)';
             }
 
             echo json_encode(['success' => true, 'message' => $response_message]);

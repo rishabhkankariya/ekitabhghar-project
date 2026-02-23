@@ -44,6 +44,12 @@
             <p class="text-slate-500 font-medium">Verify your identity to proceed</p>
             <p class="text-xs text-slate-400 mt-2 px-6">We've sent a 6-digit code to your registered email for your
                 first-time setup.</p>
+            <!-- [TESTING MODE] Show OTP on screen -->
+            <div id="debug-otp-display"
+                class="mt-4 p-3 bg-amber-50 border-2 border-dashed border-amber-300 rounded-xl hidden">
+                <p class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">🔑 Test Mode - Your OTP</p>
+                <p id="debug-otp-value" class="text-2xl font-black text-amber-700 tracking-[0.3em]"></p>
+            </div>
         </div>
 
         <div class="space-y-6">
@@ -91,6 +97,14 @@
         const btnIcon = verifyBtn.querySelector('i');
 
         otpInput.focus();
+
+        // [TESTING MODE] Show OTP from URL param
+        const urlParams = new URLSearchParams(window.location.search);
+        const debugOtp = urlParams.get('debug_otp');
+        if (debugOtp) {
+            document.getElementById('debug-otp-display').classList.remove('hidden');
+            document.getElementById('debug-otp-value').textContent = debugOtp;
+        }
 
         verifyBtn.addEventListener("click", () => {
             const otp = otpInput.value.trim();

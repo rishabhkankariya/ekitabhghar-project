@@ -128,9 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>";
 
-                        if (sendEmail($email, $name, $subject, $body) === true) {
-                            $emailCount++;
-                        }
+                        // [TESTING MODE] Skip credential email
+                        // if (sendEmail($email, $name, $subject, $body) === true) {
+                        //     $emailCount++;
+                        // }
+                        $emailCount++; // Count as success in test mode
                     } else {
                         // affected_rows is 0 (matched exactly, no change)
                         $updatedCount++;

@@ -54,23 +54,11 @@ try {
             <p style="font-size:11px;text-align:center;color:#aaa;">&copy; ' . date("Y") . ' Kitabghar. All rights reserved.</p>
         </div>';
 
-        sendEmail($email, $name, $userSubject, $userBody);
+        // [TESTING MODE] Skip user thank-you email
+        // sendEmail($email, $name, $userSubject, $userBody);
 
-        // 2. Send "New Message" notification to the Admin
-        $adminEmail = getenv('SMTP_USER') ?: 'ekitabghar@gmail.com';
-        $adminSubject = "New Support Request: " . $subject_field;
-        $adminBody = "
-        <div style='font-family:sans-serif; padding:20px; border:1px solid #ddd; border-radius:10px;'>
-            <h2 style='color:#FF5722;'>📢 New Support Request</h2>
-            <p><strong>From:</strong> {$name} ({$email})</p>
-            <p><strong>Subject:</strong> {$subject_field}</p>
-            <p><strong>Message:</strong><br>" . nl2br($message) . "</p>
-            <br>
-            <p><a href='" . (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/admin/admin_contact_support.php' 
-               style='background:#4CAF50; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;'>Open Admin Dashboard</a></p>
-        </div>";
-
-        sendEmail($adminEmail, 'Admin', $adminSubject, $adminBody);
+        // [TESTING MODE] Skip admin notification email
+        // sendEmail($adminEmail, 'Admin', $adminSubject, $adminBody);
 
         // Success redirect
         $_SESSION['toast'] = ['type' => 'success', 'message' => 'Message sent successfully!'];

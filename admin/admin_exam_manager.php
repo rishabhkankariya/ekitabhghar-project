@@ -34,8 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $toast_message = "Exam settings updated successfully!";
             $toast_type = "success";
 
-            // Send email notification - Note: using centralized connection logic
-            sendExamNotification($start_date, $end_date);
+            // [TESTING MODE] Skip email notification
+            // sendExamNotification($start_date, $end_date);
         } else {
             $toast_message = "Error updating settings: " . $stmt->error;
             $toast_type = "error";
@@ -215,7 +215,7 @@ function sendExamNotification($start, $end)
                     <div
                         class="inline-flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                         <i class="bi bi-info-circle"></i>
-                        Automated email notifications will be sent to all registered students.
+                        [TEST MODE] Email notifications are disabled. Students will see updates on their dashboard.
                     </div>
                 </div>
             </div>

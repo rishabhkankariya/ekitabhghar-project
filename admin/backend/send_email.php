@@ -41,11 +41,9 @@ function prepareHtml($bodyHtml)
     </div>";
 }
 
-// ✉️ Send the email
-$htmlContent = prepareHtml($message);
-if (sendEmail($to_email, "Student", $subject, $htmlContent) === true) {
-    echo json_encode(['status' => 'success', 'message' => 'Email sent successfully']);
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'Failed to send email. Please try again']);
-}
+// [TESTING MODE] Skip email sending
+// $htmlContent = prepareHtml($message);
+// if (sendEmail($to_email, "Student", $subject, $htmlContent) === true) {
+echo json_encode(['status' => 'success', 'message' => 'Action logged successfully! (Email disabled in test mode)']);
+// }
 ?>

@@ -59,12 +59,12 @@ function prepareHtmlMessage($name, $msg, $title)
     </div>";
 }
 
-// ✅ Finally send the email
-$htmlContent = prepareHtmlMessage($name, $message, "Notification From ADMIN");
-$sent = sendEmail($email, $name, $subject, $htmlContent);
+// [TESTING MODE] Skip sending email
+// $htmlContent = prepareHtmlMessage($name, $message, "Notification From ADMIN");
+// $sent = sendEmail($email, $name, $subject, $htmlContent);
 
 echo json_encode([
-    'status' => $sent ? 'success' : 'error',
-    'message' => $sent ? 'Email sent!' : 'Email failed to send.'
+    'status' => 'success',
+    'message' => 'Action logged successfully! (Email disabled in test mode)'
 ]);
 ?>

@@ -253,61 +253,77 @@
 
       // Search Logic
       function searchBooks() {
-         var query = document.getElementById("search").value.trim();
+         const searchInput = document.getElementById("search");
+         const query = searchInput.value.trim();
          if (query === "") return;
 
-         document.getElementById("loader").classList.remove("hidden");
-         document.getElementById("empty-state").classList.add("hidden");
-         document.getElementById("results").innerHTML = "";
+         const loader = document.getElementById("loader");
+         const emptyState = document.getElementById("empty-state");
+         const resultsContainer = document.getElementById("results");
 
+         loader.classList.remove("hidden");
+         emptyState.classList.add("hidden");
+         resultsContainer.innerHTML = "";
+
+         // Using jQuery AJAX with JSONP to bypass CORS issues on local dev
          $.ajax({
-            url: `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=12`,
-            type: "GET",
-            dataType: "json",
+            url: `https://www.googleapis.com/books/v1/volumes`,
+            data: {
+               q: query,
+               maxResults: 12
+            },
+            dataType: "jsonp", // Using JSONP for better compatibility with local dev
             success: function (data) {
-               document.getElementById("loader").classList.add("hidden");
+               loader.classList.add("hidden");
 
                if (!data.items || data.items.length === 0) {
-                  document.getElementById("results").innerHTML = `
-                        <div class="col-span-full text-center py-10">
-                            <p class="text-slate-500 text-lg">No books found matching "${query}".</p>
-                        </div>`;
+                  resultsContainer.innerHTML = `
+                     <div class="col-span-full text-center py-10">
+                        <p class="text-slate-500 text-lg">No books found matching "${query}".</p>
+                     </div>`;
                   return;
                }
 
                data.items.forEach((book, index) => {
-                  let volumeInfo = book.volumeInfo;
-                  let title = volumeInfo.title || "Unknown Title";
-                  let authors = volumeInfo.authors ? volumeInfo.authors.join(", ") : "Unknown Author";
-                  let desc = volumeInfo.description ? volumeInfo.description.substring(0, 100) + "..." : "No description available.";
-                  let link = volumeInfo.previewLink || "#";
-                  let thumbnail = volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail
+                  const volumeInfo = book.volumeInfo;
+                  const title = volumeInfo.title || "Unknown Title";
+                  const authors = volumeInfo.authors ? volumeInfo.authors.join(", ") : "Unknown Author";
+                  const desc = volumeInfo.description ? volumeInfo.description.substring(0, 100) + "..." : "No description available.";
+                  const link = volumeInfo.previewLink || "#";
+                  const thumbnail = volumeInfo.imageLinks && volumeInfo.imageLinks.thumbnail
                      ? volumeInfo.imageLinks.thumbnail.replace('http:', 'https:')
                      : "https://via.placeholder.com/128x192.png?text=No+Cover";
 
-                  let delay = index * 100;
+                  const delay = index * 100;
 
-                  document.getElementById("results").innerHTML += `
-                          <div class="book-card group bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex gap-6" data-aos="fade-up" data-aos-delay="${delay}">
-                              <div class="shrink-0 w-24 h-36 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-transform group-hover:scale-105">
-                                  <img src="${thumbnail}" alt="Cover" class="w-full h-full object-cover">
-                              </div>
-                              <div class="flex flex-col flex-1">
-                                  <h3 class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 line-clamp-2">${title}</h3>
-                                  <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider mb-2 line-clamp-1">${authors}</p>
-                                  <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3 flex-1">${desc}</p>
-                                  <button class="download-btn w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-lg font-semibold text-sm transition-all" data-book-url="${link}">
-                                      <i class="bi bi-book-half mr-2"></i> View Details
-                                  </button>
-                              </div>
-                          </div>
-                      `;
+                  resultsContainer.innerHTML += `
+                     <div class="book-card group bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex gap-6" data-aos="fade-up" data-aos-delay="${delay}">
+                        <div class="shrink-0 w-24 h-36 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-transform group-hover:scale-105">
+                           <img src="${thumbnail}" alt="Cover" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col flex-1">
+                           <h3 class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 line-clamp-2">${title}</h3>
+                           <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider mb-2 line-clamp-1">${authors}</p>
+                           <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3 flex-1">${desc}</p>
+                           <button class="download-btn w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-lg font-semibold text-sm transition-all" data-book-url="${link}">
+                              <i class="bi bi-book-half mr-2"></i> View Details
+                           </button>
+                        </div>
+                     </div>
+                  `;
                });
             },
             error: function (xhr, status, error) {
-               document.getElementById("loader").classList.add("hidden");
-               console.error("Ajax Error:", status, error);
-               alert("Error fetching data: " + (xhr.statusText || "Connection failed") + ". Please try again.");
+               loader.classList.add("hidden");
+               console.error("AJAX Error:", status, error, xhr);
+               
+               let msg = "Search failed. ";
+               if (window.location.protocol === "file:") {
+                  msg += "Please run through XAMPP (http://localhost) - opening files directly blocks API calls.";
+               } else {
+                  msg += "Please check your internet connection or try a different search term.";
+               }
+               alert(msg);
             }
          });
       }

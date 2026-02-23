@@ -34,12 +34,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p>Best Regards,<br><strong>Kitabghar Team</strong></p>
             <p style='font-size:12px;color:#777;'>This is an automated email. Please do not reply.</p>";
 
-        $res = sendEmail($email, $name, $subject, $body);
-        if ($res === true) {
-            echo "<script>alert('Feedback submitted successfully!'); window.location.href = '../feedback.html';</script>";
-        } else {
-            echo "<script>alert('Feedback submitted, but email could not be sent.'); window.location.href = '../feedback.html';</script>";
-        }
+        // [TESTING MODE] Skip email
+        // $res = sendEmail($email, $name, $subject, $body);
+        echo "<script>alert('Feedback submitted successfully!'); window.location.href = '../feedback.html';</script>";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
