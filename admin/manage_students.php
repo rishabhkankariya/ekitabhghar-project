@@ -1,10 +1,7 @@
 <?php
 session_start();
 require '../php/connection.php';
-require '../vendor/autoload.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require '../config/send_mail.php';
 
 if (!isset($_SESSION['admin_logged_in'])) {
     header("Location: admin_login.php");
@@ -111,45 +108,29 @@ if (isset($_GET['delete_id'])) {
 
 function sendCredentialEmail($to, $name, $roll, $pass)
 {
-    $mail = new PHPMailer(true);
-    $mail->SMTPDebug = 2;
-    $mail->Debugoutput = 'html';
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'ekitabghar@gmail.com';
-        $mail->Password = 'pdfxjcyzffgskypq';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-        $mail->SMTPOptions = ['ssl' => ['verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true]];
-        $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar Admin');
-        $mail->addAddress($to, $name);
-        $mail->isHTML(true);
-        $mail->Subject = 'Your Student Portal Credentials';
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+    $loginLink = $protocol . $_SERVER['HTTP_HOST'] . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\') . '/student_login.html';
 
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
-        $loginLink = $protocol . $_SERVER['HTTP_HOST'] . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\') . '/student_login.html';
+    $subject = 'Your Student Portal Credentials';
+    $body = "
+    <div style='font-family: Arial; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;'>
+        <h2 style='color: #4f46e5;'>Student Portal Access</h2>
+        <p>Dear $name,</p>
+        <p>Your account has been created. Use these credentials to log in:</p>
+        <div style='background: #f8f9fa; padding: 15px; border-radius: 8px;'>
+            <p><strong>Roll No:</strong> $roll</p>
+            <p><strong>Email:</strong> $to</p>
+            <p><strong>Temporary Password:</strong> <span style='color: #e63946; font-weight: bold;'>$pass</span></p>
+        </div>
+        <p>Login here: <a href='$loginLink'>$loginLink</a></p>
+        <p><em>Password Format: First 4 letters of Name + Day(DD) + Year(YYYY)</em></p>
+        <p style='margin-top: 20px; font-size: 12px; color: #666;'>If you didn't request this, please ignore this email.</p>
+    </div>";
 
-        $mail->Body = "
-        <div style='font-family: Arial; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;'>
-            <h2 style='color: #4f46e5;'>Student Portal Access</h2>
-            <p>Dear $name,</p>
-            <p>Your account has been created. Use these credentials to log in:</p>
-            <div style='background: #f8f9fa; padding: 15px; border-radius: 8px;'>
-                <p><strong>Roll No:</strong> $roll</p>
-                <p><strong>Email:</strong> $to</p>
-                <p><strong>Temporary Password:</strong> <span style='color: #e63946; font-weight: bold;'>$pass</span></p>
-            </div>
-            <p>Login here: <a href='$loginLink'>$loginLink</a></p>
-            <p><em>Password Format: First 4 letters of Name + Day(DD) + Year(YYYY)</em></p>
-        </div>";
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        return false;
-    }
+    $res = sendEmail($to, $name, $subject, $body);
+    return ($res === true);
 }
+
 
 // Bulk Actions
 if (isset($_POST['bulk_action']) && isset($_POST['student_ids'])) {

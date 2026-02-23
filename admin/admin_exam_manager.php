@@ -5,10 +5,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-require '../vendor/autoload.php'; // PHPMailer
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require '../config/send_mail.php';
 
 // Database Connection
 require_once '../php/connection.php';
@@ -71,57 +68,29 @@ if (!empty($current_start_date) && !empty($current_end_date)) {
 // Send Exam Notification Email
 function sendExamNotification($start, $end)
 {
-    // Use centralized connection instead of hardcoded
-    global $servername, $username, $password, $database;
-    $conn_notify = new mysqli($servername, $username, $password, $database);
-    if ($conn_notify->connect_error)
-        return;
+    global $conn; // Use the main connection
 
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'ekitabghar@gmail.com';
-        $mail->Password = 'pdfx jcyz ffgs kypq';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+    $subject = 'Exam Form is Live Don’t Miss Out!';
+    $startFormatted = date("F j, Y", strtotime($start));
+    $endFormatted = date("F j, Y", strtotime($end));
 
-        $mail->setFrom('ekitabghar@gmail.com', 'E-Kitabghar');
-        $mail->isHTML(true);
-        $mail->Subject = 'Exam Form is Live Don’t Miss Out!';
+    $htmlBody = "
+        <div style='font-family: Arial, sans-serif; background-color: #fefefe; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
+            <h2 style='color: #007BFF;'>🎓 Exam Form Now Open!</h2>
+            <p>Hello Student,</p>
+            <p>Your exam form is now live and will be available from:</p>
+            <p style='font-size: 18px; margin: 10px 0;'><strong>$startFormatted</strong> to <strong>$endFormatted</strong></p>
+            <p>Please visit your dashboard and complete the form before the deadline.</p>
+            <br>
+            <p style='margin-top: 20px;'>Regards,<br><strong>E-Kitabghar Team</strong></p>
+        </div>";
 
-        $startFormatted = date("F j, Y", strtotime($start));
-        $endFormatted = date("F j, Y", strtotime($end));
-
-        $body = "
-            <div style='font-family: Arial, sans-serif; background-color: #fefefe; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
-                <h2 style='color: #007BFF;'>🎓 Exam Form Now Open!</h2>
-                <p>Hello Student,</p>
-                <p>Your exam form is now live and will be available from:</p>
-                <p style='font-size: 18px; margin: 10px 0;'><strong>$startFormatted</strong> to <strong>$endFormatted</strong></p>
-                <p>Please visit your dashboard and complete the form before the deadline.</p>
-                <br>
-                <p style='margin-top: 20px;'>Regards,<br><strong>E-Kitabghar Team</strong></p>
-            </div>
-        ";
-
-        // Fetching from student_accounts instead of users (based on project updates)
-        $result = $conn_notify->query("SELECT email FROM student_accounts");
-        if ($result) {
-            while ($row = $result->fetch_assoc()) {
-                if (!empty($row['email'])) {
-                    $mail->addBCC($row['email']);
-                }
-            }
+    $result = $conn->query("SELECT email, full_name FROM student_accounts WHERE email IS NOT NULL AND email != ''");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            sendEmail($row['email'], $row['full_name'], $subject, $htmlBody);
         }
-
-        $mail->Body = $body;
-        $mail->send();
-    } catch (Exception $e) {
-        error_log("Exam notification email failed: " . $mail->ErrorInfo);
     }
-    $conn_notify->close();
 }
 ?>
 <!DOCTYPE html>

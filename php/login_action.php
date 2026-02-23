@@ -1,9 +1,7 @@
 <?php
 session_start();
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-require '../vendor/autoload.php';
-require 'connection.php';
+require_once 'connection.php';
+require_once '../config/send_mail.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_input = isset($_POST['email']) ? trim($_POST['email']) : '';
@@ -50,36 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['login_otp'] = $otp;
                 $_SESSION['login_otp_expiry'] = time() + 300;
 
-                // Send OTP
-                $mail = new PHPMailer(true);
-                try {
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'ekitabghar@gmail.com';
-                    $mail->Password = 'pdfxjcyzffgskypq';
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port = 587;
-                    $mail->SMTPOptions = ['ssl' => ['verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true]];
+                $subject = 'Login Verification Code';
+                $body = "<div style='font-family: Arial; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
+                    <h2>Login Verification</h2>
+                    <p>Hello <strong>{$row['full_name']}</strong>,</p>
+                    <p>Your OTP for login is: <span style='font-size: 24px; font-weight: bold; color: #4F46E5;'>$otp</span></p>
+                    <p>This code expires in 5 minutes.</p>
+                </div>";
 
-                    $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar');
-                    $mail->addAddress($row['email'], $row['full_name']);
-                    $mail->isHTML(true);
-                    $mail->Subject = 'Login Verification Code';
-                    $mail->Body = "<div style='font-family: Arial; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
-                        <h2>Login Verification</h2>
-                        <p>Hello <strong>{$row['full_name']}</strong>,</p>
-                        <p>Your OTP for login is: <span style='font-size: 24px; font-weight: bold; color: #4F46E5;'>$otp</span></p>
-                        <p>This code expires in 5 minutes.</p>
-                    </div>";
-                    $mail->send();
-
+                $res = sendEmail($row['email'], $row['full_name'], $subject, $body);
+                if ($res === true) {
                     header("Location: ../verify_login_otp.html");
-                    exit;
-                } catch (Exception $e) {
+                } else {
                     header("Location: ../student_login.html?error=Failed to send OTP. Try again.");
-                    exit;
                 }
+                exit;
             } else {
                 // Permanent Login
                 $_SESSION['user_id'] = $row['id'];

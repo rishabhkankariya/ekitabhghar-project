@@ -1,9 +1,5 @@
 <?php
-// Load PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require '../../vendor/autoload.php';
+require_once '../../config/send_mail.php';
 session_start();
 include '../../php/connection.php';
 
@@ -34,30 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $failCount = 0;
             $emailCount = 0;
             $updatedCount = 0;
-
-            // Initialize PHPMailer once outside the loop
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'ekitabghar@gmail.com';
-                $mail->Password = 'pdfxjcyzffgskypq';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-        $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
-                $mail->SMTPKeepAlive = true; // KEEP CONNECTION ALIVE
-
-                $mail->clearAddresses(); // Added for safety
-                $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar Admin');
-                $mail->isHTML(true);
-                $mail->Subject = 'Student Account Credentials';
-                $mail->Timeout = 15; // SMTP timeout
-            } catch (Exception $e) {
-                error_log("PHPMailer Setup Error: " . $mail->ErrorInfo);
-                // We'll continue even if SMTP setup fails, but emails won't send
-            }
 
             // Prepare statement (Update all fields on duplicate Roll No)
             $stmt = $conn->prepare("INSERT INTO student_accounts (roll_no, full_name, email, phone_number, course, admission_year, expected_passing_year, password_hash, is_temp_password) 
@@ -117,52 +89,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } else {
                             $updatedCount++;
                         }
-                        try {
-                            $mail->clearAddresses();
-                            $mail->addAddress($email, $name);
+                        // Dynamically Calculate Login URL
+                        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+                        $host = $_SERVER['HTTP_HOST'];
+                        $path = dirname(dirname(dirname($_SERVER['SCRIPT_NAME'])));
+                        $path = rtrim(str_replace('\\', '/', $path), '/');
+                        $loginLink = $protocol . $host . $path . '/student_login.html';
 
-                            // Dynamically Calculate Login URL
-                            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-                            $host = $_SERVER['HTTP_HOST'];
-                            $path = dirname(dirname(dirname($_SERVER['SCRIPT_NAME'])));
-                            $path = rtrim(str_replace('\\', '/', $path), '/');
-                            $loginLink = $protocol . $host . $path . '/student_login.html';
-
-                            $mail->Body = "
-                            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
-                                <h2 style='color: #2563EB; border-bottom: 2px solid #eee; padding-bottom: 10px;'>Welcome to Kitabghar</h2>
-                                <p>Dear <strong>$name</strong>,</p>
-                                <p>Your student account has been created by the administration. Please find your login credentials below:</p>
-                                
-                                <div style='background-color: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin: 15px 0;'>
-                                    <p style='margin: 5px 0;'><strong>Roll No:</strong> $roll</p>
-                                    <p style='margin: 5px 0;'><strong>Email:</strong> $email</p>
-                                    <div style='background-color: #fff; border-left: 4px solid #f59e0b; padding: 10px; margin-top: 5px;'>
-                                        <p style='margin: 0; color: #856404; font-size: 0.95em;'><strong>Temporary Password Format:</strong></p>
-                                        <p style='margin: 5px 0 0 0; font-size: 0.9em;'>
-                                            First 4 letters of your Name + Day (DD) + Year (YYYY).<br>
-                                            <span style='color: #666; font-style: italic;'>Example: 'Pankaj Sharma' (born 15/12/2004) &rarr; <strong>PANK152004</strong></span>
-                                        </p>
-                                    </div>
+                        $subject = 'Student Account Credentials';
+                        $body = "
+                        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
+                            <h2 style='color: #2563EB; border-bottom: 2px solid #eee; padding-bottom: 10px;'>Welcome to Kitabghar</h2>
+                            <p>Dear <strong>$name</strong>,</p>
+                            <p>Your student account has been created by the administration. Please find your login credentials below:</p>
+                            
+                            <div style='background-color: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin: 15px 0;'>
+                                <p style='margin: 5px 0;'><strong>Roll No:</strong> $roll</p>
+                                <p style='margin: 5px 0;'><strong>Email:</strong> $email</p>
+                                <div style='background-color: #fff; border-left: 4px solid #f59e0b; padding: 10px; margin-top: 5px;'>
+                                    <p style='margin: 0; color: #856404; font-size: 0.95em;'><strong>Temporary Password Format:</strong></p>
+                                    <p style='margin: 5px 0 0 0; font-size: 0.9em;'>
+                                        First 4 letters of your Name + Day (DD) + Year (YYYY).<br>
+                                        <span style='color: #666; font-style: italic;'>Example: 'Pankaj Sharma' (born 15/12/2004) &rarr; <strong>PANK152004</strong></span>
+                                    </p>
                                 </div>
+                            </div>
 
-                                <h3 style='font-size: 16px; margin-top: 20px;'>Steps to Login:</h3>
-                                <ol style='line-height: 1.6;'>
-                                    <li>Go to the <a href='$loginLink' style='color: #2563EB; font-weight: bold;'>Student Login Page</a>.</li>
-                                    <li>Enter your Email and the Temporary Password provided above.</li>
-                                    <li>You will be required to set a new, secure password upon your first login.</li>
-                                </ol>
+                            <h3 style='font-size: 16px; margin-top: 20px;'>Steps to Login:</h3>
+                            <ol style='line-height: 1.6;'>
+                                <li>Go to the <a href='$loginLink' style='color: #2563EB; font-weight: bold;'>Student Login Page</a>.</li>
+                                <li>Enter your Email and the Temporary Password provided above.</li>
+                                <li>You will be required to set a new, secure password upon your first login.</li>
+                            </ol>
 
-                                <div style='margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;'>
-                                    <p style='margin: 0;'>Best Regards,</p>
-                                    <p style='margin: 5px 0; font-weight: bold;'>Kitabghar Administration</p>
-                                </div>
-                            </div>";
+                            <div style='margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;'>
+                                <p style='margin: 0;'>Best Regards,</p>
+                                <p style='margin: 5px 0; font-weight: bold;'>Kitabghar Administration</p>
+                            </div>
+                        </div>";
 
-                            $mail->send();
+                        if (sendEmail($email, $name, $subject, $body) === true) {
                             $emailCount++;
-                        } catch (Exception $e) {
-                            error_log("Failed to send email to $email: " . $mail->ErrorInfo);
                         }
                     } else {
                         // affected_rows is 0 (matched exactly, no change)
@@ -174,13 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             fclose($handle);
 
-            // Safer close of SMTP
-            try {
-                if ($mail->getSMTPInstance()) {
-                    $mail->smtpClose();
-                }
-            } catch (Exception $e) { /* ignore cleanup errors */
-            }
+
 
             $finalMsg = "Upload Results: $successCount New, $updatedCount Updated, $emailCount Emails Sent, $failCount Failed.";
             header("Location: ../manage_students.php?msg=" . urlencode($finalMsg));
@@ -226,4 +187,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 header("Location: ../manage_students.php");
 ?>
-

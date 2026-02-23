@@ -23,7 +23,7 @@ RewriteRule ^(.+\.pdf)$ $1 [L]
 
 # 4. Error Document
 # Pointing to root /404.html for live server (ProFreeHost).
-# Note: On Localhost XAMPP, this might look for localhost/404.html instead of localhost/website/404.html
+# Note: On Localhost XAMPP, this might look for localhost/404.html instead of localhost/404.html
 ErrorDocument 404 /404.html
 
 # Block direct access to .htaccess

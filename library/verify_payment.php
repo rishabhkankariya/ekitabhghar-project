@@ -4,9 +4,7 @@ session_start();
 require('config.php');
 require('../admin/tcpdf/tcpdf.php');
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-require '../vendor/autoload.php';
+require_once '../config/send_mail.php';
 
 // Validate Inputs
 if (!isset($_GET['payment_id']) || !isset($_GET['email'])) {
@@ -101,26 +99,13 @@ if ($data['status'] == "authorized") {
         $pdf->Output($receipt_path, "F");
 
         // === [7] SEND RECEIPT VIA EMAIL === //
-        $mail = new PHPMailer();
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'ekitabghar@gmail.com';
-        $mail->Password = 'pdfxjcyzffgskypq';
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
+        $subject = "Your Payment Receipt - Kitabghar";
+        $body = "Thank you for your support! Please find your receipt attached.";
 
-        $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
+        $res = sendEmail($email, '', $subject, $body, '', [], [$receipt_path]);
 
-        $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar');
-        $mail->addAddress($email);
-        $mail->Subject = "Your Payment Receipt - Kitabghar";
-        $mail->Body = "Thank you for your support! Please find your receipt attached.";
-        $mail->addAttachment($receipt_path);
-
-        // Log Email Errors
-        if (!$mail->send()) {
-            error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        if ($res !== true) {
+            error_log("Email could not be sent. Error: $res");
         }
 
         // === [8] STORE RECEIPT IN SESSION & REDIRECT === //
@@ -135,4 +120,3 @@ if ($data['status'] == "authorized") {
     die("❌ Payment verification failed!");
 }
 ?>
-

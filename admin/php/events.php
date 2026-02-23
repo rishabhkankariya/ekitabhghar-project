@@ -30,14 +30,14 @@ if (isset($_POST['create_event'])) {
                     'type' => 'success',
                     'message' => 'Event Added SuccessFully!'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
     } else {
         $_SESSION['toast'] = [
                     'type' => 'error',
                     'message' => 'Missing Fields Or Image Upload Failed'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
     }
 }
@@ -65,7 +65,7 @@ if (isset($_POST['delete_event'])) {
                     'type' => 'error',
                     'message' => 'Event Deleted Successfully!'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
 }
 

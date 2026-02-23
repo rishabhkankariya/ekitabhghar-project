@@ -1,9 +1,7 @@
 <?php
 session_start();
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require '../vendor/autoload.php';
+// 0. Centralized Mail Helper
+require_once '../config/send_mail.php';
 // 1. Centralized Connection
 include 'connection.php';
 
@@ -331,57 +329,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             }
                         }
                     }
-                    $mail = new PHPMailer(true);
+                    $subject = 'Exam Form Submission Confirmation - E-Kitabghar';
+                    $body = "
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                      <style>
+                        body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 0; margin: 0; }
+                        .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+                        .title { font-size: 22px; color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; }
+                        .info-section { font-size: 18px; color: #34495e; margin-top: 25px; margin-bottom: 10px; }
+                        .info-row { margin: 5px 0; }
+                        .label { font-weight: bold; color: #2c3e50; }
+                        .value { color: #555; }
+                      </style>
+                    </head>
+                    <body>
+                      <div class='email-container'>
+                        <div class='title'><span>🎉 Exam Form Submitted Successfully!</span></div>
+                        <div class='info-section'>
+                          <div class='info-row'><span class='label'>🎓 Name:</span> <span class='value'>$student_name</span></div>
+                          <div class='info-row'><span class='label'>🔢 Roll No:</span> <span class='value'>$roll_no</span></div>
+                          <div class='info-row'><span class='label'>🗓️  Semester:</span> <span class='value'>$current_semester</span></div>
+                        </div>
+                        <div class='footer'>Thank you for choosing E-Kitabghar!</div>
+                      </div>
+                    </body>
+                    </html>";
 
-                    try {
-                        $mail->isSMTP();
-                        $mail->Host = 'smtp.gmail.com';
-                        $mail->SMTPAuth = true;
-                        $mail->Username = 'ekitabghar@gmail.com';
-                        $mail->Password = 'pdfxjcyzffgskypq';
-                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                        $mail->Port = 587;
-
-                        $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
-
-                        // Sender & Recipient
-                        $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar');
-                        $mail->addAddress($email_id); // User's email
-                        $mail->isHTML(true);
-                        $mail->Subject = 'Exam Form Submission Confirmation - E-Kitabghar';
-
-                        $mail->Body = "
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                          <style>
-                            body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 0; margin: 0; }
-                            .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
-                            .title { font-size: 22px; color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; }
-                            .section-title { font-size: 18px; color: #34495e; margin-top: 25px; margin-bottom: 10px; }
-                            .info-row { margin: 5px 0; }
-                            .label { font-weight: bold; color: #2c3e50; }
-                            .value { color: #555; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 10px; overflow-x: auto; display: block; }
-                            th, td { border: 1px solid #ddd; padding: 8px; font-size: 12px; text-align: left; white-space: nowrap; }
-                            th { background-color: #f0f0f0; color: #333; font-weight: bold; }
-                          </style>
-                        </head>
-                        <body>
-                          <div class='email-container'>
-                            <div class='title'><span>🎉 Exam Form Submitted Successfully!</span></div>
-                            <div class='info-section'>
-                              <div class='info-row'><span class='label'>🎓 Name:</span> <span class='value'>$student_name</span></div>
-                              <div class='info-row'><span class='label'>🔢 Roll No:</span> <span class='value'>$roll_no</span></div>
-                              <div class='info-row'><span class='label'>🗓️  Semester:</span> <span class='value'>$current_semester</span></div>
-                            </div>
-                            <div class='footer'>Thank you for choosing E-Kitabghar!</div>
-                          </div>
-                        </body>
-                        </html>";
-
-                        $mail->send();
-                    } catch (Exception $e) {
+                    $res = sendEmail($email_id, $student_name, $subject, $body);
+                    if ($res !== true) {
                         $message .= " However, confirmation email could not be sent.";
                     }
                 } else {

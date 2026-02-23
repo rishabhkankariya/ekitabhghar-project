@@ -1,155 +1,64 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-require '../../vendor/autoload.php';
-
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "ekitabhghar";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
+header('Content-Type: application/json');
+
+// 🔐 Security: Check if admin is logged in
+if (!isset($_SESSION['admin_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access. Please login.']);
+    exit();
+}
+
+require_once '../../config/send_mail.php';
+require_once '../../php/connection.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $userId = $_POST['user_id'];
-    $action = $_POST['action'];
-    $email = $_POST['email'];
-    $message = $_POST['message'];
+    // Validate required fields
+    $email = isset($_POST['email']) ? filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL) : null;
+    $message = isset($_POST['message']) ? trim($_POST['message']) : null;
+    $action = isset($_POST['action']) ? $_POST['action'] : null;
+
+    if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['status' => 'error', 'message' => 'Valid email is required.']);
+        exit;
+    }
+
+    if (!$message) {
+        echo json_encode(['status' => 'error', 'message' => 'Message content is empty.']);
+        exit;
+    }
 
     // Check if action is send message or send warning
     if ($action === 'message' || $action === 'warning') {
-        // Create a PHPMailer instance
-        $mail = new PHPMailer(true);
+        $subject = ($action === 'message') ? 'Message from Kitabghar Support' : '⚠️ Account Warning from Kitabghar';
 
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'ekitabghar@gmail.com';  // Replace with actual Gmail address
-            $mail->Password = 'pdfxjcyzffgskypq';  // Use the generated App Password, not the actual account password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
-
-        $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
-
-            // Fix for SSL verification issues on local environments
-            $mail->SMTPOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                )
-            );
-
-            // Sender and recipient
-            $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar Admin');
-            $mail->addAddress($email);
-
-            // Subject and Body
-            $mail->isHTML(true);
-            $mail->Subject = $action === 'message' ? 'Your Message from Admin' : 'Warning from Admin';
-            $mail->Body = '
-    <html>
-    <head>
-        <style>
-            /* General Email Styling */
-            body {
-                font-family: "Helvetica Neue", Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f7f7f7;
-                color: #333333;
-            }
-
-            /* Main container */
-            .email-container {
-                width: 100%;
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            }
-
-            /* Header Section (Small Heading) */
-            .header {
-                background-color: #3498db;
-                color: white;
-                padding: 15px;
-                text-align: center;
-                border-radius: 8px;
-                margin-bottom: 20px;
-            }
-            .header h1 {
-                font-size: 20px;
-                margin: 0;
-                font-weight: normal;
-            }
-
-            /* Content Section */
-            .content {
-                padding: 15px;
-                background-color: #f9f9f9;
-                border-radius: 8px;
-                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-            }
-
-            .content p {
-                font-size: 14px;
-                line-height: 1.5;
-                color: #555555;
-            }
-
-            /* Mobile Responsive */
-            @media screen and (max-width: 600px) {
-                .email-container {
-                    padding: 15px;
-                }
-                .header h1 {
-                    font-size: 18px;
-                }
-                .content p {
-                    font-size: 13px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="email-container">
-            <!-- Header Section with small heading -->
-            <div class="header">
-                <h1>' . ($action === 'message' ? 'Message from Admin' : 'Warning from Admin') . '</h1>
+        $htmlBody = '
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <div style="background: ' . ($action === 'message' ? '#4A90E2' : '#FF5722') . '; color: white; padding: 25px; text-align: center;">
+                <h2 style="margin:0; font-size: 22px;">' . ($action === 'message' ? 'Message from Support' : 'Administrative Warning') . '</h2>
             </div>
-
-            <!-- Content Section -->
-            <div class="content">
-                <p>' . nl2br(htmlspecialchars($message)) . '</p>
+            <div style="padding: 30px; line-height: 1.6; color: #333; background: #fff;">
+                <p style="font-size: 15px;">' . nl2br(htmlspecialchars($message)) . '</p>
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888; text-align: center;">
+                    This is an official communication from Kitabghar. Please do not reply directly to this email.
+                </div>
             </div>
-        </div>
-    </body>
-    </html>
-';
+        </div>';
 
-            // Send the message
-            if (!$mail->send()) {
-                throw new Exception("Mailer Error: " . $mail->ErrorInfo);
-            }
+        $res = sendEmail($email, "User", $subject, $htmlBody);
 
-            $response = ['status' => 'success', 'message' => ucfirst($action) . ' sent successfully!'];
-        } catch (Exception $e) {
-            $response = ['status' => 'error', 'message' => 'Message could not be sent. Mailer Error: ' . $mail->ErrorInfo];
+        if ($res === true) {
+            echo json_encode(['status' => 'success', 'message' => ucfirst($action) . ' sent successfully!']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Email failed: ' . $res]);
         }
     } else {
-        $response = ['status' => 'error', 'message' => 'Invalid action'];
+        echo json_encode(['status' => 'error', 'message' => 'Invalid action type specified.']);
     }
-
-    // Return response as JSON
-    echo json_encode($response);
+    exit;
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
 }
 ?>

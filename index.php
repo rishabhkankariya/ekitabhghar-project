@@ -1,6 +1,6 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 require_once 'php/connection.php';
 require_once 'admin/php/count.php';
@@ -2585,19 +2585,29 @@ require_once 'admin/php/fetch.php';
           <p class="text-lg text-slate-600 dark:text-slate-400 font-medium">Have questions? We're here to help.</p>
         </div>
         <form action="php/contact.php" method="POST" class="space-y-6">
-          <div class="space-y-2">
-            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
-            <input type="text" name="name" required
-              class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-5 py-4 focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all">
+          <!-- Honeypot -->
+          <input type="text" name="website" style="display:none !important" tabindex="-1" autocomplete="off">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
+              <input type="text" name="name" required placeholder="John Doe"
+                class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-5 py-4 focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
+              <input type="email" name="email" required placeholder="john@example.com"
+                class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-5 py-4 focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all">
+            </div>
           </div>
           <div class="space-y-2">
-            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
-            <input type="email" name="email" required
+            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Subject</label>
+            <input type="text" name="subject" required placeholder="How can we help?"
               class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-5 py-4 focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all">
           </div>
           <div class="space-y-2">
             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Your Message</label>
-            <textarea name="message" rows="4" required
+            <textarea name="message" rows="4" required placeholder="Tell us more about your inquiry..."
               class="w-full rounded-2xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-5 py-4 focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"></textarea>
           </div>
           <button type="submit" id="contactSubmitBtn"
@@ -3678,6 +3688,35 @@ require_once 'admin/php/fetch.php';
       }
     });
   </script>
+  <!-- Toast Trigger Logic -->
+  <?php
+  $toast_msg = '';
+  $toast_type = 'success';
+
+  if (isset($_SESSION['toast'])) {
+    $toast_msg = $_SESSION['toast']['message'];
+    $toast_type = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+  } elseif (isset($_GET['toast'])) {
+    if ($_GET['toast'] === 'success') {
+      $toast_msg = "Message sent successfully!";
+      $toast_type = 'success';
+    } elseif ($_GET['toast'] === 'error') {
+      $toast_msg = isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : "An error occurred.";
+      $toast_type = 'error';
+    }
+  }
+
+  if ($toast_msg): ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof showToast === 'function') {
+        showToast("<?= $toast_msg ?>", "<?= $toast_type ?>");
+      }
+    });
+  </script>
+  <?php endif; ?>
+
   <!-- Connectivity Handler -->
   <script src="js/connectivity.js"></script>
 </body>

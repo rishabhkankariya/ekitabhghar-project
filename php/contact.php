@@ -1,78 +1,85 @@
 <?php
-// --- DB Credentials ---
-$host = 'localhost';
-$dbname = 'ekitabhghar';
-$username = 'root';
-$password = '';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-require '../vendor/autoload.php'; // <-- Make sure this is correct path
+require_once 'connection.php';
+require_once '../config/send_mail.php';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    if (!$pdo) {
+        throw new PDOException("Database connection is not available.");
+    }
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        // Honepot field for basic spam protection
+        if (!empty($_POST['website'])) {
+            die("Spam detected.");
+        }
+
         // Get and sanitize input
         $name = htmlspecialchars(trim($_POST['name']));
         $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+        $subject_field = htmlspecialchars(trim($_POST['subject']));
         $message = htmlspecialchars(trim($_POST['message']));
 
+        // Basic Validation
+        if (empty($name) || empty($email) || empty($message) || empty($subject_field)) {
+            header("Location: ../index.php?toast=error&msg=All fields are required");
+            exit;
+        }
+
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            die("Invalid email format.");
+            header("Location: ../index.php?toast=error&msg=Invalid email format");
+            exit;
         }
 
-        // Store message
+        // Store message in database (Prepend subject until DB schema is updated)
+        $db_message = "Subject: $subject_field\n\n$message";
         $stmt = $pdo->prepare("INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)");
-        $stmt->execute([$name, $email, $message]);
+        $stmt->execute([$name, $email, $db_message]);
 
-        // Send Thanks Email using PHPMailer
-        $mail = new PHPMailer(true);
-
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'ekitabghar@gmail.com';  // Your Gmail
-            $mail->Password = 'pdfxjcyzffgskypq';   // App Password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
-
-            $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
-
-            $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar');
-            $mail->addAddress($email, $name);
-            $mail->isHTML(true);
-            $mail->Subject = "Thanks for reaching out to Kitabghar!";
-
-            $mail->Body = '
-            <div style="max-width:600px;margin:auto;padding:20px;border:1px solid #eee;border-radius:10px;font-family:Poppins,sans-serif;background:#fefefe;">
-                <h2 style="color:#4A90E2;text-align:center;">📬 Thank You, ' . htmlspecialchars($name) . '!</h2>
-                <p style="font-size:16px;color:#333;">We have received your message and our team will get back to you shortly.</p>
-                <div style="margin:20px 0;padding:15px;background:#f9f9f9;border-left:4px solid #4A90E2;">
-                    <strong>Your message:</strong><br>
-                    <p style="margin:5px 0;color:#555;">' . nl2br(htmlspecialchars($message)) . '</p>
-                </div>
-                <p style="font-size:14px;color:#777;">We appreciate you getting in touch with us. If your inquiry is urgent, please email us at <a href="mailto:ekitabghar@gmail.com">ekitabghar@gmail.com</a>.</p>
-                <hr style="margin:20px 0;">
-                <p style="font-size:13px;text-align:center;color:#aaa;">&copy; ' . date("Y") . ' Kitabghar. All rights reserved.</p>
+        // 1. Send "Thank You" email to the User
+        $userSubject = "Thank you for contacting Kitabghar - " . $subject_field;
+        $userBody = '
+        <div style="max-width:600px;margin:auto;padding:20px;border:1px solid #eee;border-radius:10px;font-family:sans-serif;background:#fefefe;">
+            <h2 style="color:#4A90E2;text-align:center;">📬 Hi ' . $name . '!</h2>
+            <p style="font-size:16px;color:#333;">We have received your message regarding "<strong>' . $subject_field . '</strong>" and we will get back to you shortly.</p>
+            <div style="margin:20px 0;padding:15px;background:#f9f9f9;border-left:4px solid #4A90E2;">
+                <strong>Your Message:</strong><br>
+                <p style="margin:5px 0;color:#555;">' . nl2br($message) . '</p>
             </div>
-            ';
+            <p style="font-size:14px;color:#777;">Regards,<br>Team Kitabghar</p>
+            <hr style="margin:20px 0;">
+            <p style="font-size:11px;text-align:center;color:#aaa;">&copy; ' . date("Y") . ' Kitabghar. All rights reserved.</p>
+        </div>';
 
-            $mail->send();
-            // Optionally show a success toast on frontend
-            header("Location: ../index.php?toast=success");
-            exit;
+        sendEmail($email, $name, $userSubject, $userBody);
 
-        } catch (Exception $e) {
-            // Just insert message, fail silently if email doesn't go
-            header("Location: ../index.php?toast=email_fail");
-            exit;
-        }
+        // 2. Send "New Message" notification to the Admin
+        $adminEmail = getenv('SMTP_USER') ?: 'ekitabghar@gmail.com';
+        $adminSubject = "New Support Request: " . $subject_field;
+        $adminBody = "
+        <div style='font-family:sans-serif; padding:20px; border:1px solid #ddd; border-radius:10px;'>
+            <h2 style='color:#FF5722;'>📢 New Support Request</h2>
+            <p><strong>From:</strong> {$name} ({$email})</p>
+            <p><strong>Subject:</strong> {$subject_field}</p>
+            <p><strong>Message:</strong><br>" . nl2br($message) . "</p>
+            <br>
+            <p><a href='" . (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/admin/admin_contact_support.php' 
+               style='background:#4CAF50; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;'>Open Admin Dashboard</a></p>
+        </div>";
+
+        sendEmail($adminEmail, 'Admin', $adminSubject, $adminBody);
+
+        // Success redirect
+        $_SESSION['toast'] = ['type' => 'success', 'message' => 'Message sent successfully!'];
+        header("Location: ../index.php?toast=success");
+        exit;
     }
 
 } catch (PDOException $e) {
-    die("💥 DB Error: " . $e->getMessage());
+    error_log("Contact form error: " . $e->getMessage());
+    header("Location: ../index.php?toast=error&msg=System error. Please try again later.");
+    exit;
 }
-?>

@@ -28,14 +28,14 @@ if (isset($_POST['create'])) {
                     'type' => 'success',
                     'message' => 'Video Uploaded Successfully!'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
             } else {
                 $_SESSION['toast'] = [
                     'type' => 'error',
                     'message' => 'Failed to insert video into the database.'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
             }
         } else {
@@ -43,7 +43,7 @@ if (isset($_POST['create'])) {
                 'type' => 'error',
                 'message' => 'Failed to move uploaded video.'
             ];
-            header("Location: /website/admin/adminpanel.php");
+            header("Location: /admin/adminpanel.php");
             exit();
         }
     } else {
@@ -51,7 +51,7 @@ if (isset($_POST['create'])) {
             'type' => 'error',
             'message' => 'File upload failed. Error code: ' . $video['error']
         ];
-        header("Location: /website/admin/adminpanel.php");
+        header("Location: /admin/adminpanel.php");
         exit();
     }
 }
@@ -78,14 +78,14 @@ if (isset($_POST['delete_video'])) {
                     'type' => 'error',
                     'message' => 'Video Deleted successfully!'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
                 } else {
                     $_SESSION['toast'] = [
                         'type' => 'error',
                         'message' => 'Failed to delete video from the database.'
                     ];
-                    header("Location: /website/admin/adminpanel.php");
+                    header("Location: /admin/adminpanel.php");
                     exit();
                 }
             } else {
@@ -93,7 +93,7 @@ if (isset($_POST['delete_video'])) {
                         'type' => 'error',
                         'message' => 'Failed to delete video file from the server.'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
             }
         } else {
@@ -101,7 +101,7 @@ if (isset($_POST['delete_video'])) {
                 'type' => 'error',
                 'message' => 'Video file does not exist: ' . $video_path
             ];
-            header("Location: /website/admin/adminpanel.php");
+            header("Location: /admin/adminpanel.php");
             exit();
         }
     } 

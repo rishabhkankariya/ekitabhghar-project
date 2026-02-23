@@ -1,7 +1,8 @@
 <?php
 session_start();
+require_once '../php/connection.php';
 
-$special_admin_password = "poly_ekitabghar@2025"; // Change this to your secure password
+$special_admin_password = getenv('SPECIAL_ADMIN_PASSWORD');
 $error = ""; // Variable to store error messages
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {

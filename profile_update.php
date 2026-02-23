@@ -2,9 +2,7 @@
 session_start();
 require_once 'php/connection.php';
 
-require 'vendor/autoload.php';
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require_once 'config/send_mail.php';
 
 if (!isset($_SESSION['user_email'])) {
   header("Location: student_login.html");
@@ -132,36 +130,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ];
 
                 // Send OTP to OLD/Current email for verification
-                $mail = new PHPMailer(true);
-                try {
-                  $mail->isSMTP();
-                  $mail->Host = 'smtp.gmail.com';
-                  $mail->SMTPAuth = true;
-                  $mail->Password = 'pdfxjcyzffgskypq';
-                  $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                  $mail->Port = 587;
+                $subject = 'Security Verification - Profile Update';
+                $body = "
+                  <div style='font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; background: #f8fafc; border-radius: 20px;'>
+                    <h2 style='color: #1e40af; text-align: center;'>Email Verification</h2>
+                    <p>Hello <strong>{$user['full_name']}</strong>,</p>
+                    <p>To finalize your profile update" . ($changingEmail ? " and verify your new email" : "") . ", please use the code below:</p>
+                    <div style='text-align: center; margin: 30px 0;'>
+                      <span style='font-size: 32px; font-weight: bold; color: #2563eb; background: #eff6ff; padding: 15px 30px; border-radius: 10px; border: 2px dashed #bfdbfe;'>$otp</span>
+                    </div>
+                    <p style='text-align: center; color: #ef4444; font-size: 13px;'>If you didn't request this, please ignore this email.</p>
+                  </div>";
 
-                  $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
-                  $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar');
-                  $mail->addAddress($new_email);
-                  $mail->isHTML(true);
-                  $mail->Subject = 'Security Verification - Profile Update';
-                  $mail->Body = "
-                    <div style='font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; background: #f8fafc; border-radius: 20px;'>
-                      <h2 style='color: #1e40af; text-align: center;'>Email Verification</h2>
-                      <p>Hello <strong>{$user['full_name']}</strong>,</p>
-                      <p>To finalize your profile update" . ($changingEmail ? " and verify your new email" : "") . ", please use the code below:</p>
-                      <div style='text-align: center; margin: 30px 0;'>
-                        <span style='font-size: 32px; font-weight: bold; color: #2563eb; background: #eff6ff; padding: 15px 30px; border-radius: 10px; border: 2px dashed #bfdbfe;'>$otp</span>
-                      </div>
-                      <p style='text-align: center; color: #ef4444; font-size: 13px;'>If you didn't request this, please ignore this email.</p>
-                    </div>";
-                  $mail->send();
+                $res = sendEmail($new_email, $user['full_name'], $subject, $body);
+
+                if ($res === true) {
                   $_SESSION['profile_update_otp_sent'] = true;
                   $showOtpForm = true;
                   $message = "Verification code sent to your current email.";
                   $messageType = "success";
-                } catch (Exception $e) {
+                } else {
                   $message = "Failed to send verification code.";
                   $messageType = "error";
                 }

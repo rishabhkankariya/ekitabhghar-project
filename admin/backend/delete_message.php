@@ -18,14 +18,7 @@ if (!$message_id || !is_numeric($message_id)) {
     exit();
 }
 
-// 📝 Database connection using mysqli
-$conn = new mysqli("localhost", "cse", "cse", "ekitabhghar");
-
-// 🚨 Check for connection error
-if ($conn->connect_error) {
-    echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
-    exit();
-}
+require_once '../../php/connection.php';
 
 // 📝 Database deletion query using mysqli
 $sql = "DELETE FROM contact_messages WHERE id = ?";

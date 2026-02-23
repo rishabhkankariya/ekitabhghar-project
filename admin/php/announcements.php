@@ -25,7 +25,7 @@ if (isset($_POST['create'])) {
         ];
     }
 
-    header("Location: /website/admin/adminpanel.php");
+    header("Location: /admin/adminpanel.php");
     exit();
 }
 
@@ -48,7 +48,7 @@ if (isset($_POST['delete'])) {
         ];
     }
 
-    header("Location: /website/admin/adminpanel.php");
+    header("Location: /admin/adminpanel.php");
     exit();
 }
 

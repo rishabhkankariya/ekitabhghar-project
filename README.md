@@ -36,7 +36,7 @@ Kitabghar is a comprehensive web-based platform designed to bridge the gap betwe
 
 ## 4. Folder Structure
 ```text
-/website
+/ (Root)
 ├── admin/              # Admin panel files & logic
 │   ├── php/            # Admin-specific backend scripts
 │   └── ...
@@ -57,7 +57,7 @@ Kitabghar is a comprehensive web-based platform designed to bridge the gap betwe
 
 ### A. Local Setup (XAMPP/WAMP)
 1.  **Download Request**: Clone or download this repository.
-2.  **Move Files**: Place the `website` folder inside `C:\xampp\htdocs\`.
+2.  **Move Files**: Place the project files directly inside `C:\xampp\htdocs\`.
 3.  **Database**:
     - Open phpMyAdmin (`http://localhost/phpmyadmin`).
     - Create a database named `ekitabhghar`.
@@ -65,7 +65,7 @@ Kitabghar is a comprehensive web-based platform designed to bridge the gap betwe
 4.  **Configuration**:
     - Open `php/connection.php`.
     - Updates credentials if you changed the default root/empty password.
-5.  **Run**: Open `http://localhost/website/index.php` in your browser.
+5.  **Run**: Open `http://localhost/index.php` in your browser.
 
 ### B. Hosting Setup (cPanel / Shared Hosting)
 1.  **Upload Files**:
@@ -134,7 +134,7 @@ CREATE TABLE `admin` (
 | **Connection Failed** | Wrong DB credentials | Check `php/connection.php` username/password. |
 | **Email not sending** | SMTP blocked / Wrong Pass | Enable "Less Secure Apps" or Generate "App Password" in Google Account. |
 | **CAPTCHA broken** | GD Library missing | Enable `extension=gd` in hosting `php.ini`. |
-| **404 on Redirect** | Hardcoded Paths | Search for `/website/` in code and change to `/` if on root domain. |
+| **404 on Redirect** | Hardcoded Paths | Search for `/` in code and change to `/` if on root domain. |
 
 ## 10. Security Notes
 - **HTTPS**: Always use SSL (https://) to protect login data.

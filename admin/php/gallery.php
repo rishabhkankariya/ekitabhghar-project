@@ -72,14 +72,14 @@ if (isset($_POST['create'])) {
                     ];
                 }
 
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
             } else {
                 $_SESSION['toast'] = [
                     'type' => 'error',
                     'message' => 'Image resize failed.'
                 ];
-                header("Location: /website/admin/adminpanel.php");
+                header("Location: /admin/adminpanel.php");
                 exit();
             }
         } else {
@@ -87,7 +87,7 @@ if (isset($_POST['create'])) {
                 'type' => 'error',
                 'message' => 'Failed to move uploaded image.'
             ];
-            header("Location: /website/admin/adminpanel.php");
+            header("Location: /admin/adminpanel.php");
             exit();
         }
     } else {
@@ -95,7 +95,7 @@ if (isset($_POST['create'])) {
             'type' => 'error',
             'message' => 'Image upload error. Please try again.'
         ];
-        header("Location: /website/admin/adminpanel.php");
+        header("Location: /admin/adminpanel.php");
         exit();
     }
 }
@@ -133,7 +133,7 @@ if (isset($_POST['delete_image'])) {
         ];
     }
 
-    header("Location: /website/admin/adminpanel.php");
+    header("Location: /admin/adminpanel.php");
     exit();
 }
 

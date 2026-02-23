@@ -75,7 +75,7 @@ function addQuestionPaper()
     $semester = $_POST['semester'];
     $subject_name = $_POST['subject_name'];
 
-    // Paths relative to this php file (website/php/)
+    // Paths relative to this php file (php/)
     $baseNotesDir = "../notes/notes/";
     $baseImagesDir = "../notes/images/";
 

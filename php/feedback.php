@@ -1,17 +1,8 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require_once '../config/send_mail.php';
+require_once 'connection.php';
 
-require '../vendor/autoload.php';
-
-// Database Connection
-$servername = "localhost";
-$username = "root"; // Change if necessary
-$password = ""; // Change if necessary
-$database = "ekitabhghar";
-
-$conn = new mysqli($servername, $username, $password, $database);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -33,43 +24,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($conn->query($sql) === TRUE) {
         // Send Email
-        $mail = new PHPMailer(true);
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'ekitabghar@gmail.com'; // Your email
-            $mail->Password = 'pdfxjcyzffgskypq';  // App Password (Generated from Google)
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
+        $subject = 'Thank You for Your Feedback!';
+        $body = "
+            <p>Dear <strong>$name</strong>,</p>
+            <p>Thank you for your valuable feedback! We appreciate your time and effort in helping us improve our services.</p>
+            <p><strong>Your Rating:</strong> $rating/5</p>
+            <p><strong>Your Message:</strong> $message</p>
+            <hr>
+            <p>Best Regards,<br><strong>Kitabghar Team</strong></p>
+            <p style='font-size:12px;color:#777;'>This is an automated email. Please do not reply.</p>";
 
-        $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
-            $mail->CharSet = 'UTF-8';
-
-            // Email Headers for better deliverability
-            $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar');
-            $mail->addReplyTo('support@kitabghar.com', 'Kitabghar Support'); // Custom Reply-To
-            $mail->addAddress($email);
-            $mail->addCustomHeader("X-Mailer", "PHP/" . phpversion());
-            $mail->addCustomHeader("Return-Path", "support@kitabghar.com");
-
-            // Email Content
-            $mail->isHTML(true);
-            $mail->Subject = 'Thank You for Your Feedback!';
-            $mail->Body = "
-                <p>Dear <strong>$name</strong>,</p>
-                <p>Thank you for your valuable feedback! We appreciate your time and effort in helping us improve our services.</p>
-                <p><strong>Your Rating:</strong> $rating/5</p>
-                <p><strong>Your Message:</strong> $message</p>
-                <hr>
-                <p>Best Regards,<br><strong>Kitabghar Team</strong></p>
-                <p style='font-size:12px;color:#777;'>This is an automated email. Please do not reply.</p>
-            ";
-
-            $mail->send();
+        $res = sendEmail($email, $name, $subject, $body);
+        if ($res === true) {
             echo "<script>alert('Feedback submitted successfully!'); window.location.href = '../feedback.html';</script>";
-        } catch (Exception $e) {
-            error_log("Mail Error: " . $mail->ErrorInfo); // Log the error
+        } else {
             echo "<script>alert('Feedback submitted, but email could not be sent.'); window.location.href = '../feedback.html';</script>";
         }
     } else {
@@ -79,4 +47,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $conn->close();
 ?>
-

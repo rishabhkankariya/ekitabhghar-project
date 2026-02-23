@@ -9,10 +9,7 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 require_once '../../php/connection.php';
-require '../../vendor/autoload.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require_once '../../config/send_mail.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get JSON input
@@ -79,57 +76,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Function to send email
 function sendAccessEmail($to, $name)
 {
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'ekitabghar@gmail.com';
-        $mail->Password = 'pdfxjcyzffgskypq';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        // SSL verification bypass (if needed for local dev)
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
-
-        $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar Admin');
-        $mail->addAddress($to, $name);
-        $mail->addReplyTo('no-reply@ekitabghar.in', 'No Reply');
-
-        $mail->isHTML(true);
-        $mail->Subject = 'Exam Form Edit Access Granted';
-
-        $mail->Body = "
-        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto;'>
-            <div style='background-color: #4f46e5; color: #fff; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;'>
-                <h2>🔓 Action Required: Edit Access Granted</h2>
+    $subject = 'Exam Form Edit Access Granted';
+    $body = "
+    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto;'>
+        <div style='background-color: #4f46e5; color: #fff; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;'>
+            <h2>🔓 Action Required: Edit Access Granted</h2>
+        </div>
+        <div style='background-color: #f9fafb; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb;'>
+            <p>Dear <strong>$name</strong>,</p>
+            <p>The administrator has granted you permission to <strong>edit your exam form</strong>.</p>
+            <p>You can now log in to the student portal and make the necessary changes to your application. Please ensure all details are correct before re-submitting.</p>
+            
+             <div style='text-align: center; margin: 30px 0;'>
+                <a href='http://localhost/student_login.html' style='background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Login to Edit</a>
             </div>
-            <div style='background-color: #f9fafb; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb;'>
-                <p>Dear <strong>$name</strong>,</p>
-                <p>The administrator has granted you permission to <strong>edit your exam form</strong>.</p>
-                <p>You can now log in to the student portal and make the necessary changes to your application. Please ensure all details are correct before re-submitting.</p>
-                
-                 <div style='text-align: center; margin: 30px 0;'>
-                    <a href='http://localhost/website/student_login.html' style='background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Login to Edit</a>
-                </div>
 
-                <p style='margin-top: 30px; font-size: 13px; color: #6b7280; text-align: center;'>This is an automated message. Please do not reply directly to this email.</p>
-            </div>
-        </div>";
+            <p style='margin-top: 30px; font-size: 13px; color: #6b7280; text-align: center;'>This is an automated message. Please do not reply directly to this email.</p>
+        </div>
+    </div>";
 
-        $mail->AltBody = "Dear $name,\n\nThe administrator has granted you permission to edit your exam form.\n\nPlease log in to the student portal to update your details.\n\nThank you.";
-
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        error_log("Mail Error: " . $mail->ErrorInfo);
-        return false;
-    }
+    return sendEmail($to, $name, $subject, $body) === true;
 }
 ?>

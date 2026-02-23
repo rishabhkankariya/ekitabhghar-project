@@ -6,8 +6,10 @@
  * Access: health_check.php?token=ekitabhghar_prod_2026
  */
 
+require_once 'php/env_loader.php';
+
 // --- SECURITY TOKEN ---
-$secretToken = 'ekitabhghar_prod_2026';
+$secretToken = getenv('HEALTH_CHECK_TOKEN');
 
 if (!isset($_GET['token']) || $_GET['token'] !== $secretToken) {
     header('HTTP/1.1 403 Forbidden');
@@ -380,7 +382,7 @@ $status = ($failed === 0) ? 'HEALTHY' : 'CRITICAL';
                         <span class="item-msg"><?php echo htmlspecialchars($item['message']); ?></span>
                     </div>
                     <div class="item-status-text text-<?php echo strtolower($item['status']); ?>">
-                            <?php echo $item['status']; ?>
+                        <?php echo $item['status']; ?>
                     </div>
                 </div>
             <?php endforeach; ?>

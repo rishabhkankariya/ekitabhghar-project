@@ -26,7 +26,7 @@ if ($action === "fetch") {
             'year' => $row['year'],
             'semester' => $row['semester'],
             'subject_name' => $row['subject_name'],
-            'pdf' => '/website/' . htmlspecialchars($row['pdf_path'])
+            'pdf' => '/' . htmlspecialchars($row['pdf_path'])
         ];
     }
 

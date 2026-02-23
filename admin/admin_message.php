@@ -5,9 +5,7 @@ if (!isset($_SESSION['admin_id'])) {
   exit();
 }
 
-require '../vendor/autoload.php'; // Ensure PHPMailer is installed
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require_once '../config/send_mail.php';
 
 require '../php/connection.php';
 $conn1 = $conn;
@@ -59,53 +57,37 @@ $sql_messages = "SELECT * FROM messages ORDER BY sent_at DESC";
 $result_messages = $conn1->query($sql_messages);
 
 // Function to Send Email Notification
-function sendNotificationEmail($message)
+function sendNotificationEmail($messageContent)
 {
   global $conn1;
-  $mail = new PHPMailer(true);
 
-  try {
-    $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
-    $mail->SMTPAuth = true;
-    $mail->Username = 'ekitabghar@gmail.com'; // Your email
-    $mail->Password = 'pdfx jcyz ffgs kypq';  // Use Google App Password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
+  $subject = 'New Notification from E-Kitabghar!';
+  $emailBody = "
+          <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
+              <h2 style='color: #4CAF50;'>📢 New Notification Received</h2>
+              <p>Dear Student,</p>
+              <p>You have received a new message from <strong>E-Kitabghar</strong>:</p>
+              <p>✅ <strong>Please check your student dashboard</strong> for more details.</p>
+              <br>
+              <p>Best Regards,</p>
+              <p><strong>E-Kitabghar Team</strong></p>
+          </div>";
 
-    $mail->setFrom('ekitabghar@gmail.com', 'E-Kitabghar');
-    $mail->isHTML(true);
-    $mail->Subject = 'New Notification from E-Kitabghar!';
+  // Fetch all student emails
+  $bcc = [];
+  $sql = "SELECT email FROM student_accounts";
+  $result = $conn1->query($sql);
 
-    $emailBody = "
-            <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
-                <h2 style='color: #4CAF50;'>📢 New Notification Received</h2>
-                <p>Dear Student,</p>
-                <p>You have received a new message from <strong>E-Kitabghar</strong>:</p>
-                <p>✅ <strong>Please check your student dashboard</strong> for more details.</p>
-                <br>
-                <p>Best Regards,</p>
-                <p><strong>E-Kitabghar Team</strong></p>
-            </div>
-        ";
-
-    // Fetch all student emails - Using student_accounts for accuracy
-    $sql = "SELECT email FROM student_accounts";
-    $result = $conn1->query($sql);
-
-    if ($result) {
-      while ($row = $result->fetch_assoc()) {
-        if (!empty($row['email'])) {
-          $mail->addBCC($row['email']);
-        }
+  if ($result) {
+    while ($row = $result->fetch_assoc()) {
+      if (!empty($row['email'])) {
+        $bcc[] = $row['email'];
       }
     }
+  }
 
-    $mail->Body = $emailBody;
-    $mail->send();
-
-  } catch (Exception $e) {
-    error_log("Email failed: " . $mail->ErrorInfo);
+  if (!empty($bcc)) {
+    sendEmail(null, '', $subject, $emailBody, '', $bcc);
   }
 }
 
@@ -209,7 +191,8 @@ function sendNotificationEmail($message)
                     <div>
                       <div class="text-sm font-bold text-slate-900"><?= htmlspecialchars($row['admin_name']) ?></div>
                       <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
-                        <?= date("M d, Y • h:i A", strtotime($row['sent_at'])) ?></div>
+                        <?= date("M d, Y • h:i A", strtotime($row['sent_at'])) ?>
+                      </div>
                     </div>
                   </div>
                   <form method="POST" action="../php/delete_message.php"
@@ -222,7 +205,8 @@ function sendNotificationEmail($message)
                   </form>
                 </div>
                 <div class="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap px-1">
-                  <?= htmlspecialchars($row['message']) ?></div>
+                  <?= htmlspecialchars($row['message']) ?>
+                </div>
               </div>
             <?php endwhile; ?>
           <?php else: ?>

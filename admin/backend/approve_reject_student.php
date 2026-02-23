@@ -10,19 +10,9 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Load PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-require '../../vendor/autoload.php';
+require_once '../../config/send_mail.php';
+require_once '../../php/connection.php';
 
-// DB Config
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "ekitabhghar";
-
-// DB connection
-$conn = new mysqli($servername, $username, $password, $database);
 if ($conn->connect_error) {
     die(json_encode(['status' => 'error', 'message' => "DB connection failed: " . $conn->connect_error]));
 }
@@ -52,7 +42,7 @@ if ($input && isset($input['action']) && isset($input['ids'])) {
             $update = $conn->prepare("UPDATE students SET status = 'approved' WHERE id = ?");
             $update->bind_param("i", $id);
             if ($update->execute()) {
-                sendEmail($student['email_id'], $student['student_name'], "Exam Form Approved", "Your exam form has been approved ✅.");
+                sendEmail($student['email_id'], $student['student_name'], "Exam Form Approved", prepareHtml($student['student_name'], "Your exam form has been approved ✅."));
             }
             $update->close();
         } elseif ($action === 'reject') {
@@ -67,7 +57,7 @@ if ($input && isset($input['action']) && isset($input['ids'])) {
                 $delete->execute();
 
                 $conn->commit();
-                sendEmail($student['email_id'], $student['student_name'], "Exam Form Rejected", "Your exam form has been rejected ❌. Reason: $reason");
+                sendEmail($student['email_id'], $student['student_name'], "Exam Form Rejected", prepareHtml($student['student_name'], "Your exam form has been rejected ❌. Reason: $reason"));
             } catch (Exception $e) {
                 $conn->rollback();
             }
@@ -77,52 +67,20 @@ if ($input && isset($input['action']) && isset($input['ids'])) {
     exit();
 }
 
-// Email Function
-function sendEmail($email, $name, $subject, $message)
+// Helper to prepare HTML
+function prepareHtml($name, $message)
 {
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'ekitabghar@gmail.com';
-        $mail->Password = 'pdfxjcyzffgskypq'; // Use app password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        $mail->SMTPOptions = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false, 'allow_self_signed' => true));
-
-        // Fix for SSL verification issues on local/some environments
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
-
-        $mail->setFrom('ekitabghar@gmail.com', 'Kitabghar Exam Form');
-        $mail->addAddress($email);
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-
-        $mail->Body = "
-        <div style='max-width: 600px; margin: auto; font-family: Arial, sans-serif;'>
-            <div style='background: #0d6efd; padding: 20px; color: white; text-align: center; font-size: 24px; border-radius: 10px 10px 0 0;'>
-                <i class='bi bi-envelope-check'></i> Exam Form Notification
-            </div>
-            <div style='padding: 20px; background: #f9f9f9; border-radius: 0 0 10px 10px;'>
-                <p style='font-size: 18px;'>Dear <strong>$name</strong>,</p>
-                <p style='font-size: 16px;'>$message</p>
-                <p style='font-size: 14px; color: #777; margin-top: 20px; text-align: center;'>This is an automated email. Please do not reply.</p>
-            </div>
-        </div>";
-
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        return false;
-    }
+    return "
+    <div style='max-width: 600px; margin: auto; font-family: Arial, sans-serif;'>
+        <div style='background: #0d6efd; padding: 20px; color: white; text-align: center; font-size: 24px; border-radius: 10px 10px 0 0;'>
+            Exam Form Notification
+        </div>
+        <div style='padding: 20px; background: #f9f9f9; border-radius: 0 0 10px 10px;'>
+            <p style='font-size: 18px;'>Dear <strong>$name</strong>,</p>
+            <p style='font-size: 16px;'>$message</p>
+            <p style='font-size: 14px; color: #777; margin-top: 20px; text-align: center;'>This is an automated email. Please do not reply.</p>
+        </div>
+    </div>";
 }
 
 // Handle Approve/Reject
@@ -158,7 +116,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $update->close();
 
         if ($success) {
-            if (sendEmail($email, $name, $subject, $message)) {
+            if (sendEmail($email, $name, $subject, prepareHtml($name, $message)) === true) {
                 $_SESSION['message'] = "<i class='bi bi-check-circle-fill text-success'></i> Student approved and email sent.";
                 $_SESSION['message_type'] = "success";
             } else {
@@ -212,7 +170,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             $conn->commit();
 
             // Only attempt email after successful DB transaction
-            if (sendEmail($email, $name, $subject, $message)) {
+            if (sendEmail($email, $name, $subject, prepareHtml($name, $message)) === true) {
                 $_SESSION['message'] = "<i class='bi bi-trash-fill text-danger'></i> Student rejected, archived & email sent.";
                 $_SESSION['message_type'] = "danger";
             } else {
@@ -237,7 +195,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $update->close();
 
         if ($success) {
-            if (sendEmail($email, $name, $subject, $message)) {
+            if (sendEmail($email, $name, $subject, prepareHtml($name, $message)) === true) {
                 $_SESSION['message'] = "<i class='bi bi-check-circle-fill text-primary'></i> Student can now edit their form. Email sent.";
                 $_SESSION['message_type'] = "primary";
             } else {
