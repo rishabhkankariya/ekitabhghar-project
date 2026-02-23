@@ -7,8 +7,11 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "", "ekitabhghar");
-if ($conn->connect_error) die("DB Error: " . $conn->connect_error);
+require_once '../../php/connection.php';
+// session_start() is already called after require_once for autoload.php
+// but connection.php might also start session if not started.
+if ($conn->connect_error)
+    die("DB Error: " . $conn->connect_error);
 
 $imageDir = realpath(__DIR__ . '/../../../php/image/') . '/';
 $challanDir = realpath(__DIR__ . '/../../../php/challans/') . '/';
@@ -19,8 +22,10 @@ $defaultSign = $uploadDir . 'default_sign.png';
 $hodSignPath = $uploadDir . 'hod_sign.png';
 $logoPath = $uploadDir . 'gpcu.png';
 
-function getBase64Img($filePath) {
-    if (!file_exists($filePath)) return '';
+function getBase64Img($filePath)
+{
+    if (!file_exists($filePath))
+        return '';
     $ext = pathinfo($filePath, PATHINFO_EXTENSION);
     $data = base64_encode(file_get_contents($filePath));
     return 'data:image/' . $ext . ';base64,' . $data;
@@ -182,5 +187,10 @@ while ($student = $students->fetch_assoc()) {
 }
 
 $mpdf->WriteHTML($html);
-$mpdf->Output('student_report.pdf', 'I');
+$mode = $_GET['mode'] ?? 'I';
+if (!in_array($mode, ['I', 'D']))
+    $mode = 'I';
+
+$filename = 'Student_Report_' . date('Y-m-d') . '.pdf';
+$mpdf->Output($filename, $mode);
 ?>

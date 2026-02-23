@@ -112,6 +112,8 @@ if (isset($_GET['delete_id'])) {
 function sendCredentialEmail($to, $name, $roll, $pass)
 {
     $mail = new PHPMailer(true);
+    $mail->SMTPDebug = 2;
+    $mail->Debugoutput = 'html';
     try {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
@@ -408,23 +410,28 @@ $branches = [
                                                     </div>
                                                     <div>
                                                         <div class="font-bold text-slate-800">
-                                                            <?= htmlspecialchars($row['full_name']) ?></div>
+                                                            <?= htmlspecialchars($row['full_name']) ?>
+                                                        </div>
                                                         <div
                                                             class="text-[11px] text-slate-400 font-medium tracking-wider uppercase">
-                                                            <?= $row['roll_no'] ?></div>
+                                                            <?= $row['roll_no'] ?>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-4 py-4">
                                                 <div class="text-slate-700 font-medium">
-                                                    <?= htmlspecialchars($row['course']) ?></div>
+                                                    <?= htmlspecialchars($row['course']) ?>
+                                                </div>
                                                 <div class="text-[11px] text-slate-400"><?= $row['admission_year'] ?> -
-                                                    <?= $row['expected_passing_year'] ?></div>
+                                                    <?= $row['expected_passing_year'] ?>
+                                                </div>
                                             </td>
                                             <td class="px-4 py-4">
                                                 <div class="text-slate-600"><?= htmlspecialchars($row['email']) ?></div>
                                                 <div class="text-[11px] text-slate-400">
-                                                    <?= $row['phone_number'] ?: 'No Phone' ?></div>
+                                                    <?= $row['phone_number'] ?: 'No Phone' ?>
+                                                </div>
                                             </td>
                                             <td class="px-4 py-4">
                                                 <?php if ($row['account_status'] == 'active'): ?>

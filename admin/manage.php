@@ -1114,7 +1114,7 @@ if (!isset($_SESSION['admin_id'])) {
     // 🚀 DOWNLOAD PDF
     function downloadStudentList() {
       const link = document.createElement('a');
-      link.href = "backend/listmaker/generate_student_pdf.php";
+      link.href = "backend/listmaker/generate_student_pdf.php?mode=D";
       link.download = "Student_List.pdf"; // This only works if headers are set correctly in PHP
       document.body.appendChild(link);
       link.click();
