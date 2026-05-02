@@ -8,18 +8,18 @@ $dbname = getenv('DB_NAME');
 
 date_default_timezone_set("Asia/Kolkata");
 
-/* MySQLi */
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
-if ($conn->connect_error) {
-    die("MySQLi Connection failed: " . $conn->connect_error);
-}
-
-/* PDO */
+/* PostgreSQL PDO Connection */
 try {
-    $dsn = "mysql:host=$servername;port=$port;dbname=$dbname;charset=utf8mb4";
+    $dsn = "pgsql:host=$servername;port=$port;dbname=$dbname";
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("PDO Connection failed: " . $e->getMessage());
+    die("PostgreSQL Connection failed: " . $e->getMessage());
 }
+
+/* Legacy MySQLi compatibility - Remove this section after migration */
+// Note: MySQLi doesn't support PostgreSQL, so we'll use PDO for all database operations
+// If you have code using $conn (MySQLi), it needs to be updated to use $pdo instead
+$conn = null; // Placeholder to prevent errors during migration
 ?>
