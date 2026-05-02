@@ -26,3 +26,9 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Enable rewrite
 RUN a2enmod rewrite
+
+# Expose port 80 for Render
+EXPOSE 80
+
+# Start Apache in foreground
+CMD ["apache2-foreground"]
