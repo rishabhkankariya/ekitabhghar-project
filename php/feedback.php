@@ -3,16 +3,12 @@
 require_once '../config/send_mail.php';
 require_once 'connection.php';
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = htmlspecialchars(trim($conn->real_escape_string($_POST['name'])));
+    $name = htmlspecialchars(trim($_POST['name']));
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ? $_POST['email'] : null;
     $rating = (int) $_POST['rating'];
-    $message = htmlspecialchars(trim($conn->real_escape_string($_POST['message'])));
+    $message = htmlspecialchars(trim($_POST['message']));
 
     if (!$email) {
         echo "<script>alert('Invalid email address!'); window.history.back();</script>";
@@ -20,9 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert into database
-    $sql = "INSERT INTO feedback (name, email, rating, message) VALUES ('$name', '$email', '$rating', '$message')";
+    $stmt = $pdo->prepare("INSERT INTO feedback (name, email, rating, message) VALUES (?, ?, ?, ?)");
 
-    if ($conn->query($sql) === TRUE) {
+    if ($stmt->execute([$name, $email, $rating, $message])) {
         // Send Email
         $subject = 'Thank You for Your Feedback!';
         $body = "
@@ -38,9 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // $res = sendEmail($email, $name, $subject, $body);
         echo "<script>alert('Feedback submitted successfully!'); window.location.href = '../feedback.html';</script>";
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        echo "Error submitting feedback.";
     }
 }
-
-$conn->close();
 ?>

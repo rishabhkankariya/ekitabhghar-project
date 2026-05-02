@@ -38,12 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = trim($_POST["admin_password"]);
 
     $sql = "SELECT * FROM admin WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $admin = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$username]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($admin && password_verify($password, $admin['password'])) {
         $_SESSION["admin_logged_in"] = true;

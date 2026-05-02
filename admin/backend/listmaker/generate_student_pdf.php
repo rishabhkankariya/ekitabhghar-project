@@ -8,10 +8,9 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 require_once '../../php/connection.php';
-// session_start() is already called after require_once for autoload.php
-// but connection.php might also start session if not started.
-if ($conn->connect_error)
-    die("DB Error: " . $conn->connect_error);
+
+if (!$pdo)
+    die("DB Error: Connection failed");
 
 $imageDir = realpath(__DIR__ . '/../../../php/image/') . '/';
 $challanDir = realpath(__DIR__ . '/../../../php/challans/') . '/';
@@ -77,8 +76,8 @@ $html = '
     <h1>All Students Report</h1>
 </div>';
 
-$students = $conn->query("SELECT * FROM students");
-while ($student = $students->fetch_assoc()) {
+$stmt_students = $pdo->query("SELECT * FROM students");
+while ($student = $stmt_students->fetch(PDO::FETCH_ASSOC)) {
     $id = $student['id'];
 
     $photoPath = file_exists($imageDir . basename($student['student_photo'])) ? $imageDir . basename($student['student_photo']) : $defaultPhoto;
@@ -90,11 +89,9 @@ while ($student = $students->fetch_assoc()) {
     $exSubjects = json_decode($student['ex_subjects'], true) ?: [];
 
     $challans = [];
-    $stmt = $conn->prepare("SELECT * FROM challans WHERE student_id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $challan_result = $stmt->get_result();
-    while ($row = $challan_result->fetch_assoc()) {
+    $stmt = $pdo->prepare("SELECT * FROM challans WHERE student_id = ?");
+    $stmt->execute([$id]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $fileFullPath = $challanDir . basename($row['file_path']);
         if (file_exists($fileFullPath)) {
             $row['base64'] = base64_encode(file_get_contents($fileFullPath));

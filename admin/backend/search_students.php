@@ -1,61 +1,37 @@
 <?php
+require_once '../../php/connection.php';
 
-// Database Connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "ekitabhghar";
+$query = isset($_GET['query']) ? '%' . $_GET['query'] . '%' : '%';
 
-$conn = new mysqli($servername, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$stmt = $pdo->prepare("SELECT * FROM students 
+    WHERE student_name LIKE ? OR roll_no LIKE ? OR course_type LIKE ?
+    OR current_semester LIKE ? OR category LIKE ? OR status LIKE ? OR CAST(exam_date AS TEXT) LIKE ?");
+$stmt->execute([$query, $query, $query, $query, $query, $query, $query]);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get query
-$query = isset($_GET['query']) ? $_GET['query'] : '';
-$query = mysqli_real_escape_string($conn, $query);
-
-// Match query with multiple fields
-$sql = "SELECT * FROM students 
-        WHERE student_name LIKE '%$query%' 
-        OR roll_no LIKE '%$query%' 
-        OR course_type LIKE '%$query%'
-        OR current_semester LIKE '%$query%' 
-        OR category LIKE '%$query%' 
-        OR status LIKE '%$query%'
-        OR exam_date LIKE '%$query%'";
-
-$result = mysqli_query($conn, $sql);
-
-if ($result && mysqli_num_rows($result) > 0) {
+if (count($rows) > 0) {
     echo "<table class='min-w-full border border-gray-200 rounded-xl overflow-hidden'>";
     echo "<thead><tr class='bg-gray-100 text-left'>
-            <th class='px-4 py-2'>S.No</th>
-            <th class='px-4 py-2'>Name</th>
-            <th class='px-4 py-2'>Roll No</th>
-            <th class='px-4 py-2'>Course</th>
-            <th class='px-4 py-2'>Year</th>
-            <th class='px-4 py-2'>Semester</th>
-            <th class='px-4 py-2'>Category</th>
-            <th class='px-4 py-2'>Status</th>
+            <th class='px-4 py-2'>S.No</th><th class='px-4 py-2'>Name</th>
+            <th class='px-4 py-2'>Roll No</th><th class='px-4 py-2'>Course</th>
+            <th class='px-4 py-2'>Year</th><th class='px-4 py-2'>Semester</th>
+            <th class='px-4 py-2'>Category</th><th class='px-4 py-2'>Status</th>
           </tr></thead><tbody>";
-
     $sno = 1;
-    while ($row = mysqli_fetch_assoc($result)) {
+    foreach ($rows as $row) {
         echo "<tr class='border-t'>
                 <td class='px-4 py-2'>" . $sno++ . "</td>
-                <td class='px-4 py-2'>" . $row['student_name'] . "</td>
-                <td class='px-4 py-2'>" . $row['roll_no'] . "</td>
-                <td class='px-4 py-2'>" . $row['course_type'] . "</td>
+                <td class='px-4 py-2'>" . htmlspecialchars($row['student_name']) . "</td>
+                <td class='px-4 py-2'>" . htmlspecialchars($row['roll_no']) . "</td>
+                <td class='px-4 py-2'>" . htmlspecialchars($row['course_type']) . "</td>
                 <td class='px-4 py-2'>" . getYearFromSemester($row['current_semester']) . "</td>
-                <td class='px-4 py-2'>" . $row['current_semester'] . "</td>
-                <td class='px-4 py-2'>" . $row['category'] . "</td>
+                <td class='px-4 py-2'>" . htmlspecialchars($row['current_semester']) . "</td>
+                <td class='px-4 py-2'>" . htmlspecialchars($row['category']) . "</td>
                 <td class='px-4 py-2 font-medium'>" .
                   ($row['status'] === 'approved' ? "<span class='text-green-600'>Approved</span>" :
                   ($row['status'] === 'rejected' ? "<span class='text-red-600'>Rejected</span>" :
                   "<span class='text-yellow-600'>Pending</span>")) .
-                "</td>
-              </tr>";
+                "</td></tr>";
     }
     echo "</tbody></table>";
 } else {

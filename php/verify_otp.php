@@ -33,9 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_SESSION['temp_user']['email'];
         $hashedPassword = $_SESSION['temp_user']['password'];
 
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password, email_verified) VALUES (?, ?, ?, 1)");
-        $stmt->bind_param("sss", $username, $email, $hashedPassword);
-        if ($stmt->execute()) {
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, email_verified) VALUES (?, ?, ?, 1)");
+        if ($stmt->execute([$username, $email, $hashedPassword])) {
             unset($_SESSION['otp'], $_SESSION['otp_expiry'], $_SESSION['temp_user']);
             // [TESTING MODE] Skip verification success email
             // sendEmail($email, $username, $subject, $body);

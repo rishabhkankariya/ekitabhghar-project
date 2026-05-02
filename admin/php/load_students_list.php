@@ -1,27 +1,26 @@
 <?php
-// Ensure this is included, not accessed directly
 include '../php/connection.php';
 
-$where = "1";
+$where = "1=1";
+$params = [];
 
-// Search Logic
 if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $search = $conn->real_escape_string($_GET['search']);
-    $where .= " AND (full_name LIKE '%$search%' OR roll_no LIKE '%$search%' OR email LIKE '%$search%')";
+    $search = '%' . $_GET['search'] . '%';
+    $where .= " AND (full_name LIKE ? OR roll_no LIKE ? OR email LIKE ?)";
+    $params = array_merge($params, [$search, $search, $search]);
 }
 
-// Status Filter Logic
 if (isset($_GET['status']) && !empty($_GET['status'])) {
-    $status = $conn->real_escape_string($_GET['status']);
-    $where .= " AND account_status = '$status'";
+    $where .= " AND account_status = ?";
+    $params[] = $_GET['status'];
 }
 
-// Ensure correct columns are selected
 $sql = "SELECT id, roll_no, full_name, email, phone_number, account_status, is_temp_password, course, admission_year, expected_passing_year FROM student_accounts WHERE $where ORDER BY id DESC LIMIT 50";
-$result = $conn->query($sql);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if ($stmt->rowCount() > 0) {
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $statusColors = [
             'active' => 'bg-green-100 text-green-800',
             'blocked' => 'bg-red-100 text-red-800',

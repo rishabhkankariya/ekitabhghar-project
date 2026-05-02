@@ -7,11 +7,9 @@ if (!isset($_SESSION['user_email'])) {
 require_once 'php/connection.php';
 
 $email = $_SESSION['user_email'];
-$stmt = $conn->prepare("SELECT full_name, profile_image FROM student_accounts WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$user_res = $stmt->get_result();
-$user = $user_res->fetch_assoc();
+$stmt = $pdo->prepare("SELECT full_name, profile_image FROM student_accounts WHERE email = ?");
+$stmt->execute([$email]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Force Profile Image Update
 if (!$user || empty($user['profile_image']) || $user['profile_image'] === 'users.png') {

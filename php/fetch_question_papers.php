@@ -1,14 +1,12 @@
 <?php
-require_once 'connection.php'; // Make sure this file has your database connection
+require_once 'connection.php';
 
 header('Content-Type: application/json');
 
-$query = "SELECT * FROM question_papers ORDER BY year, semester";
-$result = $conn->query($query);
-
+$stmt = $pdo->query("SELECT * FROM question_papers ORDER BY year, semester");
 $questionData = [];
 
-while ($row = $result->fetch_assoc()) {
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $year = $row['year'];
     $semester = $row['semester'];
 

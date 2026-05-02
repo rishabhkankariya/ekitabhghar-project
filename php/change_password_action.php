@@ -25,10 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hash = password_hash($new_pass, PASSWORD_BCRYPT);
     $user_id = $_SESSION['user_id'];
 
-    $stmt = $conn->prepare("UPDATE student_accounts SET password_hash = ?, is_temp_password = 0, account_status = 'active', updated_at = NOW() WHERE id = ?");
-    $stmt->bind_param("si", $hash, $user_id);
+    $stmt = $pdo->prepare("UPDATE student_accounts SET password_hash = ?, is_temp_password = 0, account_status = 'active', updated_at = NOW() WHERE id = ?");
 
-    if ($stmt->execute()) {
+    if ($stmt->execute([$hash, $user_id])) {
         unset($_SESSION['force_password_change']);
         $_SESSION['is_logged_in'] = true;
 

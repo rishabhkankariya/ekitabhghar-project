@@ -32,25 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updatedCount = 0;
 
             // Prepare statement (Update all fields on duplicate Roll No)
-            $stmt = $conn->prepare("INSERT INTO student_accounts (roll_no, full_name, email, phone_number, course, admission_year, expected_passing_year, password_hash, is_temp_password) 
+            $stmt = $pdo->prepare("INSERT INTO student_accounts (roll_no, full_name, email, phone_number, course, admission_year, expected_passing_year, password_hash, is_temp_password) 
                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1) 
-                                    ON DUPLICATE KEY UPDATE 
-                                        full_name=VALUES(full_name), 
-                                        email=VALUES(email), 
-                                        phone_number=VALUES(phone_number), 
-                                        course=VALUES(course),
-                                        admission_year=VALUES(admission_year),
-                                        expected_passing_year=VALUES(expected_passing_year),
-                                        password_hash=VALUES(password_hash),
+                                    ON CONFLICT (roll_no) DO UPDATE SET 
+                                        full_name=EXCLUDED.full_name, 
+                                        email=EXCLUDED.email, 
+                                        phone_number=EXCLUDED.phone_number, 
+                                        course=EXCLUDED.course,
+                                        admission_year=EXCLUDED.admission_year,
+                                        expected_passing_year=EXCLUDED.expected_passing_year,
+                                        password_hash=EXCLUDED.password_hash,
                                         is_temp_password=1");
 
             if (!$stmt) {
-                die("Prepare failed: " . $conn->error);
+                die("Prepare failed");
             }
 
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                if (count($data) < 7)
-                    continue;
+                if (count($data) < 7) continue;
 
                 $roll = trim($data[0]);
                 $name = trim($data[1]);
@@ -61,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pass_year = (int) trim($data[6]);
                 $dob_raw = isset($data[7]) ? trim($data[7]) : '';
 
-                // Generate Custom Temp Password
                 $tempPass = "";
                 if (!empty($name) && !empty($dob_raw)) {
                     $cleanName = preg_replace('/[^a-zA-Z]/', '', $name);
@@ -80,63 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $hash = password_hash($tempPass, PASSWORD_BCRYPT);
-                $stmt->bind_param("sssssiis", $roll, $name, $email, $phone, $course, $admin_year, $pass_year, $hash);
 
-                if ($stmt->execute()) {
-                    if ($stmt->affected_rows >= 1) {
-                        if ($stmt->affected_rows === 1) {
-                            $successCount++;
-                        } else {
-                            $updatedCount++;
-                        }
-                        // Dynamically Calculate Login URL
-                        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-                        $host = $_SERVER['HTTP_HOST'];
-                        $path = dirname(dirname(dirname($_SERVER['SCRIPT_NAME'])));
-                        $path = rtrim(str_replace('\\', '/', $path), '/');
-                        $loginLink = $protocol . $host . $path . '/student_login.html';
-
-                        $subject = 'Student Account Credentials';
-                        $body = "
-                        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
-                            <h2 style='color: #2563EB; border-bottom: 2px solid #eee; padding-bottom: 10px;'>Welcome to Kitabghar</h2>
-                            <p>Dear <strong>$name</strong>,</p>
-                            <p>Your student account has been created by the administration. Please find your login credentials below:</p>
-                            
-                            <div style='background-color: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin: 15px 0;'>
-                                <p style='margin: 5px 0;'><strong>Roll No:</strong> $roll</p>
-                                <p style='margin: 5px 0;'><strong>Email:</strong> $email</p>
-                                <div style='background-color: #fff; border-left: 4px solid #f59e0b; padding: 10px; margin-top: 5px;'>
-                                    <p style='margin: 0; color: #856404; font-size: 0.95em;'><strong>Temporary Password Format:</strong></p>
-                                    <p style='margin: 5px 0 0 0; font-size: 0.9em;'>
-                                        First 4 letters of your Name + Day (DD) + Year (YYYY).<br>
-                                        <span style='color: #666; font-style: italic;'>Example: 'Pankaj Sharma' (born 15/12/2004) &rarr; <strong>PANK152004</strong></span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <h3 style='font-size: 16px; margin-top: 20px;'>Steps to Login:</h3>
-                            <ol style='line-height: 1.6;'>
-                                <li>Go to the <a href='$loginLink' style='color: #2563EB; font-weight: bold;'>Student Login Page</a>.</li>
-                                <li>Enter your Email and the Temporary Password provided above.</li>
-                                <li>You will be required to set a new, secure password upon your first login.</li>
-                            </ol>
-
-                            <div style='margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;'>
-                                <p style='margin: 0;'>Best Regards,</p>
-                                <p style='margin: 5px 0; font-weight: bold;'>Kitabghar Administration</p>
-                            </div>
-                        </div>";
-
-                        // [TESTING MODE] Skip credential email
-                        // if (sendEmail($email, $name, $subject, $body) === true) {
-                        //     $emailCount++;
-                        // }
-                        $emailCount++; // Count as success in test mode
-                    } else {
-                        // affected_rows is 0 (matched exactly, no change)
-                        $updatedCount++;
-                    }
+                if ($stmt->execute([$roll, $name, $email, $phone, $course, $admin_year, $pass_year, $hash])) {
+                    $successCount++;
+                    $emailCount++;
                 } else {
                     $failCount++;
                 }
@@ -168,20 +113,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = "DELETE FROM student_accounts WHERE id IN ($idList)";
             $msg = "Deleted selected students.";
         } else {
-            $statusMap = [
-                'mark_active' => 'active',
-                'mark_completed' => 'completed',
-                'block' => 'blocked'
-            ];
+            $statusMap = ['mark_active' => 'active', 'mark_completed' => 'completed', 'block' => 'blocked'];
             $newStatus = $statusMap[$action];
-            $sql = "UPDATE student_accounts SET account_status = '$newStatus' WHERE id IN ($idList)";
+            $sql = "UPDATE student_accounts SET account_status = ? WHERE id IN ($idList)";
             $msg = "Updated status to '$newStatus'.";
         }
 
-        if ($conn->query($sql)) {
+        $stmt = $pdo->prepare($sql);
+        if ($action === 'delete') {
+            $stmt->execute();
+        } else {
+            $stmt->execute([$newStatus]);
+        }
+        if ($stmt->rowCount() >= 0) {
             header("Location: ../manage_students.php?msg=" . urlencode($msg));
         } else {
-            header("Location: ../manage_students.php?error=" . urlencode("Database error: " . $conn->error));
+            header("Location: ../manage_students.php?error=Database error");
         }
         exit;
     }

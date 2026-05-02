@@ -14,13 +14,13 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("Invalid Request: Note ID is required.");
 }
 
-$note_id = mysqli_real_escape_string($conn, $_GET['id']);
+$note_id = (int)$_GET['id'];
 
 // 3. Fetch Note Details from Database
-$query = "SELECT subject_name, notes_link FROM student_notes WHERE id = '$note_id'";
-$result = mysqli_query($conn, $query);
+$stmt = $pdo->prepare("SELECT subject_name, notes_link FROM student_notes WHERE id = ?");
+$stmt->execute([$note_id]);
 
-if ($row = mysqli_fetch_assoc($result)) {
+if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $file_path = $row['notes_link'];
     $full_path = '../' . $file_path; // notes_link is like 'notes/filename.pdf' relative to the 'notes' dir
 
@@ -51,6 +51,4 @@ if ($row = mysqli_fetch_assoc($result)) {
     http_response_code(404);
     die("Error: Note record not found.");
 }
-
-mysqli_close($conn);
 ?>

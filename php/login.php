@@ -47,14 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     unset($_SESSION["captcha"]);
     unset($_SESSION["captcha_time"]);
 
-    $stmt = $conn->prepare("SELECT id, full_name as username, email, password_hash as password, account_status FROM student_accounts WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare("SELECT id, full_name as username, email, password_hash as password, account_status FROM student_accounts WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-
+    if ($user) {
         if ($user['account_status'] === 'blocked') {
             echo json_encode(["success" => false, "message" => "❌ Account is blocked. Contact Administrator."]);
             exit;
@@ -73,8 +70,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo json_encode(["success" => false, "message" => "❌ No user found with this email."]);
     }
-
-    $stmt->close();
-    $conn->close();
 }
 ?>

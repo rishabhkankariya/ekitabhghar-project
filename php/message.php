@@ -7,17 +7,10 @@ if (!isset($_SESSION['user_email'])) {
 
 require_once 'connection.php';
 
-// Prepare database connection if not already handled by connection.php
-if (!isset($conn)) {
-  die("Database connection failed.");
-}
-
 $email = $_SESSION['user_email'];
-$stmt = $conn->prepare("SELECT full_name, profile_image FROM student_accounts WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$user_res = $stmt->get_result();
-$user = $user_res->fetch_assoc();
+$stmt = $pdo->prepare("SELECT full_name, profile_image FROM student_accounts WHERE email = ?");
+$stmt->execute([$email]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Force Profile Image Update
 if (!$user || empty($user['profile_image']) || $user['profile_image'] === 'users.png') {
@@ -25,8 +18,7 @@ if (!$user || empty($user['profile_image']) || $user['profile_image'] === 'users
   exit;
 }
 
-$sql = "SELECT * FROM messages ORDER BY sent_at DESC";
-$result = $conn->query($sql);
+$result = $pdo->query("SELECT * FROM messages ORDER BY sent_at DESC");
 ?>
 
 <!DOCTYPE html>
@@ -201,9 +193,10 @@ $result = $conn->query($sql);
       </div>
 
       <div class="space-y-6">
-        <?php if ($result->num_rows > 0): ?>
+        <?php $rows = $result->fetchAll(PDO::FETCH_ASSOC); ?>
+        <?php if (count($rows) > 0): ?>
           <?php $delay = 0;
-          while ($row = $result->fetch_assoc()): ?>
+          foreach ($rows as $row): ?>
             <div
               class="group bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl hover:border-indigo-100 transition-all duration-300"
               data-aos="fade-up" data-aos-delay="<?= $delay; ?>">
@@ -222,7 +215,7 @@ $result = $conn->query($sql);
                 <?= nl2br(htmlspecialchars($row['message'])); ?>
               </div>
             </div>
-            <?php $delay += 50; endwhile; ?>
+            <?php $delay += 50; endforeach; ?>
         <?php else: ?>
           <div class="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200" data-aos="zoom-in">
             <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300 mb-4">

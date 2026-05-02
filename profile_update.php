@@ -14,11 +14,10 @@ $message = "";
 $messageType = "";
 
 // Single Session Enforcement
-$check_sess = $conn->prepare("SELECT session_token FROM student_accounts WHERE email = ?");
-$check_sess->bind_param("s", $email);
-$check_sess->execute();
-$sess_res = $check_sess->get_result();
-if ($sess_row = $sess_res->fetch_assoc()) {
+$check_sess = $pdo->prepare("SELECT session_token FROM student_accounts WHERE email = ?");
+$check_sess->execute([$email]);
+$sess_row = $check_sess->fetch(PDO::FETCH_ASSOC);
+if ($sess_row) {
   if (!empty($sess_row['session_token']) && $sess_row['session_token'] !== session_id()) {
     session_unset();
     session_destroy();
@@ -29,19 +28,17 @@ if ($sess_row = $sess_res->fetch_assoc()) {
 $updateType = "";
 $showOtpForm = ($_SESSION['profile_update_otp_sent'] ?? false) && isset($_SESSION['profile_update_data']);
 
-$stmt = $conn->prepare("SELECT id, roll_no, full_name, email, profile_image FROM student_accounts WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt = $pdo->prepare("SELECT id, roll_no, full_name, email, profile_image FROM student_accounts WHERE email = ?");
+$stmt->execute([$email]);
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($result->num_rows > 0) {
-  $user = $result->fetch_assoc();
+if ($result) {
+  $user = $result;
 } else {
   session_destroy();
   header("Location: student_login.html?error=Account not found. Please login again.");
   exit;
 }
-$stmt->close();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $step = $_POST['step'] ?? 'init';
@@ -61,12 +58,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $messageType = "error";
       } else {
         // Validate Current Password
-        $stmt = $conn->prepare("SELECT password_hash FROM student_accounts WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->bind_result($current_password_hash);
-        $stmt->fetch();
-        $stmt->close();
+        $stmt = $pdo->prepare("SELECT password_hash FROM student_accounts WHERE email = ?");
+        $stmt->execute([$email]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $current_password_hash = $row ? $row['password_hash'] : null;
 
         if (!password_verify($_POST['current-password'], $current_password_hash)) {
           $message = "Error: Incorrect current password.";
@@ -79,14 +74,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
           // Check if new email is already taken
           if ($changingEmail) {
-            $stmt = $conn->prepare("SELECT id FROM student_accounts WHERE email = ? AND email != ?");
-            $stmt->bind_param("ss", $new_email, $email);
-            $stmt->execute();
-            if ($stmt->get_result()->num_rows > 0) {
+            $stmt = $pdo->prepare("SELECT id FROM student_accounts WHERE email = ? AND email != ?");
+            $stmt->execute([$new_email, $email]);
+            if ($stmt->rowCount() > 0) {
               $message = "Error: This email is already registered with another account.";
               $messageType = "error";
             }
-            $stmt->close();
           }
 
           if (empty($message)) {
@@ -136,14 +129,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $messageType = "success";
               } else {
                 // Just update Name or Image
-                $stmt = $conn->prepare("UPDATE student_accounts SET full_name=?, profile_image=? WHERE email=?");
-                $stmt->bind_param("sss", $new_username, $profile_image, $email);
-                if ($stmt->execute()) {
+                $stmt = $pdo->prepare("UPDATE student_accounts SET full_name=?, profile_image=? WHERE email=?");
+                if ($stmt->execute([$new_username, $profile_image, $email])) {
                   $message = "Profile updated successfully!";
                   $messageType = "success";
                   $updateType = "success";
                 }
-                $stmt->close();
               }
             }
           }
@@ -160,10 +151,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           unset($_SESSION['profile_update_otp_sent']);
         } else {
           $data = $_SESSION['profile_update_data'];
-          $stmt = $conn->prepare("UPDATE student_accounts SET full_name=?, email=?, password_hash=?, profile_image=? WHERE email=?");
-          $stmt->bind_param("sssss", $data['full_name'], $data['email'], $data['password_hash'], $data['profile_image'], $email);
+          $stmt = $pdo->prepare("UPDATE student_accounts SET full_name=?, email=?, password_hash=?, profile_image=? WHERE email=?");
 
-          if ($stmt->execute()) {
+          if ($stmt->execute([$data['full_name'], $data['email'], $data['password_hash'], $data['profile_image'], $email])) {
             if ($data['changing_email']) {
               $_SESSION['user_email'] = $data['email'];
             }
@@ -177,7 +167,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $message = "Error updating database.";
             $messageType = "error";
           }
-          $stmt->close();
         }
       } else {
         $message = "Incorrect verification code.";

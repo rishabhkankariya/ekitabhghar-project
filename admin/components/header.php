@@ -12,12 +12,9 @@ include __DIR__ . '/../../php/connection.php';
 // Fetch admin profile picture
 $admin_id = $_SESSION['admin_id'];
 $query = "SELECT username, profile_pic FROM admin WHERE admin_id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $admin_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$admin = $result->fetch_assoc();
-$stmt->close();
+$stmt = $pdo->prepare($query);
+$stmt->execute([$admin_id]);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $profile_pic = (!empty($admin['profile_pic'])) ? $admin['profile_pic'] : 'uploads/dummy.png';
 $admin_name = $admin['username'] ?? 'Admin';

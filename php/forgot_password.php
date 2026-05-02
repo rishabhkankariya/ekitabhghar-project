@@ -21,13 +21,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   if (isset($_POST["step"]) && $_POST["step"] === "request_otp") {
     $user_input = trim($_POST["user_input"]);
     // Update table to student_accounts and check by email or roll_no
-    $stmt = $conn->prepare("SELECT email, full_name FROM student_accounts WHERE roll_no = ? OR email = ?");
-    $stmt->bind_param("ss", $user_input, $user_input);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare("SELECT email, full_name FROM student_accounts WHERE roll_no = ? OR email = ?");
+    $stmt->execute([$user_input, $user_input]);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if ($result->num_rows === 1) {
-      $row = $result->fetch_assoc();
+    if (count($result) === 1) {
+      $row = $result[0];
       $email = $row["email"];
       $full_name = $row["full_name"];
       $otp = rand(100000, 999999);
@@ -67,10 +66,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $new_password = password_hash(trim($_POST["new_password"]), PASSWORD_BCRYPT);
       $email = $_SESSION["reset_email"];
       // Use student_accounts and password_hash
-      $stmt = $conn->prepare("UPDATE student_accounts SET password_hash = ?, is_temp_password = 0 WHERE email = ?");
-      $stmt->bind_param("ss", $new_password, $email);
+      $stmt = $pdo->prepare("UPDATE student_accounts SET password_hash = ?, is_temp_password = 0 WHERE email = ?");
 
-      if ($stmt->execute()) {
+      if ($stmt->execute([$new_password, $email])) {
         $message = "Success! Your password has been updated.";
         $resetType = "success";
 

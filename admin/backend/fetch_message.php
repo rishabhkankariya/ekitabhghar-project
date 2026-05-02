@@ -1,13 +1,6 @@
 <?php
 require_once '../../php/connection.php';
-
-$sql = "SELECT * FROM contact_messages ORDER BY submitted_at DESC";
-$result = $conn->query($sql);
-$messages = [];
-
-while ($row = $result->fetch_assoc()) {
-    $messages[] = $row;
-}
-
+$stmt = $pdo->query("SELECT * FROM contact_messages ORDER BY submitted_at DESC");
+$messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 echo json_encode($messages);
 ?>

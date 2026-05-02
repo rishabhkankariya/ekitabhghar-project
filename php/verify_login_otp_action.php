@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 3. Verify OTP
-    // (Check expiry if you want strict security, added in generated time + 300s)
     if (time() > $_SESSION['login_otp_expiry']) {
         echo json_encode(["success" => false, "message" => "OTP has expired."]);
         exit;
@@ -46,10 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['is_logged_in'] = true;
             unset($_SESSION['is_temp_password']);
 
-            // Log access time (already done in login_action, but maybe update again? Not critical)
-            $update = $conn->prepare("UPDATE student_accounts SET last_login_at = NOW() WHERE id = ?");
-            $update->bind_param("i", $_SESSION['user_id']);
-            $update->execute();
+            // Log access time
+            $update = $pdo->prepare("UPDATE student_accounts SET last_login_at = NOW() WHERE id = ?");
+            $update->execute([$_SESSION['user_id']]);
 
             echo json_encode(["success" => true, "redirect" => "dashboard.php"]);
         }

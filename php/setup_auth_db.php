@@ -1,43 +1,44 @@
 <?php
 include 'connection.php';
 
-$sql = "CREATE TABLE IF NOT EXISTS `student_accounts` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `roll_no` VARCHAR(50) NOT NULL UNIQUE,
-    `full_name` VARCHAR(100) NOT NULL,
-    `email` VARCHAR(100) NOT NULL UNIQUE,
-    `phone_number` VARCHAR(15),
-    `course` VARCHAR(50) NOT NULL DEFAULT 'Diploma',
-    `admission_year` INT NOT NULL,
-    `expected_passing_year` INT NOT NULL,
-    `password_hash` VARCHAR(255) NOT NULL,
-    `is_temp_password` BOOLEAN DEFAULT TRUE,
-    `account_status` ENUM('active', 'completed', 'blocked', 'backlog') DEFAULT 'active',
-    `last_login_at` DATETIME NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX `idx_email` (`email`),
-    INDEX `idx_status` (`account_status`)
+// Note: This file creates MySQL-style tables. For PostgreSQL, use appropriate syntax.
+// These CREATE TABLE statements are kept for reference but may need adjustment for PostgreSQL.
+
+$sql = "CREATE TABLE IF NOT EXISTS student_accounts (
+    id SERIAL PRIMARY KEY,
+    roll_no VARCHAR(50) NOT NULL UNIQUE,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone_number VARCHAR(15),
+    course VARCHAR(50) NOT NULL DEFAULT 'Diploma',
+    admission_year INT NOT NULL,
+    expected_passing_year INT NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    is_temp_password BOOLEAN DEFAULT TRUE,
+    account_status VARCHAR(20) DEFAULT 'active',
+    last_login_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
-if ($conn->query($sql) === TRUE) {
+try {
+    $pdo->exec($sql);
     echo "Table 'student_accounts' created successfully.\n";
-} else {
-    echo "Error creating table: " . $conn->error . "\n";
+} catch (PDOException $e) {
+    echo "Error creating table: " . $e->getMessage() . "\n";
 }
 
-$sql_admin = "CREATE TABLE IF NOT EXISTS `library_admin` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `username` VARCHAR(50) NOT NULL UNIQUE,
-    `password` VARCHAR(255) NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+$sql_admin = "CREATE TABLE IF NOT EXISTS library_admin (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
-if ($conn->query($sql_admin) === TRUE) {
+try {
+    $pdo->exec($sql_admin);
     echo "Table 'library_admin' created successfully.\n";
-} else {
-    echo "Error creating table: " . $conn->error . "\n";
+} catch (PDOException $e) {
+    echo "Error creating table: " . $e->getMessage() . "\n";
 }
-
-$conn->close();
 ?>

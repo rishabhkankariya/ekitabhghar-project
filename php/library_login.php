@@ -39,42 +39,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = trim($_POST["password"]);
 
     $sql = "SELECT id, username, password FROM library_admin WHERE username = ?";
-    $stmt = $conn->prepare($sql);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$username]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($stmt) {
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $admin = $result->fetch_assoc();
-        $stmt->close();
+    if ($admin && password_verify($password, $admin['password'])) {
+        $_SESSION["admin_id"] = $admin["id"];
+        $_SESSION["username"] = $admin["username"];
 
-      if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION["admin_id"] = $admin["id"];
-            $_SESSION["username"] = $admin["username"];
-
-            $_SESSION['library_login_toast'] = [
-                'type' => 'success',
-                'message' => 'Login successful! Redirecting...'
-            ];
-            // Redirect to intermediate page for spinner + delay
-            header("Location: ../library_dashboard.php");
-            exit();
-        }else {
-            $_SESSION['library_login_toast'] = [
-                'type' => 'error',
-                'message' => 'Invalid username or password!'
-            ];
-            header("Location: ../library_login.html");
-            exit();
-        }
+        $_SESSION['library_login_toast'] = [
+            'type' => 'success',
+            'message' => 'Login successful! Redirecting...'
+        ];
+        // Redirect to intermediate page for spinner + delay
+        header("Location: ../library_dashboard.php");
+        exit();
     } else {
         $_SESSION['library_login_toast'] = [
             'type' => 'error',
-            'message' => 'Database error: ' . $conn->error
+            'message' => 'Invalid username or password!'
         ];
         header("Location: ../library_login.html");
         exit();
     }
-    $conn->close();
 }
 ?>

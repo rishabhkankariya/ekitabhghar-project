@@ -24,45 +24,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Fetch student email and name before updating
-    $stmt_fetch = $conn->prepare("SELECT student_name, email_id FROM students WHERE id = ?");
-    $stmt_fetch->bind_param("i", $student_id);
-    $stmt_fetch->execute();
-    $result_fetch = $stmt_fetch->get_result();
-
-    if ($result_fetch->num_rows === 0) {
+    $stmt_fetch = $pdo->prepare("SELECT student_name, email_id FROM students WHERE id = ?");
+    $stmt_fetch->execute([$student_id]);
+    if ($stmt_fetch->rowCount() === 0) {
         echo json_encode(['success' => false, 'message' => 'Student not found']);
         exit;
     }
-
-    $student = $result_fetch->fetch_assoc();
+    $student = $stmt_fetch->fetch(PDO::FETCH_ASSOC);
     $student_name = $student['student_name'];
     $student_email = $student['email_id'];
-    $stmt_fetch->close();
-
 
     $can_edit = ($action === 'enable') ? 1 : 0;
-
-    // Use prepared statement to update
-    if (isset($conn)) {
-        $stmt = $conn->prepare("UPDATE students SET can_edit = ? WHERE id = ?");
-        $stmt->bind_param("ii", $can_edit, $student_id);
-
-        if ($stmt->execute()) {
-            $response_message = ($action === 'enable') ? 'Access enabled' : 'Access disabled';
-
-            // [TESTING MODE] Skip email notification
-            if ($action === 'enable') {
-                $response_message .= '. (Email notification disabled in test mode)';
-            }
-
-            echo json_encode(['success' => true, 'message' => $response_message]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Update failed: ' . $conn->error]);
-        }
-        $stmt->close();
+    $stmt = $pdo->prepare("UPDATE students SET can_edit = ? WHERE id = ?");
+    if ($stmt->execute([$can_edit, $student_id])) {
+        $response_message = ($action === 'enable') ? 'Access enabled' : 'Access disabled';
+        echo json_encode(['success' => true, 'message' => $response_message]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+        echo json_encode(['success' => false, 'message' => 'Update failed']);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);

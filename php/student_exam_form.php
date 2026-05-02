@@ -5,11 +5,6 @@ require_once '../config/send_mail.php';
 // 1. Centralized Connection
 include 'connection.php';
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
 $message = "";
 $messageType = "";
 
@@ -177,12 +172,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $course = $_POST['course'] ?? '';
 
             // Check if student already submitted
-            $check_sql = "SELECT id, can_edit, student_photo, student_signature, previous_result FROM students WHERE email_id = ?";
-            $check_stmt = $conn->prepare($check_sql);
-            $check_stmt->bind_param("s", $email_id);
-            $check_stmt->execute();
-            $existing = $check_stmt->get_result()->fetch_assoc();
-            $check_stmt->close();
+            $check_stmt = $pdo->prepare("SELECT id, can_edit, student_photo, student_signature, previous_result FROM students WHERE email_id = ?");
+            $check_stmt->execute([$email_id]);
+            $existing = $check_stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($existing && $existing['can_edit'] == 0) {
                 $message = "⚠ You have already submitted the exam form and it is under review.";
@@ -231,51 +223,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 if ($existing) {
                     // UPDATE
                     $sql = "UPDATE students SET roll_no=?, student_name=?, course=?, father_address=?, course_type=?, current_semester=?, admission_fees=?, category=?, mobile_no=?, email_id=?, exam_date=?, student_signature=?, subjects=?, ex_subjects=?, student_photo=?, previous_result=?, status='pending', can_edit=0 WHERE id=?";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param(
-                        "ssssssssssssssssi",
-                        $roll_no,
-                        $student_name,
-                        $course,
-                        $father_address,
-                        $course_type,
-                        $current_semester,
-                        $admission_fees,
-                        $category,
-                        $mobile_no,
-                        $email_id,
-                        $exam_date,
-                        $savedSignature,
-                        $subjects_json,
-                        $ex_subjects_json,
-                        $savedPhoto,
-                        $results_json,
-                        $existing['id']
-                    );
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute([
+                        $roll_no, $student_name, $course, $father_address, $course_type,
+                        $current_semester, $admission_fees, $category, $mobile_no, $email_id,
+                        $exam_date, $savedSignature, $subjects_json, $ex_subjects_json,
+                        $savedPhoto, $results_json, $existing['id']
+                    ]);
                 } else {
                     // INSERT
                     $sql = "INSERT INTO students (roll_no, student_name, course, father_address, course_type, current_semester, admission_fees, category, mobile_no, email_id, exam_date, student_signature, subjects, ex_subjects, student_photo, previous_result) 
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param(
-                        "ssssssssssssssss",
-                        $roll_no,
-                        $student_name,
-                        $course,
-                        $father_address,
-                        $course_type,
-                        $current_semester,
-                        $admission_fees,
-                        $category,
-                        $mobile_no,
-                        $email_id,
-                        $exam_date,
-                        $savedSignature,
-                        $subjects_json,
-                        $ex_subjects_json,
-                        $savedPhoto,
-                        $results_json
-                    );
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute([
+                        $roll_no, $student_name, $course, $father_address, $course_type,
+                        $current_semester, $admission_fees, $category, $mobile_no, $email_id,
+                        $exam_date, $savedSignature, $subjects_json, $ex_subjects_json,
+                        $savedPhoto, $results_json
+                    ]);
                 }
                 $challanUploadDir = "challans/";
                 $challanPaths = [];
@@ -316,17 +281,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $messageType = "success";
 
                     // Correctly get student ID for both INSERT and UPDATE
-                    $student_id = $existing ? $existing['id'] : $stmt->insert_id;
+                    $student_id = $existing ? $existing['id'] : $pdo->lastInsertId();
 
-                    // 🔁 Insert uploaded challans into challans table
+                    // Insert uploaded challans into challans table
                     if (!empty($challanPaths)) {
                         foreach ($challanPaths as $path) {
-                            $challanStmt = $conn->prepare("INSERT INTO challans (student_id, file_path) VALUES (?, ?)");
-                            if ($challanStmt) {
-                                $challanStmt->bind_param("is", $student_id, $path);
-                                $challanStmt->execute();
-                                $challanStmt->close();
-                            }
+                            $challanStmt = $pdo->prepare("INSERT INTO challans (student_id, file_path) VALUES (?, ?)");
+                            $challanStmt->execute([$student_id, $path]);
                         }
                     }
                     $subject = 'Exam Form Submission Confirmation - E-Kitabghar';
@@ -363,15 +324,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     //     $message .= " However, confirmation email could not be sent.";
                     // }
                 } else {
-                    $message = "⚠ Submission failed: " . $stmt->error;
+                    $message = "⚠ Submission failed.";
                     $messageType = "error";
                 }
-                $stmt->close();
             }
         }
     }
 }
-$conn->close();
+// PDO closes automatically
 ?>
 <!DOCTYPE html>
 <html lang="en">

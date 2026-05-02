@@ -16,11 +16,10 @@ if (isset($_SESSION['force_password_change'])) {
 require_once 'php/connection.php';
 
 // Single Session Enforcement
-$check_sess = $conn->prepare("SELECT session_token FROM student_accounts WHERE id = ?");
-$check_sess->bind_param("i", $_SESSION['user_id']);
-$check_sess->execute();
-$sess_res = $check_sess->get_result();
-if ($sess_row = $sess_res->fetch_assoc()) {
+$check_sess = $pdo->prepare("SELECT session_token FROM student_accounts WHERE id = ?");
+$check_sess->execute([$_SESSION['user_id']]);
+$sess_row = $check_sess->fetch(PDO::FETCH_ASSOC);
+if ($sess_row) {
   if (!empty($sess_row['session_token']) && $sess_row['session_token'] !== session_id()) {
     session_unset();
     session_destroy();
@@ -31,11 +30,9 @@ if ($sess_row = $sess_res->fetch_assoc()) {
 
 // 3. Fetch User Details from new table
 $user_id = $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT full_name, email, profile_image, last_login_at, last_login_ip, last_login_location, admission_year, expected_passing_year FROM student_accounts WHERE id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+$stmt = $pdo->prepare("SELECT full_name, email, profile_image, last_login_at, last_login_ip, last_login_location, admission_year, expected_passing_year FROM student_accounts WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
   session_destroy();
@@ -102,38 +99,32 @@ if (empty($last_ip) || $last_ip === '0.0.0.0' || $last_ip === '::1' || $last_ip 
     }
   }
 
-  // Create Logs Table if not exists (Safety check)
-  $conn->query("CREATE TABLE IF NOT EXISTS student_login_logs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+  // Create Logs Table if not exists (Safety check) - PostgreSQL syntax
+  $pdo->exec("CREATE TABLE IF NOT EXISTS student_login_logs (
+      id SERIAL PRIMARY KEY,
       student_id INT NOT NULL,
       ip_address VARCHAR(45),
-      login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-      location VARCHAR(255),
-      INDEX (student_id)
+      login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      location VARCHAR(255)
   )");
 
   // Update DB with the (possibly public) IP and correct location
-  $upd = $conn->prepare("UPDATE student_accounts SET last_login_ip = ?, last_login_at = ?, last_login_location = ? WHERE id = ?");
-  $upd->bind_param("sssi", $last_ip, $last_time, $last_loc, $user_id);
-  $upd->execute();
+  $upd = $pdo->prepare("UPDATE student_accounts SET last_login_ip = ?, last_login_at = ?, last_login_location = ? WHERE id = ?");
+  $upd->execute([$last_ip, $last_time, $last_loc, $user_id]);
 
-  // Smart Log Update: Check if we have a recent log entry (last 2 mins) that might be 'Localhost Access' or '::1'
-  // If yes, update it. If no, insert new.
-  $check_log = $conn->prepare("SELECT id FROM student_login_logs WHERE student_id = ? AND login_time >= DATE_SUB(NOW(), INTERVAL 2 MINUTE) ORDER BY id DESC LIMIT 1");
-  $check_log->bind_param("i", $user_id);
-  $check_log->execute();
-  $log_res = $check_log->get_result();
+  // Smart Log Update: Check if we have a recent log entry (last 2 mins)
+  $check_log = $pdo->prepare("SELECT id FROM student_login_logs WHERE student_id = ? AND login_time >= NOW() - INTERVAL '2 minutes' ORDER BY id DESC LIMIT 1");
+  $check_log->execute([$user_id]);
+  $existing_log = $check_log->fetch(PDO::FETCH_ASSOC);
 
-  if ($existing_log = $log_res->fetch_assoc()) {
+  if ($existing_log) {
     // Update existing recent log
-    $log_stmt = $conn->prepare("UPDATE student_login_logs SET ip_address = ?, location = ?, login_time = ? WHERE id = ?");
-    $log_stmt->bind_param("sssi", $last_ip, $last_loc, $last_time, $existing_log['id']);
-    $log_stmt->execute();
+    $log_stmt = $pdo->prepare("UPDATE student_login_logs SET ip_address = ?, location = ?, login_time = ? WHERE id = ?");
+    $log_stmt->execute([$last_ip, $last_loc, $last_time, $existing_log['id']]);
   } else {
     // Insert new log if no recent one found
-    $log_stmt = $conn->prepare("INSERT INTO student_login_logs (student_id, ip_address, login_time, location) VALUES (?, ?, ?, ?)");
-    $log_stmt->bind_param("isss", $user_id, $last_ip, $last_time, $last_loc);
-    $log_stmt->execute();
+    $log_stmt = $pdo->prepare("INSERT INTO student_login_logs (student_id, ip_address, login_time, location) VALUES (?, ?, ?, ?)");
+    $log_stmt->execute([$user_id, $last_ip, $last_time, $last_loc]);
   }
 }
 
@@ -151,8 +142,8 @@ if (!empty($student_session)) {
   $display_session = $student_session;
 } else {
   // Priority 2: Admin set global session from exam_settings
-  $session_query = $conn->query("SELECT academic_session FROM exam_settings LIMIT 1");
-  if ($session_query && $row = $session_query->fetch_assoc()) {
+  $session_query = $pdo->query("SELECT academic_session FROM exam_settings LIMIT 1");
+  if ($session_query && $row = $session_query->fetch(PDO::FETCH_ASSOC)) {
     $display_session = $row['academic_session'];
   }
 }
@@ -415,12 +406,10 @@ if (!empty($student_session)) {
           <?php
           // Fetch Last 4 Logs
           $recent_logs = [];
-          $log_query = $conn->prepare("SELECT ip_address, login_time, location FROM student_login_logs WHERE student_id = ? ORDER BY login_time DESC LIMIT 4");
+          $log_query = $pdo->prepare("SELECT ip_address, login_time, location FROM student_login_logs WHERE student_id = ? ORDER BY login_time DESC LIMIT 4");
           if ($log_query) {
-            $log_query->bind_param("i", $user_id);
-            $log_query->execute();
-            $logs_result = $log_query->get_result();
-            while ($row = $logs_result->fetch_assoc()) {
+            $log_query->execute([$user_id]);
+            while ($row = $log_query->fetch(PDO::FETCH_ASSOC)) {
               $recent_logs[] = $row;
             }
           }

@@ -26,10 +26,9 @@ if (empty($roll_no) || empty($full_name) || empty($email)) {
 }
 
 // Check if student already exists
-$check = $conn->prepare("SELECT id FROM student_accounts WHERE roll_no = ? OR email = ?");
-$check->bind_param("ss", $roll_no, $email);
-$check->execute();
-if ($check->get_result()->num_rows > 0) {
+$check = $pdo->prepare("SELECT id FROM student_accounts WHERE roll_no = ? OR email = ?");
+$check->execute([$roll_no, $email]);
+if ($check->rowCount() > 0) {
     echo json_encode(['status' => 'error', 'message' => 'Roll number or Email already exists']);
     exit();
 }
@@ -55,13 +54,10 @@ if (empty($tempPass) || strlen($tempPass) < 8) {
 
 $passwordHash = password_hash($tempPass, PASSWORD_BCRYPT);
 
-$sql = "INSERT INTO student_accounts (roll_no, full_name, email, phone_number, course, admission_year, expected_passing_year, password_hash, is_temp_password, account_status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 'active')";
+$stmt = $pdo->prepare("INSERT INTO student_accounts (roll_no, full_name, email, phone_number, course, admission_year, expected_passing_year, password_hash, is_temp_password, account_status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 'active')");
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("sssssiis", $roll_no, $full_name, $email, $phone, $course, $admission_year, $passing_year, $passwordHash);
-
-if ($stmt->execute()) {
+if ($stmt->execute([$roll_no, $full_name, $email, $phone, $course, $admission_year, $passing_year, $passwordHash])) {
     // Calculate Login URL
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
     $host = $_SERVER['HTTP_HOST'];
@@ -105,6 +101,6 @@ if ($stmt->execute()) {
     // $res = sendEmail($email, $full_name, $subject, $body);
     echo json_encode(['status' => 'success', 'message' => 'Student account created successfully! (Email disabled in test mode)']);
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $conn->error]);
+    echo json_encode(['status' => 'error', 'message' => 'Database error inserting student']);
 }
 ?>

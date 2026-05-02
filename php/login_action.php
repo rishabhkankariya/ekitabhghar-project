@@ -21,12 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     unset($_SESSION['captcha']); // Clear captcha after use
 
     // 2. Fetch User
-    $stmt = $conn->prepare("SELECT id, roll_no, email, full_name, password_hash, is_temp_password, account_status FROM student_accounts WHERE email = ? OR roll_no = ?");
-    $stmt->bind_param("ss", $login_input, $login_input);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare("SELECT id, roll_no, email, full_name, password_hash, is_temp_password, account_status FROM student_accounts WHERE email = ? OR roll_no = ?");
+    $stmt->execute([$login_input, $login_input]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($row = $result->fetch_assoc()) {
+    if ($row) {
         // Status Checks
         if ($row['account_status'] === 'blocked') {
             header("Location: ../student_login.html?error=Account is blocked. Contact Administrator.");
@@ -61,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Update Login Details
                 $ip = $_SERVER['REMOTE_ADDR'];
-                $conn->query("UPDATE student_accounts SET last_login_at = NOW(), last_login_ip = '$ip' WHERE id = " . $row['id']);
+                $upd = $pdo->prepare("UPDATE student_accounts SET last_login_at = NOW(), last_login_ip = ? WHERE id = ?");
+                $upd->execute([$ip, $row['id']]);
 
                 header("Location: ../dashboard.php");
                 exit;

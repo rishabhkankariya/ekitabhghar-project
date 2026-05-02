@@ -1,42 +1,14 @@
 <?php
-// Start session to check for admin login (for security)
 session_start();
 header('Content-Type: application/json');
-
-// 🔐 Verify admin session
-if (!isset($_SESSION['admin_id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
-    exit();
-}
-
-// 📥 Retrieve message ID from request (POST)
+if (!isset($_SESSION['admin_id'])) { echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']); exit(); }
 $message_id = isset($_POST['id']) ? $_POST['id'] : null;
-
-// 🚫 Validate message ID
-if (!$message_id || !is_numeric($message_id)) {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid message ID']);
-    exit();
-}
-
+if (!$message_id || !is_numeric($message_id)) { echo json_encode(['status' => 'error', 'message' => 'Invalid message ID']); exit(); }
 require_once '../../php/connection.php';
-
-// 📝 Database deletion query using mysqli
-$sql = "DELETE FROM contact_messages WHERE id = ?";
-
-// Prepare the statement
-$stmt = $conn->prepare($sql);
-
-// Bind the message_id to the SQL query
-$stmt->bind_param('i', $message_id);  // 'i' for integer
-
-// Execute the query and check if the message was deleted successfully
-if ($stmt->execute()) {
+$stmt = $pdo->prepare("DELETE FROM contact_messages WHERE id = ?");
+if ($stmt->execute([$message_id])) {
     echo json_encode(['status' => 'success', 'message' => 'Message deleted successfully']);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Failed to delete message']);
 }
-
-// Close the statement and connection
-$stmt->close();
-$conn->close();
 ?>

@@ -11,11 +11,10 @@ if (!isset($_SESSION['user_email'])) {
 $user_email = $_SESSION['user_email']; // Logged-in student email
 
 // Single Session Enforcement
-$check_sess = $conn->prepare("SELECT session_token FROM student_accounts WHERE email = ?");
-$check_sess->bind_param("s", $user_email);
-$check_sess->execute();
-$sess_res = $check_sess->get_result();
-if ($sess_row = $sess_res->fetch_assoc()) {
+$check_sess = $pdo->prepare("SELECT session_token FROM student_accounts WHERE email = ?");
+$check_sess->execute([$user_email]);
+$sess_row = $check_sess->fetch(PDO::FETCH_ASSOC);
+if ($sess_row) {
   if (!empty($sess_row['session_token']) && $sess_row['session_token'] !== session_id()) {
     session_unset();
     session_destroy();
@@ -25,24 +24,20 @@ if ($sess_row = $sess_res->fetch_assoc()) {
 }
 
 // --- RESTRICT ACCESS IF PROFILE IMAGE IS MISSING ---
-$check_img = $conn->prepare("SELECT profile_image FROM student_accounts WHERE email = ?");
-$check_img->bind_param("s", $user_email);
-$check_img->execute();
-$img_res = $check_img->get_result()->fetch_assoc();
+$check_img = $pdo->prepare("SELECT profile_image FROM student_accounts WHERE email = ?");
+$check_img->execute([$user_email]);
+$img_res = $check_img->fetch(PDO::FETCH_ASSOC);
 
 if (!$img_res || empty($img_res['profile_image']) || $img_res['profile_image'] === 'users.png') {
   header("Location: profile_update.php?error=Access Denied! You must upload a profile image first.");
   exit;
 }
-$check_img->close();
 // ----------------------------------------------------
 
 // 1. Fetch Master Data from student_accounts
-$master_query = $conn->prepare("SELECT roll_no, full_name, phone_number, course FROM student_accounts WHERE email = ?");
-$master_query->bind_param("s", $user_email);
-$master_query->execute();
-$master_data = $master_query->get_result()->fetch_assoc();
-$master_query->close();
+$master_query = $pdo->prepare("SELECT roll_no, full_name, phone_number, course FROM student_accounts WHERE email = ?");
+$master_query->execute([$user_email]);
+$master_data = $master_query->fetch(PDO::FETCH_ASSOC);
 
 $master_roll = $master_data['roll_no'] ?? "";
 $master_name = $master_data['full_name'] ?? "";
@@ -50,12 +45,9 @@ $master_phone = $master_data['phone_number'] ?? "";
 $master_course = $master_data['course'] ?? "";
 
 // 2. Check Submission Status from students table
-$student_query = $conn->prepare("SELECT * FROM students WHERE email_id = ?");
-$student_query->bind_param("s", $user_email);
-$student_query->execute();
-$student_result = $student_query->get_result();
-$student_data = $student_result->fetch_assoc();
-$student_query->close();
+$student_query = $pdo->prepare("SELECT * FROM students WHERE email_id = ?");
+$student_query->execute([$user_email]);
+$student_data = $student_query->fetch(PDO::FETCH_ASSOC);
 
 $already_submitted = ($student_data !== null);
 $can_edit = $student_data['can_edit'] ?? 0;
@@ -65,8 +57,8 @@ $student_name = $student_data['student_name'] ?? $master_name;
 $mobile_no = $student_data['mobile_no'] ?? $master_phone;
 
 // Get exam start and end dates from the database
-$exam_query = $conn->query("SELECT start_date, end_date FROM exam_settings LIMIT 1");
-$exam_settings = $exam_query->fetch_assoc();
+$exam_query = $pdo->query("SELECT start_date, end_date FROM exam_settings LIMIT 1");
+$exam_settings = $exam_query->fetch(PDO::FETCH_ASSOC);
 
 if (!$exam_settings) {
   die("Exam settings not found.");
@@ -117,7 +109,7 @@ if ($already_submitted && !$can_edit) {
 }
 
 // Close connection
-$conn->close();
+// PDO closes automatically
 ?>
 <!DOCTYPE html>
 <html lang="en">
