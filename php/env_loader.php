@@ -7,9 +7,14 @@
 
 function loadEnv($path)
 {
-    // If running on Render (or any server with env vars already set),
-    // no need to load .env file
-    if (getenv('RENDER') !== false || getenv('SMTP_USER') !== false) {
+    // Check if essential DB environment variables are set
+    $dbHost = getenv('DB_HOST');
+    $dbUser = getenv('DB_USER');
+    $dbName = getenv('DB_NAME');
+    
+    // If running on Render and DB vars are properly set, skip .env file
+    if ((getenv('RENDER') !== false || getenv('SMTP_USER') !== false) && 
+        !empty($dbHost) && !empty($dbUser) && !empty($dbName)) {
         return true;
     }
 
