@@ -54,117 +54,107 @@ function fetchYearsSemesters()
 // Fetch all question papers
 function fetchQuestionPapers()
 {
-    global $conn;
-    $query = "SELECT * FROM student_notes";
-    $result = mysqli_query($conn, $query);
-    $data = [];
-
-    while ($row = mysqli_fetch_assoc($result)) {
-        $data[] = $row;
-    }
-
+    global $pdo;
+    $stmt = $pdo->query("SELECT * FROM student_notes");
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode(['status' => 'success', 'data' => $data]);
 }
 
 // Add new question paper
 function addQuestionPaper()
 {
-    global $conn;
+    global $pdo;
 
     $year = $_POST['year'];
     $semester = $_POST['semester'];
     $subject_name = $_POST['subject_name'];
 
-    // Paths relative to this php file (php/)
     $baseNotesDir = "../notes/notes/";
     $baseImagesDir = "../notes/images/";
 
-    // Check/Create directories
-    if (!is_dir($baseNotesDir))
-        mkdir($baseNotesDir, 0777, true);
-    if (!is_dir($baseImagesDir))
-        mkdir($baseImagesDir, 0777, true);
+    if (!is_dir($baseNotesDir)) mkdir($baseNotesDir, 0777, true);
+    if (!is_dir($baseImagesDir)) mkdir($baseImagesDir, 0777, true);
 
     $pdfDestination = "";
     if (isset($_FILES['pdf']) && $_FILES['pdf']['name']) {
         $pdfFileName = time() . "_" . basename($_FILES['pdf']['name']);
         $targetPath = $baseNotesDir . $pdfFileName;
         if (move_uploaded_file($_FILES['pdf']['tmp_name'], $targetPath)) {
-            $pdfDestination = "notes/" . $pdfFileName; // Path stored in DB
+            $pdfDestination = "notes/" . $pdfFileName;
         }
     }
 
-    $imageDestination = "images/default.png"; // Default image
+    $imageDestination = "images/default.png";
     if (isset($_FILES['image']) && $_FILES['image']['name']) {
         $imageFileName = time() . "_" . basename($_FILES['image']['name']);
         $targetPath = $baseImagesDir . $imageFileName;
         if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-            $imageDestination = "images/" . $imageFileName; // Path stored in DB
+            $imageDestination = "images/" . $imageFileName;
         }
     }
 
-    $query = "INSERT INTO student_notes (semester, subject_name, image_url, notes_link)
-              VALUES ('$year', '$subject_name', '$imageDestination', '$pdfDestination')";
-
-    if (mysqli_query($conn, $query)) {
-        echo json_encode(['status' => 'success', 'message' => 'Question paper added successfully.']);
+    $stmt = $pdo->prepare("INSERT INTO student_notes (semester, subject_name, image_url, notes_link) VALUES (?, ?, ?, ?)");
+    if ($stmt->execute([$year, $subject_name, $imageDestination, $pdfDestination])) {
+        echo json_encode(['status' => 'success', 'message' => 'Note added successfully.']);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to add question paper: ' . mysqli_error($conn)]);
+        echo json_encode(['status' => 'error', 'message' => 'Failed to add note.']);
     }
 }
 
 // Update an existing question paper
 function updateQuestionPaper()
 {
-    global $conn;
+    global $pdo;
     $id = $_POST['id'];
     $subject_name = $_POST['subject_name'];
 
     $baseNotesDir = "../notes/notes/";
     $baseImagesDir = "../notes/images/";
 
-    $updateFields = ["subject_name = '$subject_name'"];
+    $updateFields = [];
+    $params = [];
 
-    // Update PDF if provided
+    $updateFields[] = "subject_name = ?";
+    $params[] = $subject_name;
+
     if (isset($_FILES['pdf']) && $_FILES['pdf']['name']) {
         $pdfFileName = time() . "_" . basename($_FILES['pdf']['name']);
         $targetPath = $baseNotesDir . $pdfFileName;
         if (move_uploaded_file($_FILES['pdf']['tmp_name'], $targetPath)) {
-            $pdfDestination = "notes/" . $pdfFileName;
-            $updateFields[] = "notes_link = '$pdfDestination'";
+            $updateFields[] = "notes_link = ?";
+            $params[] = "notes/" . $pdfFileName;
         }
     }
 
-    // Update Image if provided
     if (isset($_FILES['image']) && $_FILES['image']['name']) {
         $imageFileName = time() . "_" . basename($_FILES['image']['name']);
         $targetPath = $baseImagesDir . $imageFileName;
         if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-            $imageDestination = "images/" . $imageFileName;
-            $updateFields[] = "image_url = '$imageDestination'";
+            $updateFields[] = "image_url = ?";
+            $params[] = "images/" . $imageFileName;
         }
     }
 
-    $sql = "UPDATE student_notes SET " . implode(", ", $updateFields) . " WHERE id = '$id'";
-
-    if (mysqli_query($conn, $sql)) {
-        echo json_encode(['status' => 'success', 'message' => 'Question paper updated successfully.']);
+    $params[] = $id;
+    $sql = "UPDATE student_notes SET " . implode(", ", $updateFields) . " WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    if ($stmt->execute($params)) {
+        echo json_encode(['status' => 'success', 'message' => 'Note updated successfully.']);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to update question paper: ' . mysqli_error($conn)]);
+        echo json_encode(['status' => 'error', 'message' => 'Failed to update note.']);
     }
 }
 
 // Delete a question paper
 function deleteQuestionPaper()
 {
-    global $conn;
+    global $pdo;
     $id = $_POST['id'];
-
-    $query = "DELETE FROM student_notes WHERE id = '$id'";
-    if (mysqli_query($conn, $query)) {
-        echo json_encode(['status' => 'success', 'message' => 'Question paper deleted successfully.']);
+    $stmt = $pdo->prepare("DELETE FROM student_notes WHERE id = ?");
+    if ($stmt->execute([$id])) {
+        echo json_encode(['status' => 'success', 'message' => 'Note deleted successfully.']);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to delete question paper.']);
+        echo json_encode(['status' => 'error', 'message' => 'Failed to delete note.']);
     }
 }
 ?>

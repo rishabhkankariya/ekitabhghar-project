@@ -16,11 +16,12 @@ $semester_names = [
 ];
 $display_semester = $semester_names[$semester] ?? 'Semester Notes';
 
-$query = "SELECT id, subject_name, image_url, notes_link FROM student_notes WHERE semester='$semester'";
-$result = mysqli_query($conn, $query);
+$stmt = $pdo->prepare("SELECT id, subject_name, image_url, notes_link FROM student_notes WHERE semester = ?");
+$stmt->execute([$semester]);
+$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if (mysqli_num_rows($result) > 0) {
-    while ($row = mysqli_fetch_assoc($result)) {
+if (count($result) > 0) {
+    foreach ($result as $row) {
         $imgPath = $row['image_url'] ? $row['image_url'] : 'images/default_cover.jpg';
         $notesLink = $row['notes_link'];
 
@@ -98,5 +99,4 @@ if (mysqli_num_rows($result) > 0) {
         <p class="text-xl font-medium">No notes available for this semester yet.</p>
     </div>';
 }
-mysqli_close($conn);
 ?>

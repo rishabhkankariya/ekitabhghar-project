@@ -3,11 +3,11 @@ header('Content-Type: application/json');
 include 'connection.php'; // Include database connection
 
 $query = "SELECT * FROM syllabus ORDER BY year, semester";
-$result = $conn->query($query);
+$stmt = $pdo->query($query);
 
 $syllabusData = [];
 
-while ($row = $result->fetch_assoc()) {
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $year = $row['year'];
     $semester = $row['semester'];
 
