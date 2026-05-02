@@ -536,7 +536,8 @@ SELECT setval('visitor_count_id_seq', 2);
 ALTER TABLE challans
   ADD CONSTRAINT challans_student_fk FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE;
 
-ALTER TABLE student_login_logs
-  ADD CONSTRAINT student_login_logs_student_fk FOREIGN KEY (student_id) REFERENCES student_accounts (id) ON DELETE CASCADE;
+-- Note: student_login_logs does not enforce FK to allow historical/orphaned log entries
+-- ALTER TABLE student_login_logs
+--   ADD CONSTRAINT student_login_logs_student_fk FOREIGN KEY (student_id) REFERENCES student_accounts (id) ON DELETE CASCADE;
 
 COMMIT;
