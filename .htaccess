@@ -7,6 +7,9 @@ Options -Indexes
 # Set default file
 DirectoryIndex index.php
 
+# Allow direct access to health.php for monitoring
+RewriteRule ^health\.php$ health.php [L]
+
 # 1. Hide .php extensions (Works for root AND subdirectories like /admin/login)
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.php -f
