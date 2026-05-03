@@ -147,6 +147,11 @@ $passed = count(array_filter($report, fn($item) => $item['status'] === 'PASS'));
 $failed = $total - $passed;
 $status = ($failed === 0) ? 'HEALTHY' : 'CRITICAL';
 
+
+?>
+<?php
+http_response_code(200);
+echo "OK";
 ?>
 <!DOCTYPE html>
 <html lang="en">
