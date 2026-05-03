@@ -80,7 +80,7 @@ foreach ($writable as $path) {
 }
 
 /* ---------- 4. PHP EXTENSIONS ---------- */
-$extensions = ["pdo_mysql", "mysqli", "gd", "mbstring", "curl", "openssl"];
+$extensions = ["pdo_pgsql", "pgsql", "pdo", "gd", "mbstring", "curl", "openssl"];
 foreach ($extensions as $ext) {
     check(
         "Ext: $ext",
@@ -92,28 +92,29 @@ foreach ($extensions as $ext) {
 
 /* ---------- 5. DATABASE CHECK ---------- */
 try {
-    // Using ACTUAL env variables from connection.php
+    // Using PostgreSQL connection for Render deployment
     $host = getenv("DB_HOST");
     $db = getenv("DB_NAME");
     $user = getenv("DB_USER");
     $pass = getenv("DB_PASS");
-    $port = getenv("DB_PORT") ?: '3306';
+    $port = getenv("DB_PORT") ?: '5432';
 
     if (!$host || !$db)
         throw new Exception("Environment variables missing");
 
-    $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
+    $dsn = "pgsql:host=$host;port=$port;dbname=$db";
     $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
 
-    check("DB Connection", true, "Connected to '$db' on '$host'.", "");
+    check("DB Connection", true, "Connected to PostgreSQL '$db' on '$host'.", "");
 
-    $tables = ["visitor_count", "students", "admin", "announcements", "student_accounts"];
+    $tables = ["visitor_count", "student_accounts", "announcements", "imp_announcements", "modal_announcement"];
     foreach ($tables as $table) {
-        $stmt = $pdo->query("SHOW TABLES LIKE '$table'");
-        check("Table: $table", $stmt->rowCount() > 0, "Table exists.", "Table is missing.");
+        $stmt = $pdo->query("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '$table')");
+        $exists = $stmt->fetchColumn();
+        check("Table: $table", $exists, "Table exists.", "Table is missing.");
     }
 } catch (Exception $e) {
-    check("DB Connection", false, "", "Failed: " . (strpos($e->getMessage(), 'Environment') !== false ? "Env variables not set" : "Check credentials"));
+    check("DB Connection", false, "", "Failed: " . (strpos($e->getMessage(), 'Environment') !== false ? "Env variables not set" : "Check credentials: " . $e->getMessage()));
 }
 
 /* ---------- 6. MOD_REWRITE CHECK ---------- */
