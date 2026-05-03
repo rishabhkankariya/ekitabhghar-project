@@ -27,19 +27,17 @@ RUN composer install --no-dev --optimize-autoloader
 # Enable rewrite
 RUN a2enmod rewrite
 
-# Configure Apache to listen on PORT environment variable
-RUN echo 'Listen ${PORT}' > /etc/apache2/ports.conf
-
-# Create a simple startup script
+# Create startup script that configures Apache for Render's dynamic port
 RUN echo '#!/bin/bash\n\
 export PORT=${PORT:-80}\n\
-echo "Starting Apache on port $PORT"\n\
-sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf\n\
-sed -i "s/:80/:$PORT/g" /etc/apache2/sites-available/000-default.conf\n\
+echo "Configuring Apache for port $PORT"\n\
+echo "Listen $PORT" > /etc/apache2/ports.conf\n\
+sed -i "s/<VirtualHost \*:80>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf\n\
+echo "Starting Apache on 0.0.0.0:$PORT"\n\
 apache2-foreground' > /start.sh && chmod +x /start.sh
 
-# Expose port
-EXPOSE $PORT
+# Expose port (Render will set this dynamically)
+EXPOSE 80
 
 # Start Apache with custom script
 CMD ["/start.sh"]
