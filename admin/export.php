@@ -1,12 +1,12 @@
-<?php
+﻿<?php
 require_once('tcpdf/tcpdf.php'); // Include TCPDF library
 
 // Database Connection
-include '../../php/connection.php';
+include '../php/connection.php';
 
 // Fetch all student records
 $sql = "SELECT id, roll_no, student_name, father_address, course_type, current_semester, admission_fees, category, mobile_no, email_id, exam_date, student_signature, status FROM students ORDER BY id DESC";
-$result = $conn->query($sql);
+$stmt_exp = $pdo->query($sql); $result = $stmt_exp;
 
 // Create new PDF document
 $pdf = new TCPDF('L', PDF_UNIT, 'A4', true, 'UTF-8', false);
@@ -41,8 +41,8 @@ $html = '<h2 style="text-align:center;">Exam Form Records</h2>
         </tr>';
 
 // Table Data
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if ($result->rowCount() > 0) {
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $html .= '<tr>';
         $html .= '<td>' . htmlspecialchars($row['id']) . '</td>';
         $html .= '<td>' . htmlspecialchars($row['roll_no']) . '</td>';
@@ -77,3 +77,4 @@ $html .= '</table>';
 $pdf->writeHTML($html, true, false, true, false, '');
 $pdf->Output('exam_form_records.pdf', 'D');
 ?>
+

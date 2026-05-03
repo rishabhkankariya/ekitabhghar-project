@@ -1,19 +1,16 @@
 <?php
-// DB Connection
 require '../php/connection.php';
 
-// Add announcement
 if (isset($_POST['add'])) {
-    $msg = $conn->real_escape_string($_POST['message']);
-    $conn->query("INSERT INTO imp_announcements (message) VALUES ('$msg')");
+    $stmt = $pdo->prepare("INSERT INTO imp_announcements (message) VALUES (?)");
+    $stmt->execute([trim($_POST['message'])]);
     echo "<script>window.location.href='admin_announcements.php';</script>";
     exit;
 }
 
-// Delete announcement
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-    $conn->query("DELETE FROM imp_announcements WHERE id = $id");
+    $pdo->prepare("DELETE FROM imp_announcements WHERE id = ?")->execute([$id]);
     echo "<script>window.location.href='admin_announcements.php';</script>";
     exit;
 }
@@ -88,9 +85,10 @@ if (isset($_GET['delete'])) {
             </h3>
 
             <?php
-            $result = $conn->query("SELECT * FROM imp_announcements ORDER BY created_at DESC");
-            if ($result->num_rows > 0):
-                while ($row = $result->fetch_assoc()):
+            $result = $pdo->query("SELECT * FROM imp_announcements ORDER BY created_at DESC");
+            $rows = $result->fetchAll(PDO::FETCH_ASSOC);
+            if (count($rows) > 0):
+                foreach ($rows as $row):
                     $id = $row['id'];
                     $msg = htmlspecialchars($row['message']);
                     $date = date("M d, Y • h:i A", strtotime($row['created_at']));
@@ -114,7 +112,7 @@ if (isset($_GET['delete'])) {
                         </div>
                     </div>
                 <?php
-                endwhile;
+                endforeach;
             else:
                 ?>
                 <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-16 text-center">

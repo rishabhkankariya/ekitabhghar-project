@@ -17,16 +17,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // SQL query to insert the admin user with the hashed password
     $sql = "INSERT INTO admin (username, password, profile_pic) VALUES (?, ?, 'uploads/dummy.png')";
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $username, $hashed_password);
-
-    if ($stmt->execute()) {
+    $stmt = $pdo->prepare("INSERT INTO admin (username, password, profile_pic) VALUES (?, ?, 'uploads/dummy.png')");
+    if ($stmt->execute([$username, $hashed_password])) {
         echo "Admin user added successfully!";
     } else {
-        echo "Error: " . $stmt->error;
+        echo "Error inserting admin user.";
     }
-
-    $stmt->close();
-    $conn->close();
 }
 ?>

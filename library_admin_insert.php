@@ -11,17 +11,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hash the password
 
-    $sql = "INSERT INTO library_admin (username, password) VALUES (?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $username, $password);
-
-    if ($stmt->execute()) {
+    $stmt = $pdo->prepare("INSERT INTO library_admin (username, password) VALUES (?, ?)");
+    if ($stmt->execute([$username, $password])) {
         echo "Admin user inserted successfully!";
     } else {
-        echo "Error: " . $conn->error;
+        echo "Error inserting library admin.";
     }
-
-    $stmt->close();
-    $conn->close();
 }
 ?>

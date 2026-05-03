@@ -5,21 +5,16 @@ require '../php/connection.php';
 // Handle delete request if POST data is provided
 if (isset($_POST['delete_id'])) {
   $id = intval($_POST['delete_id']);
+  $stmt = $pdo->prepare("SELECT file_name FROM contributed_notes WHERE id = ?");
+  $stmt->execute([$id]);
+  $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  $query = "SELECT file_name FROM contributed_notes WHERE id = $id";
-  $result = $conn->query($query);
+  if ($row) {
+    $file_path = "../PHP/uploads/notes/" . $row['file_name'];
+    if (file_exists($file_path)) unlink($file_path);
 
-  if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $file_name = $row['file_name'];
-
-    $file_path = "../PHP/uploads/notes/" . $file_name;
-    if (file_exists($file_path)) {
-      unlink($file_path);
-    }
-
-    $delete_query = "DELETE FROM contributed_notes WHERE id = $id";
-    if ($conn->query($delete_query)) {
+    $del = $pdo->prepare("DELETE FROM contributed_notes WHERE id = ?");
+    if ($del->execute([$id])) {
       echo json_encode(['status' => 'success', 'message' => 'Note permanently removed.']);
     } else {
       echo json_encode(['status' => 'error', 'message' => 'Failed to remove entry from registry.']);
@@ -27,7 +22,6 @@ if (isset($_POST['delete_id'])) {
   } else {
     echo json_encode(['status' => 'error', 'message' => 'Resource not found.']);
   }
-  $conn->close();
   exit;
 }
 
@@ -86,9 +80,10 @@ if (isset($_POST['delete_id'])) {
     <!-- Notes Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="notes-list">
       <?php
-      $result = mysqli_query($conn, "SELECT * FROM contributed_notes ORDER BY uploaded_at DESC");
-      if (mysqli_num_rows($result) > 0):
-        while ($row = mysqli_fetch_assoc($result)):
+      $stmt = $pdo->query("SELECT * FROM contributed_notes ORDER BY uploaded_at DESC");
+      $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if (count($rows) > 0):
+        foreach ($rows as $row):
           $id = $row['id'];
           $student_name = htmlspecialchars($row['student_name']);
           $notes_title = htmlspecialchars($row['notes_title']);
@@ -133,7 +128,7 @@ if (isset($_POST['delete_id'])) {
             </div>
           </div>
         <?php
-        endwhile;
+        endforeach;
       else:
         ?>
         <div class="col-span-full py-20 bg-white border border-dashed border-slate-300 rounded-3xl text-center">

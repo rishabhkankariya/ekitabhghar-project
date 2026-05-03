@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['admin_id'])) {
     echo "<script>window.location.href = 'admin_login.php';</script>";
@@ -21,36 +21,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $toast_message = "Please provide both start and end dates!";
         $toast_type = "error";
     } else {
-        $check = $conn->query("SELECT * FROM exam_settings LIMIT 1");
-
-        if ($check->num_rows > 0) {
-            $stmt = $conn->prepare("UPDATE exam_settings SET start_date = ?, end_date = ?");
+        $check = $pdo->query("SELECT * FROM exam_settings LIMIT 1");
+        if ($check->rowCount() > 0) {
+            $stmt = $pdo->prepare("UPDATE exam_settings SET start_date = ?, end_date = ?");
         } else {
-            $stmt = $conn->prepare("INSERT INTO exam_settings (start_date, end_date) VALUES (?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO exam_settings (start_date, end_date) VALUES (?, ?)");
         }
-        $stmt->bind_param("ss", $start_date, $end_date);
-
-        if ($stmt->execute()) {
+        if ($stmt->execute([$start_date, $end_date])) {
             $toast_message = "Exam settings updated successfully!";
             $toast_type = "success";
-
-            // [TESTING MODE] Skip email notification
-            // sendExamNotification($start_date, $end_date);
         } else {
-            $toast_message = "Error updating settings: " . $stmt->error;
+            $toast_message = "Error updating settings.";
             $toast_type = "error";
         }
-
-        $stmt->close();
     }
 }
 
 $current_start_date = "";
 $current_end_date = "";
-$exam_query = "SELECT * FROM exam_settings LIMIT 1";
-$exam_result = $conn->query($exam_query);
-if ($exam_result && $exam_result->num_rows > 0) {
-    $exam = $exam_result->fetch_assoc();
+$exam_result = $pdo->query("SELECT * FROM exam_settings LIMIT 1");
+if ($exam_result && $exam_result->rowCount() > 0) {
+    $exam = $exam_result->fetch(PDO::FETCH_ASSOC);
     $current_start_date = $exam["start_date"];
     $current_end_date = $exam["end_date"];
 }
@@ -64,34 +55,7 @@ if (!empty($current_start_date) && !empty($current_end_date)) {
     }
 }
 
-
-// Send Exam Notification Email
-function sendExamNotification($start, $end)
-{
-    global $conn; // Use the main connection
-
-    $subject = 'Exam Form is Live Don’t Miss Out!';
-    $startFormatted = date("F j, Y", strtotime($start));
-    $endFormatted = date("F j, Y", strtotime($end));
-
-    $htmlBody = "
-        <div style='font-family: Arial, sans-serif; background-color: #fefefe; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
-            <h2 style='color: #007BFF;'>🎓 Exam Form Now Open!</h2>
-            <p>Hello Student,</p>
-            <p>Your exam form is now live and will be available from:</p>
-            <p style='font-size: 18px; margin: 10px 0;'><strong>$startFormatted</strong> to <strong>$endFormatted</strong></p>
-            <p>Please visit your dashboard and complete the form before the deadline.</p>
-            <br>
-            <p style='margin-top: 20px;'>Regards,<br><strong>E-Kitabghar Team</strong></p>
-        </div>";
-
-    $result = $conn->query("SELECT email, full_name FROM student_accounts WHERE email IS NOT NULL AND email != ''");
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            sendEmail($row['email'], $row['full_name'], $subject, $htmlBody);
-        }
-    }
-}
+function sendExamNotification($start, $end) { /* disabled */ }
 ?>
 <!DOCTYPE html>
 <html lang="en">

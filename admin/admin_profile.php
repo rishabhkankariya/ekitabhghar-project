@@ -13,24 +13,18 @@ $admin_id = $_SESSION['admin_id'];
 
 // Fetch admin details
 $sql = "SELECT username, profile_pic FROM admin WHERE admin_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $admin_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$admin = $result->fetch_assoc();
-$stmt->close();
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$admin_id]);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Update Username
 if (isset($_POST['update_username'])) {
   $new_username = trim(htmlspecialchars($_POST['new_username']));
   if (!empty($new_username)) {
-    $sql = "UPDATE admin SET username = ? WHERE admin_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("si", $new_username, $admin_id);
-    if ($stmt->execute()) {
+    $stmt = $pdo->prepare("UPDATE admin SET username = ? WHERE admin_id = ?");
+    if ($stmt->execute([$new_username, $admin_id])) {
       $_SESSION['toast'] = ['type' => 'success', 'message' => 'Username updated successfully!'];
     }
-    $stmt->close();
     header('Location: admin_profile.php');
     exit();
   }
@@ -39,26 +33,21 @@ if (isset($_POST['update_username'])) {
 // Update Profile Picture
 if (isset($_POST['update_profile']) && isset($_FILES["profile_pic"])) {
   $target_dir = "uploads/";
-  if (!file_exists($target_dir))
-    mkdir($target_dir, 0777, true);
+  if (!file_exists($target_dir)) mkdir($target_dir, 0777, true);
 
   $file_ext = strtolower(pathinfo($_FILES["profile_pic"]["name"], PATHINFO_EXTENSION));
   $file_name = "admin_" . $admin_id . "_" . time() . "." . $file_ext;
   $target_file = $target_dir . $file_name;
-
   $check = getimagesize($_FILES["profile_pic"]["tmp_name"]);
 
   if (!$check || !in_array($file_ext, ['jpg', 'jpeg', 'png']) || $_FILES["profile_pic"]["size"] > 2000000) {
     $_SESSION['toast'] = ['type' => 'error', 'message' => 'Invalid image! Use JPG/PNG under 2MB.'];
   } else {
     if (move_uploaded_file($_FILES["profile_pic"]["tmp_name"], $target_file)) {
-      $sql = "UPDATE admin SET profile_pic = ? WHERE admin_id = ?";
-      $stmt = $conn->prepare($sql);
-      $stmt->bind_param("si", $target_file, $admin_id);
-      if ($stmt->execute()) {
+      $stmt = $pdo->prepare("UPDATE admin SET profile_pic = ? WHERE admin_id = ?");
+      if ($stmt->execute([$target_file, $admin_id])) {
         $_SESSION['toast'] = ['type' => 'success', 'message' => 'Profile picture updated!'];
       }
-      $stmt->close();
       header('Location: admin_profile.php');
       exit();
     }
@@ -71,12 +60,9 @@ if (isset($_POST['change_password'])) {
   $new_password = trim($_POST['new_password']);
   $confirm_password = trim($_POST['confirm_password']);
 
-  $sql = "SELECT password FROM admin WHERE admin_id = ?";
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("i", $admin_id);
-  $stmt->execute();
-  $admin_data = $stmt->get_result()->fetch_assoc();
-  $stmt->close();
+  $stmt = $pdo->prepare("SELECT password FROM admin WHERE admin_id = ?");
+  $stmt->execute([$admin_id]);
+  $admin_data = $stmt->fetch(PDO::FETCH_ASSOC);
 
   if (!password_verify($current_password, $admin_data['password'])) {
     $_SESSION['toast'] = ['type' => 'error', 'message' => 'Incorrect current password!'];
@@ -86,13 +72,10 @@ if (isset($_POST['change_password'])) {
     $_SESSION['toast'] = ['type' => 'error', 'message' => 'Min 6 characters required.'];
   } else {
     $hashed = password_hash($new_password, PASSWORD_BCRYPT);
-    $sql = "UPDATE admin SET password = ? WHERE admin_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("si", $hashed, $admin_id);
-    if ($stmt->execute()) {
+    $stmt = $pdo->prepare("UPDATE admin SET password = ? WHERE admin_id = ?");
+    if ($stmt->execute([$hashed, $admin_id])) {
       $_SESSION['toast'] = ['type' => 'success', 'message' => 'Password updated successfully!'];
     }
-    $stmt->close();
     header('Location: admin_profile.php');
     exit();
   }

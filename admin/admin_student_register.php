@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include '../php/connection.php';
 
@@ -10,9 +10,8 @@ if (!isset($_SESSION['admin_logged_in'])) {
 // Handle Single Delete Action
 if (isset($_GET['delete_id'])) {
     $id = intval($_GET['delete_id']);
-    $stmt = $conn->prepare("DELETE FROM student_accounts WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
+    $stmt = $pdo->prepare("DELETE FROM student_accounts WHERE id = ?");
+    if ($stmt->execute([$id])) {
         header("Location: admin_student_register.php?msg=Student deleted successfully");
     } else {
         header("Location: admin_student_register.php?error=Failed to delete student");
@@ -24,13 +23,19 @@ if (isset($_GET['delete_id'])) {
 $where = "1";
 $search = "";
 if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $search = $conn->real_escape_string($_GET['search']);
+    $search = htmlspecialchars(trim($_GET['search']));
     $where .= " AND (full_name LIKE '%$search%' OR roll_no LIKE '%$search%' OR email LIKE '%$search%' OR course LIKE '%$search%')";
 }
 
 // Fetch Students (Simple View)
-$sql = "SELECT id, roll_no, full_name, email, course, admission_year, account_status FROM student_accounts WHERE $where ORDER BY id DESC LIMIT 50";
-$result = $conn->query($sql);
+$searchParam = "%$search%";
+$stmt_list = $pdo->prepare("SELECT id, roll_no, full_name, email, course, admission_year, account_status FROM student_accounts WHERE 1=1" . (!empty($search) ? " AND (full_name LIKE ? OR roll_no LIKE ? OR email LIKE ? OR course LIKE ?)" : "") . " ORDER BY id DESC LIMIT 50");
+if (!empty($search)) { 
+    $stmt_list->execute([$searchParam, $searchParam, $searchParam, $searchParam]); 
+} else { 
+    $stmt_list->execute(); 
+}
+$result = $stmt_list;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,8 +109,8 @@ $result = $conn->query($sql);
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                        <?php if ($result && $result->rowCount() > 0): ?>
+                            <?php while ($row = $result->fetch(PDO::FETCH_ASSOC)): ?>
                                 <tr class="hover:bg-blue-50/50 transition-colors group">
                                     <td class="p-5 font-mono text-gray-600 font-medium">
                                         <?= htmlspecialchars($row['roll_no']) ?>
@@ -160,7 +165,7 @@ $result = $conn->query($sql);
                 class="p-4 bg-gray-50 border-t border-gray-200 text-sm text-gray-500 flex justify-between items-center">
                 <span>Showing top 50 results</span>
                 <span>Total Active Students:
-                    <?= $conn->query("SELECT count(*) FROM student_accounts")->fetch_row()[0] ?></span>
+                    <?= $pdo->query("SELECT COUNT(*) FROM student_accounts")->fetchColumn() ?></span>
             </div>
         </div>
 

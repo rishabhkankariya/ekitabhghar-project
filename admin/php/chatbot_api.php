@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 header("Content-Type: text/html; charset=UTF-8");
 require_once __DIR__ . '/../../php/connection.php';
 
@@ -23,12 +23,12 @@ function formatLink($url, $text, $icon = '🔗')
 }
 
 // ✅ Context System
-function getWebsiteContext($conn)
+function getWebsiteContext($pdo)
 {
     $examInfo = "No active exam forms.";
-    $q = mysqli_query($conn, "SELECT start_date, end_date FROM exam_settings ORDER BY id DESC LIMIT 1");
-    if ($q && mysqli_num_rows($q) > 0) {
-        $row = mysqli_fetch_assoc($q);
+    $q = $pdo->query("SELECT start_date, end_date FROM exam_settings ORDER BY id DESC LIMIT 1");
+    if ($q && $q->rowCount() > 0) {
+        $row = $q->fetch(PDO::FETCH_ASSOC);
         $start = date("d M Y", strtotime($row["start_date"]));
         $end = date("d M Y", strtotime($row["end_date"]));
         $examInfo = "Exam form collection is from $start to $end.";
@@ -97,9 +97,9 @@ if (empty($userMessage) || $userMessageLower === "help") {
     $response = $commands[$userMessageLower];
 } elseif (strpos($userMessageLower, "exam") !== false) {
     $q = "SELECT start_date, end_date FROM exam_settings ORDER BY id DESC LIMIT 1";
-    $result = @mysqli_query($conn, $q);
-    if ($result && mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
+    $result = $pdo->query($q);
+    if ($result && $result->rowCount() > 0) {
+        $row = $result->fetch(PDO::FETCH_ASSOC);
         $s = date("d M Y", strtotime($row["start_date"]));
         $e = date("d M Y", strtotime($row["end_date"]));
         $response = "📅 <b>Exam Update</b><br>Active from <b>$s</b> to <b>$e</b>." . formatLink('student_login.html', 'Apply Now', '✍️');
@@ -107,7 +107,7 @@ if (empty($userMessage) || $userMessageLower === "help") {
         $response = "📅 <b>Exam Hub</b><br>No active cycles detected.";
     }
 } else {
-    $context = getWebsiteContext($conn);
+    $context = getWebsiteContext($pdo);
     $aiResponse = callGeminiAPI($userMessage, $context);
     if ($aiResponse) {
         $response = $aiResponse;

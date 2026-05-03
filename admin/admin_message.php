@@ -13,26 +13,18 @@ $conn2 = $conn;
 
 // Fetch admin name from admin_system database
 $admin_id = $_SESSION['admin_id'];
-$stmt_admin = $conn2->prepare("SELECT username FROM admin WHERE admin_id = ?");
-$stmt_admin->bind_param("s", $admin_id);
-$stmt_admin->execute();
-$result_admin = $stmt_admin->get_result();
-$admin_data = $result_admin->fetch_assoc();
-$admin_name = ($result_admin->num_rows > 0) ? $admin_data['username'] : die("Error: Admin not found.");
-$stmt_admin->close();
+$stmt_admin = $pdo->prepare("SELECT username FROM admin WHERE admin_id = ?");
+$stmt_admin->execute([$admin_id]);
+$admin_data = $stmt_admin->fetch(PDO::FETCH_ASSOC);
+$admin_name = $admin_data ? $admin_data['username'] : die("Error: Admin not found.");
 
 $toast_message = "";
 $toast_type = "";
 
 // Handle message sending
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['message'])) {
-  $message = $conn1->real_escape_string($_POST['message']);
-
-  // Insert message into database
-  $stmt_insert = $conn1->prepare("INSERT INTO messages (admin_id, admin_name, message) VALUES (?, ?, ?)");
-  $stmt_insert->bind_param("sss", $admin_id, $admin_name, $message);
-
-  if ($stmt_insert->execute()) {
+  $stmt_insert = $pdo->prepare("INSERT INTO messages (admin_id, admin_name, message) VALUES (?, ?, ?)");
+  if ($stmt_insert->execute([$admin_id, $admin_name, $_POST['message']])) {
     // [TESTING MODE] Skip email notification to all students
     // sendNotificationEmail($message);
     $_SESSION['toast'] = ['type' => 'success', 'message' => 'Message successfully broadcasted!'];
@@ -43,7 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['message'])) {
     header("Location: admin_message.php");
     exit();
   }
-  $stmt_insert->close();
 }
 
 if (isset($_SESSION['toast'])) {
@@ -52,43 +43,13 @@ if (isset($_SESSION['toast'])) {
   unset($_SESSION['toast']);
 }
 
-// Fetch all messages
-$sql_messages = "SELECT * FROM messages ORDER BY sent_at DESC";
-$result_messages = $conn1->query($sql_messages);
+$result_messages = $pdo->query("SELECT * FROM messages ORDER BY sent_at DESC");
 
-// Function to Send Email Notification
 function sendNotificationEmail($messageContent)
 {
-  global $conn1;
-
-  $subject = 'New Notification from E-Kitabghar!';
-  $emailBody = "
-          <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
-              <h2 style='color: #4CAF50;'>📢 New Notification Received</h2>
-              <p>Dear Student,</p>
-              <p>You have received a new message from <strong>E-Kitabghar</strong>:</p>
-              <p>✅ <strong>Please check your student dashboard</strong> for more details.</p>
-              <br>
-              <p>Best Regards,</p>
-              <p><strong>E-Kitabghar Team</strong></p>
-          </div>";
-
-  // Fetch all student emails
-  $bcc = [];
-  $sql = "SELECT email FROM student_accounts";
-  $result = $conn1->query($sql);
-
-  if ($result) {
-    while ($row = $result->fetch_assoc()) {
-      if (!empty($row['email'])) {
-        $bcc[] = $row['email'];
-      }
-    }
-  }
-
-  if (!empty($bcc)) {
-    sendEmail(null, '', $subject, $emailBody, '', $bcc);
-  }
+  global $pdo;
+  $stmt = $pdo->query("SELECT email FROM student_accounts");
+  // Email disabled in test mode
 }
 
 ?>
@@ -180,8 +141,8 @@ function sendNotificationEmail($messageContent)
       <div class="lg:col-span-7">
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 block px-1">Recent Transmissions</h3>
         <div class="space-y-4">
-          <?php if ($result_messages->num_rows > 0): ?>
-            <?php while ($row = $result_messages->fetch_assoc()): ?>
+          <?php if ($result_messages->rowCount() > 0): ?>
+            <?php while ($row = $result_messages->fetch(PDO::FETCH_ASSOC)): ?>
               <div
                 class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow transition-all hover:border-slate-300 group">
                 <div class="flex items-start justify-between mb-4">

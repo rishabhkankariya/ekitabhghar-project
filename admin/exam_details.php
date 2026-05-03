@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 if (!isset($_SESSION['admin_id'])) {
@@ -6,16 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "ekitabhghar";
-
-// Database Connection
-$conn = new mysqli($servername, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once "../php/connection.php";
 
 if (!isset($_GET['id'])) {
     die("Invalid request.");
@@ -23,20 +14,12 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 $sql = "SELECT * FROM students WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$result = $stmt->get_result();
-$student = $result->fetch_assoc();
+$stmt = $pdo->prepare($sql); $stmt->execute([$id]); $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Fetch challans for the student
 $challans = [];
 $challan_sql = "SELECT * FROM challans WHERE student_id = ?";
-$challan_stmt = $conn->prepare($challan_sql);
-$challan_stmt->bind_param("i", $id);
-$challan_stmt->execute();
-$challan_result = $challan_stmt->get_result();
-while ($row = $challan_result->fetch_assoc()) {
+$challan_stmt = $pdo->prepare($challan_sql); $challan_stmt->execute([$id]); while ($row = $challan_stmt->fetch(PDO::FETCH_ASSOC)) {
     $challans[] = $row;
 }
 
@@ -374,3 +357,4 @@ $ex_subjects = json_decode($student['ex_subjects'], true) ?: [];
 </body>
 
 </html>
+

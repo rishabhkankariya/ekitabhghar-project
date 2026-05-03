@@ -25,12 +25,9 @@ $admin_id = $_SESSION['admin_id'];
 
 // Fetch admin profile picture
 $query = "SELECT profile_pic FROM admin WHERE admin_id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $admin_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$admin = $result->fetch_assoc();
-$stmt->close();
+$stmt = $pdo->prepare($query);
+$stmt->execute([$admin_id]);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $profile_pic = (!empty($admin['profile_pic'])) ? $admin['profile_pic'] : 'uploads/dummy.png';
 

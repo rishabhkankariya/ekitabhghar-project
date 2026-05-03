@@ -12,9 +12,7 @@ if (!isset($_SESSION['admin_id'])) {
 
 if (isset($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
-    $stmt = $conn->prepare("DELETE FROM feedback WHERE id = ?");
-    $stmt->bind_param("i", $delete_id);
-    $stmt->execute();
+    $pdo->prepare("DELETE FROM feedback WHERE id = ?")->execute([$delete_id]);
     header("Location: admin_feedbacks.php");
     exit;
 }
@@ -23,15 +21,11 @@ $limit = 8;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($page - 1) * $limit;
 
-$sql = "SELECT * FROM feedback ORDER BY submitted_at DESC LIMIT ?, ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ii", $offset, $limit);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt = $pdo->prepare("SELECT * FROM feedback ORDER BY submitted_at DESC LIMIT ? OFFSET ?");
+$stmt->execute([$limit, $offset]);
+$result = $stmt;
 
-$total_sql = "SELECT COUNT(*) AS total FROM feedback";
-$total_result = $conn->query($total_sql);
-$total_feedbacks = $total_result->fetch_assoc()['total'];
+$total_feedbacks = $pdo->query("SELECT COUNT(*) FROM feedback")->fetchColumn();
 $total_pages = ceil($total_feedbacks / $limit);
 ?>
 <!DOCTYPE html>
@@ -118,8 +112,8 @@ $total_pages = ceil($total_feedbacks / $limit);
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        <?php if ($result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                        <?php if ($result->rowCount() > 0): ?>
+                            <?php while ($row = $result->fetch(PDO::FETCH_ASSOC)): ?>
                                 <tr class="hover:bg-slate-50 transition-colors">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
