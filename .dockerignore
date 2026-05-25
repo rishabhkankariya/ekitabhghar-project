@@ -2,11 +2,15 @@
 .gitignore
 .env
 node_modules
-vendor
 *.md
+!RENDER_DEPLOYMENT.md
 .vscode
 .idea
 *.log
 challans/*
 results/*
 uploads/*
+.DS_Store
+*.swp
+*.swo
+*~

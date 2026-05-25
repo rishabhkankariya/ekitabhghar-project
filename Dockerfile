@@ -20,12 +20,23 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . /var/www/html/
 
+# Copy startup script
+COPY start-apache.sh /usr/local/bin/start-apache.sh
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+    && chmod -R 755 /var/www/html \
+    && chmod +x /usr/local/bin/start-apache.sh
 
-# Expose port 80
-EXPOSE 80
+# Update Apache configuration for proper document root and permissions
+RUN echo '<Directory /var/www/html/>\n\
+    Options Indexes FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' >> /etc/apache2/apache2.conf
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Expose port (Render will override this with PORT env var)
+EXPOSE 10000
+
+# Start Apache with custom script that handles PORT
+CMD ["/usr/local/bin/start-apache.sh"]
