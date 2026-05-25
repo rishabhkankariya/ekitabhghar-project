@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION["admin_id"] = $admin['admin_id'];
         $_SESSION["admin_username"] = $admin['username'];
 
-        header("Location: /admin/adminpanel.php");
+        header("Location: ../adminpanel.php");
         exit();
     } else {
         $_SESSION['admin_login_toast'] = [

@@ -13,12 +13,14 @@ require_once 'admin/php/fetch.php';
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="royalblue">
-  <title>KITABGHAR | HOME</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="favicon_logoai/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon_logoai/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon_logoai/favicon-16x16.png">
-  <link rel="manifest" href="favicon_logoai/site.webmanifest">
+  <meta name="theme-color" content="#1e293b">
+  <title>E-Kitabghar | Diploma Exam Portal</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico?v=3">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png?v=3">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=3">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=3">
+  <link rel="manifest" href="site.webmanifest">
 
 
   <!-- Fonts -->
@@ -38,7 +40,7 @@ require_once 'admin/php/fetch.php';
   <meta property="og:title" content="Kitabghar - CSE Books & Study Resources">
   <meta property="og:description"
     content="Download Computer Science books, programming guides, and study materials. Access is restricted to students of the polytechnic college with a valid ID.">
-  <meta property="og:image" content="favicon_logoai/android-chrome-512x512.png">
+  <meta property="og:image" content="android-chrome-512x512.png">
   <meta property="og:type" content="website">
   <script src="https://kit.fontawesome.com/e72d27fd60.js" crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
@@ -1360,21 +1362,24 @@ require_once 'admin/php/fetch.php';
 </head>
 
 <body>
-  <!-- 🌊 Modern Loader -->
+  <!-- Simple Loading Screen -->
   <div id="loader"
-    class="fixed inset-0 z-[10000] bg-slate-900 flex flex-col items-center justify-center transition-opacity duration-500">
-    <div class="relative w-32 h-32 mb-8">
-      <div class="absolute inset-0 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
-      <div class="absolute inset-2 border-t-4 border-cyan-400 border-solid rounded-full animate-spin_reverse"></div>
-      <div class="absolute inset-0 flex items-center justify-center">
-        <img src="favicon_logoai/apple-touch-icon.png" alt="Logo" class="w-16 h-16 object-contain animate-pulse">
-      </div>
+    class="fixed inset-0 z-[10000] bg-[#1e293b] flex flex-col items-center justify-center transition-opacity duration-500">
+    
+    <!-- Website Name -->
+    <div class="text-center mb-8">
+      <h1 class="text-5xl font-bold text-white mb-3 tracking-tight">E-Kitabghar</h1>
+      <p class="text-white/90 text-xl font-medium">Diploma Exam Portal</p>
     </div>
-    <div class="flex gap-2">
-      <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-75"></div>
-      <div class="w-3 h-3 bg-cyan-500 rounded-full animate-bounce delay-150"></div>
-      <div class="w-3 h-3 bg-indigo-500 rounded-full animate-bounce delay-300"></div>
+    
+    <!-- Loading Spinner -->
+    <div class="relative w-16 h-16 mb-6">
+      <div class="absolute inset-0 border-4 border-white/30 rounded-full"></div>
+      <div class="absolute inset-0 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
     </div>
+    
+    <!-- Loading Text -->
+    <p class="text-white/80 text-sm font-medium">Loading...</p>
   </div>
 
   <!-- 📢 Modern Announcement Modal -->
@@ -1446,7 +1451,7 @@ require_once 'admin/php/fetch.php';
   <!-- ================= HEADER SECTION ================= -->
 
   <!-- 🟢 Top Bar -->
-  <div class="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 py-2 hidden md:block">
+  <div class="bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-950 border-b border-slate-200 dark:border-slate-800 py-2 hidden md:block">
     <div class="max-w-7xl mx-auto px-4 flex justify-between items-center text-sm">
       <!-- Left: Translate -->
       <div class="translate-wrapper relative z-50">
@@ -1456,7 +1461,7 @@ require_once 'admin/php/fetch.php';
       <!-- Right: Interactions -->
       <div class="flex items-center gap-6">
         <!-- Font Size -->
-        <div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+        <div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 shadow-sm border border-slate-200 dark:border-slate-700">
           <button id="decrease-font"
             class="w-8 h-8 flex items-center justify-center hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors text-slate-600 dark:text-slate-300"
             title="Decrease Size">A-</button>
@@ -1489,25 +1494,25 @@ require_once 'admin/php/fetch.php';
   </div>
 
   <!-- 🏛️ Main Branding Header -->
-  <header class="bg-white dark:bg-slate-900 shadow-sm relative z-40">
+  <header class="bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-900 shadow-md border-b-2 border-slate-200 dark:border-slate-800 relative z-40">
     <div class="max-w-7xl mx-auto px-4 py-4 md:py-6 flex flex-col md:flex-row items-center gap-4 md:gap-8">
       <!-- Logo -->
       <div class="flex items-center gap-4 flex-shrink-0 animate-fade-in-down">
-        <img loading="lazy" src="favicon_logoai/apple-touch-icon.png" style="width: 30%;" alt="Govt Logo"
-          class="h-20 w-25 md:h-20 md:w-20 object-cover rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] ring-4 ring-white/80 dark:ring-white/10 hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.3)] hover:scale-105 active:scale-95 transition-all duration-500 ease-out bg-white cursor-pointer backdrop-blur-sm">
-        <div class="h-12 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+        <img loading="lazy" src="apple-touch-icon.png?v=3" style="width: 30%;" alt="Govt Logo"
+          class="h-20 w-25 md:h-20 md:w-20 object-cover rounded-full shadow-lg ring-4 ring-slate-300 dark:ring-slate-700 hover:shadow-xl hover:ring-blue-400 dark:hover:ring-blue-500 hover:scale-105 active:scale-95 transition-all duration-500 ease-out bg-white cursor-pointer border-2 border-slate-200 dark:border-slate-700">
+        <div class="h-12 w-px bg-slate-300 dark:bg-slate-700 hidden md:block shadow-sm"></div>
         <div class="text-center md:text-left">
           <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Kitabghar</h1>
-          <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase">Govt
+          <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium tracking-wide uppercase">Govt
             Polytechnic College Ujjain</p>
         </div>
       </div>
 
       <!-- Descriptions -->
       <div class="hidden md:block flex-1 text-center md:text-right">
-        <p class="text-white text-sm leading-relaxed max-w-xl ml-auto">
-          An online platform for <strong class="text-blue-600">Computer Science</strong> diploma students.
-          Access <strong class="text-slate-800 dark:text-slate-200">notes, books, and resources</strong> to accelerate
+        <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed max-w-xl ml-auto">
+          An online platform for <strong class="text-blue-600 dark:text-blue-400">Computer Science</strong> diploma students.
+          Access <strong class="text-slate-900 dark:text-slate-100">notes, books, and resources</strong> to accelerate
           your academic journey.
         </p>
       </div>
@@ -1516,7 +1521,7 @@ require_once 'admin/php/fetch.php';
 
   <!-- 🧭 Navbar -->
   <nav
-    class="sticky top-0 z-[100] bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 shadow-md transition-all duration-300"
+    class="sticky top-0 z-[100] bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b-2 border-slate-300 dark:border-slate-800 shadow-md transition-all duration-300"
     id="mainNavbar">
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex items-center justify-between h-16 md:h-20">
@@ -1524,64 +1529,60 @@ require_once 'admin/php/fetch.php';
         <!-- Mobile Menu Triggers -->
         <div class="flex items-center gap-4 md:hidden">
           <button onclick="toggleSidebar()"
-            class="p-2 text-slate-700 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            class="p-2 text-slate-700 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-300 dark:border-slate-700">
             <i class="fa-solid fa-bars text-2xl"></i>
           </button>
-          <img src="favicon_logoai/apple-touch-icon.png" alt="Logo" class="h-10 rounded-lg">
+          <img src="apple-touch-icon.png" alt="Logo" class="h-10 rounded-lg shadow-sm ring-2 ring-slate-200 dark:ring-slate-700">
         </div>
 
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center gap-1">
           <a href="index.php"
-            class="px-4 py-2 rounded-lg text-blue-600 bg-blue-50 dark:bg-blue-900/20 font-bold flex items-center gap-2">
+            class="px-4 py-2 rounded-lg text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 font-bold flex items-center gap-2 border-2 border-blue-200 dark:border-blue-800 shadow-sm">
             <i class="fa-solid fa-house"></i> Home
           </a>
           <a href="about.html"
-            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex items-center gap-2 border border-transparent">
             <i class="bi bi-bookmark-star-fill"></i> About
           </a>
 
           <!-- Dropdown -->
           <div class="relative group">
             <button
-              class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2 group">
+              class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex items-center gap-2 group border border-transparent">
               <i class="bi bi-journal-bookmark-fill"></i> CSE Notes <i
                 class="fa-solid fa-chevron-down text-xs transition-transform group-hover:rotate-180"></i>
             </button>
             <div
-              class="absolute top-full left-0 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 p-2">
+              class="absolute top-full left-0 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border-2 border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 p-2">
               <a href="notes/firstsem.html"
-                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">1st
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors border border-transparent hover:border-blue-200 dark:hover:border-slate-600">1st
                 Semester</a>
               <a href="notes/secondsem.html"
-                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">2nd
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors border border-transparent hover:border-blue-200 dark:hover:border-slate-600">2nd
                 Semester</a>
               <a href="notes/thirdsem.html"
-                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">3rd
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors border border-transparent hover:border-blue-200 dark:hover:border-slate-600">3rd
                 Semester</a>
               <a href="notes/fourthsem.html"
-                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">4th
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors border border-transparent hover:border-blue-200 dark:hover:border-slate-600">4th
                 Semester</a>
               <a href="notes/fifthsem.html"
-                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">5th
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors border border-transparent hover:border-blue-200 dark:hover:border-slate-600">5th
                 Semester</a>
               <a href="notes/sixthsem.html"
-                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors">6th
+                class="block px-4 py-3 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium transition-colors border border-transparent hover:border-blue-200 dark:hover:border-slate-600">6th
                 Semester</a>
             </div>
           </div>
 
           <a href="syllabus.html"
-            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex items-center gap-2 border border-transparent">
             <i class="bi bi-stickies-fill"></i> Syllabus
           </a>
           <a href="question.html"
-            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex items-center gap-2 border border-transparent">
             <i class="bi bi-stickies-fill"></i> Papers
-          </a>
-          <a href="library/index.php"
-            class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
-            <i class="bi bi-book-half"></i> Library
           </a>
         </div>
 
@@ -1589,28 +1590,28 @@ require_once 'admin/php/fetch.php';
         <div class="hidden md:flex items-center gap-3">
           <!-- Developer 1 Group -->
           <div class="relative group hidden lg:flex">
-            <div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700 cursor-pointer">
+            <div class="flex items-center gap-3 pl-4 border-l-2 border-slate-300 dark:border-slate-700 cursor-pointer">
               <img src="img/rishabh.png" alt="Rishabh"
-                class="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-blue-500 transition-all">
+                class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-200 dark:ring-transparent group-hover:ring-blue-500 transition-all shadow-sm">
               <div class="text-left">
                 <p class="text-xs font-bold text-slate-900 dark:text-white">Rishabh K.</p>
-                <p class="text-[10px] text-blue-600 font-semibold tracking-wide">DEVELOPER</p>
+                <p class="text-[10px] text-blue-600 dark:text-blue-500 font-semibold tracking-wide">DEVELOPER</p>
               </div>
             </div>
             <!-- Hover Card -->
             <div
-              class="absolute top-full right-0 mt-4 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+              class="absolute top-full right-0 mt-4 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
               <div class="flex flex-col items-center text-center">
-                <img src="img/rishabh.png" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md">
+                <img src="img/rishabh.png" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md ring-2 ring-slate-200 dark:ring-slate-700">
                 <h4 class="font-bold text-slate-900 dark:text-white">Rishabh Kankariya</h4>
-                <p class="text-xs text-slate-500 mb-4">Full Stack Developer</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Full Stack Developer</p>
                 <div class="flex gap-2 w-full mb-2">
                   <a href="mailto:rishabhkankariya69@gmail.com"
-                    class="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition-colors"><i
+                    class="flex-1 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-bold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors border border-blue-200 dark:border-blue-800"><i
                       class="bi bi-envelope-fill"></i> Email</a>
                 </div>
                 <a href="https://www.linkedin.com/in/rishabh-kankariya-202a93252/" target="_blank"
-                  class="w-full py-2 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                  class="w-full py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg text-[10px] font-bold hover:bg-blue-600 dark:hover:bg-blue-500 transition-all flex items-center justify-center gap-2 border border-slate-900 dark:border-white">
                   <i class="bi bi-linkedin"></i> LinkedIn Profile
                 </a>
               </div>
@@ -1619,28 +1620,28 @@ require_once 'admin/php/fetch.php';
 
           <!-- Developer 2 Group -->
           <div class="relative group hidden lg:flex">
-            <div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700 cursor-pointer">
+            <div class="flex items-center gap-3 pl-4 border-l-2 border-slate-300 dark:border-slate-700 cursor-pointer">
               <img src="img/gourav.jpeg" alt="Gourav"
-                class="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-purple-500 transition-all">
+                class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-200 dark:ring-transparent group-hover:ring-purple-500 transition-all shadow-sm">
               <div class="text-left">
                 <p class="text-xs font-bold text-slate-900 dark:text-white">Gourav S.</p>
-                <p class="text-[10px] text-purple-600 font-semibold tracking-wide">DEVELOPER</p>
+                <p class="text-[10px] text-purple-600 dark:text-purple-500 font-semibold tracking-wide">DEVELOPER</p>
               </div>
             </div>
             <!-- Hover Card -->
             <div
-              class="absolute top-full right-0 mt-4 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+              class="absolute top-full right-0 mt-4 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 border-2 border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
               <div class="flex flex-col items-center text-center">
-                <img src="img/gourav.jpeg" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md">
+                <img src="img/gourav.jpeg" class="w-20 h-20 rounded-full object-cover mb-3 shadow-md ring-2 ring-slate-200 dark:ring-slate-700">
                 <h4 class="font-bold text-slate-900 dark:text-white">Gourav Sen</h4>
-                <p class="text-xs text-slate-500 mb-4">Full Stack Developer</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Full Stack Developer</p>
                 <div class="flex gap-2 w-full mb-2">
                   <a href="mailto:gsen5448@gmail.com"
-                    class="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition-colors"><i
+                    class="flex-1 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-bold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors border border-blue-200 dark:border-blue-800"><i
                       class="bi bi-envelope-fill"></i> Email</a>
                 </div>
                 <a href="https://www.linkedin.com/in/gourav-sen-614b62375/" target="_blank"
-                  class="w-full py-2 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                  class="w-full py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg text-[10px] font-bold hover:bg-blue-600 dark:hover:bg-blue-500 transition-all flex items-center justify-center gap-2 border border-slate-900 dark:border-white">
                   <i class="bi bi-linkedin"></i> LinkedIn Profile
                 </a>
               </div>
@@ -1650,21 +1651,21 @@ require_once 'admin/php/fetch.php';
           <!-- Login Button -->
           <div class="relative group ml-2">
             <button
-              class="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:shadow-lg transition-all transform group-hover:scale-105 flex items-center gap-2">
+              class="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold text-sm hover:shadow-lg transition-all transform group-hover:scale-105 flex items-center gap-2 border-2 border-gray-900 dark:border-white shadow-md">
               <i class="bi bi-person-circle"></i> Login
             </button>
             <div
-              class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+              class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
               <a href="student_login.html"
-                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200">
+                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors">
                 <i class="bi bi-mortarboard-fill text-blue-500 mr-2"></i> Student Login
               </a>
               <a href="admin/admin_login.php"
-                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 border-t border-slate-100 dark:border-slate-700">
+                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 border-t-2 border-slate-200 dark:border-slate-700 transition-colors">
                 <i class="bi bi-shield-lock-fill text-red-500 mr-2"></i> Admin Login
               </a>
               <a href="library_login.html"
-                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 border-t border-slate-100 dark:border-slate-700">
+                class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 border-t-2 border-slate-200 dark:border-slate-700 transition-colors">
                 <i class="bi bi-book-fill text-yellow-500 mr-2"></i> Library Login
               </a>
             </div>
@@ -1680,7 +1681,7 @@ require_once 'admin/php/fetch.php';
     class="fixed inset-y-0 left-0 w-72 bg-white dark:bg-slate-900 shadow-2xl z-[999] transform -translate-x-full transition-transform duration-300 ease-out flex flex-col h-full">
     <div
       class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950">
-      <img src="img/kitabghar.png" alt="Logo" class="h-10 rounded-lg shadow-sm">
+      <img src="img/kitabghar.png?v=3" alt="Logo" class="h-10 rounded-lg shadow-sm">
       <button onclick="toggleSidebar()"
         class="w-8 h-8 flex items-center justify-center bg-white dark:bg-slate-800 rounded-full shadow-sm text-slate-500 hover:text-red-500 transition-colors">
         <i class="bi bi-x-lg"></i>
@@ -1729,10 +1730,6 @@ require_once 'admin/php/fetch.php';
         class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
         <i class="fa-solid fa-file-circle-question text-slate-400"></i> Question Papers
       </a>
-      <a href="library/index.php"
-        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
-        <i class="bi bi-book-half text-slate-400"></i> Digital Library
-      </a>
       <a href="feedback.html"
         class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors">
         <i class="bi bi-person-rolodex text-slate-400"></i> Feedback
@@ -1769,7 +1766,7 @@ require_once 'admin/php/fetch.php';
         class="flex items-center gap-3 w-full px-4 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
         <i class="bi bi-mortarboard-fill"></i> Student Login
       </a>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-2 gap-3 mt-3">
         <a href="admin/admin_login.php"
           class="flex items-center justify-center gap-2 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs border border-slate-200 dark:border-slate-700 active:scale-95 transition-all shadow-sm">
           <i class="bi bi-shield-lock-fill text-red-500"></i> Admin
@@ -2759,7 +2756,7 @@ require_once 'admin/php/fetch.php';
         <!-- Brand Column -->
         <div class="space-y-6">
           <div class="flex items-center gap-3">
-            <img src="img/kitabghar.png" alt="Kitabghar Logo" class="h-14 rounded-xl shadow-2xl border border-white/10">
+            <img src="img/kitabghar.png?v=3" alt="Kitabghar Logo" class="h-14 rounded-xl shadow-2xl border border-white/10">
           </div>
           <p class="text-slate-400 text-sm leading-relaxed">
             Empowering Computer Science students with accessible, high-quality learning resources. Join our community of

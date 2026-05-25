@@ -3,30 +3,45 @@ version: '3.8'
 services:
   web:
     build: .
-    container_name: php_app
+    container_name: ekitabghar_web
     ports:
       - "8080:80"
     volumes:
       - .:/var/www/html
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME}
     depends_on:
       - db
-    command: >
-      bash -c "docker-php-ext-install mysqli pdo pdo_mysql && apache2-foreground"
+    networks:
+      - ekitabghar_network
 
   db:
-    image: mysql:8.0
-    container_name: mysql_db
-    restart: always
+    image: postgres:15
+    container_name: ekitabghar_db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ekitabhghar
-      MYSQL_USER: ekitabhghar_admin
-      MYSQL_PASSWORD: admin_pass
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/mysql
-      - ./ekitabhghar.sql:/docker-entrypoint-initdb.d/ekitabhghar.sql
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ekitabghar_network
+
+networks:
+  ekitabghar_network:
+    driver: bridge
 
 volumes:
-  db_data:
+  postgres_data:

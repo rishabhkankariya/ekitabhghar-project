@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+node_modules
+vendor
+*.md
+.vscode
+.idea
+*.log
+challans/*
+results/*
+uploads/*

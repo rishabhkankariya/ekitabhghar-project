@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         }
     }
 
-    header("Location: /admin/adminpanel.php");
+    header("Location: ../adminpanel.php");
     exit();
 }
 

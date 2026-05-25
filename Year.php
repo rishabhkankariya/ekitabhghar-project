@@ -24,10 +24,10 @@ if (!$user || empty($user['profile_image']) || $user['profile_image'] === 'users
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Material | Kitabghar</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon_logoai/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon_logoai/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon_logoai/favicon-16x16.png">
-    <link rel="manifest" href="favicon_logoai/site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />

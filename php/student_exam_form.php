@@ -295,6 +295,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <!DOCTYPE html>
                     <html>
                     <head>
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="manifest" href="../site.webmanifest">
                       <style>
                         body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 0; margin: 0; }
                         .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }

@@ -39,6 +39,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <i class="bi bi-person-badge"></i>
                     <span class="font-medium text-sm">Student Viewer</span>
                 </a>
+                <a href="manage_departments.php"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 <?php echo $current_page == 'manage_departments.php' ? 'sidebar-item-active text-white' : 'hover:bg-slate-800 hover:text-white'; ?>">
+                    <i class="bi bi-building"></i>
+                    <span class="font-medium text-sm">Departments</span>
+                </a>
             </div>
 
             <div class="pt-4">

@@ -43,6 +43,12 @@ require_once 'php/slides.php';
 <html lang="en">
 
 <head>
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico">
+    <link rel="manifest" href="../../site.webmanifest">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | E-KITABGHAR</title>
@@ -306,6 +312,24 @@ require_once 'php/slides.php';
                 <button onclick="window.location.href='admin_student_register.php'"
                     class="w-full py-3 bg-slate-900 hover:bg-black text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2">
                     Open Registry <i class="bi bi-arrow-right text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Manage Departments -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow transition-all group">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                        <i class="bi bi-building text-xl"></i>
+                    </div>
+                    <span
+                        class="text-xs font-bold text-purple-600 uppercase bg-purple-50 px-2 py-1 rounded">Structure</span>
+                </div>
+                <h4 class="text-lg font-bold text-slate-900 mb-2">Department Management</h4>
+                <p class="text-slate-500 text-sm mb-6 leading-relaxed">Configure departments, courses, and academic
+                    structure for multi-department support.</p>
+                <button onclick="window.location.href='manage_departments.php'"
+                    class="w-full py-3 bg-slate-900 hover:bg-black text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                    Manage Depts <i class="bi bi-arrow-right text-sm"></i>
                 </button>
             </div>
 
