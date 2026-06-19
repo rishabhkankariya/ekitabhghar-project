@@ -141,27 +141,6 @@ function sendEmail($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc =
     }
 
     try {
-        // Ensure email_queue table exists (cached static variable to execute once per request)
-        static $emailQueueTableChecked = false;
-        if (!$emailQueueTableChecked) {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS email_queue (
-                id SERIAL PRIMARY KEY,
-                to_email VARCHAR(255) NOT NULL,
-                to_name VARCHAR(255) NOT NULL,
-                subject VARCHAR(255) NOT NULL,
-                body TEXT NOT NULL,
-                alt_body TEXT,
-                bcc TEXT,
-                attachments TEXT,
-                status VARCHAR(50) DEFAULT 'pending',
-                attempts INTEGER DEFAULT 0,
-                error_message TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                sent_at TIMESTAMP NULL
-            )");
-            $emailQueueTableChecked = true;
-        }
-
         // Persist attachments if any to a dedicated persistent folder
         $persistedAttachments = [];
         if (!empty($attachments)) {
