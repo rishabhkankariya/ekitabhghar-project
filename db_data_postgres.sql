@@ -2,6 +2,7 @@
 -- Cleaned from original MySQL dump
 
 BEGIN;
+SET session_replication_role = 'replica';
 
 INSERT INTO admin (admin_id, username, password, profile_pic) VALUES
 (1, 'megha_malviya', '$2y$10$e3.2vAumlLoDe.KOi3IwpevKW0JpcUpci9hkgDo7fT/rg8yJaZTQu', 'uploads/6939752ad1efe_BHARAT_POSTER.jpg'),
@@ -242,4 +243,5 @@ SELECT setval(pg_get_serial_sequence('users', 'id'), COALESCE(max(id), 1)) FROM 
 SELECT setval(pg_get_serial_sequence('videos', 'id'), COALESCE(max(id), 1)) FROM videos;
 SELECT setval(pg_get_serial_sequence('visitor_count', 'id'), COALESCE(max(id), 1)) FROM visitor_count;
 
+SET session_replication_role = 'origin';
 COMMIT;
