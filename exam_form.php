@@ -889,7 +889,16 @@ if ($already_submitted && !$can_edit) {
             class="bi bi-arrow-left"></i> Back to Dashboard</a>
       </div>
     </div>
-  <?php else: ?>
+  <?php else: 
+    $cleanMobile = preg_replace('/[^0-9]/', '', $mobile_no);
+    if (strlen($cleanMobile) === 11 && substr($cleanMobile, 0, 1) === '0') {
+        $cleanMobile = substr($cleanMobile, 1);
+    }
+    if (strlen($cleanMobile) === 12 && substr($cleanMobile, 0, 2) === '91') {
+        $cleanMobile = substr($cleanMobile, 2);
+    }
+    $isMobileInvalid = !preg_match('/^[0-9]{10}$/', $cleanMobile);
+  ?>
 
     <div class="main-container">
       <form action="php/student_exam_form.php" method="POST" enctype="multipart/form-data" id="mainForm">
@@ -923,6 +932,12 @@ if ($already_submitted && !$can_edit) {
         </div>
 
         <div class="form-content">
+        <?php if ($isMobileInvalid): ?>
+          <div class="alert alert-danger" style="background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; line-height: 1.5;">
+            <i class="fas fa-exclamation-triangle" style="margin-right: 8px; color: #dc2626;"></i>
+            <strong>Warning:</strong> Your profile has an invalid mobile number (<code><?= htmlspecialchars($mobile_no) ?></code>). To submit this exam form, please contact the college administrator to update your mobile number to a valid 10-digit number.
+          </div>
+        <?php endif; ?>
 
           <!-- 1. Student Details -->
           <div class="section-title"><i class="fas fa-user-graduate"></i> Student Details</div>
@@ -988,7 +1003,7 @@ if ($already_submitted && !$can_edit) {
             <div class="form-group">
               <label class="form-label required">Mobile No</label>
               <input type="tel" class="form-control" name="mobile_no"
-                value="<?php echo htmlspecialchars($master_phone); ?>" readonly
+                value="<?php echo htmlspecialchars($mobile_no); ?>" readonly
                 style="background-color: #f3f4f6; cursor: not-allowed;">
               <p style="font-size: 11px; color: #666; margin-top: 4px;">Primary contact from profile</p>
             </div>
@@ -1325,7 +1340,7 @@ if ($already_submitted && !$can_edit) {
 
         <!-- Review Modal -->
         <div id="reviewModal" class="modal">
-          <div class="modal-content" style="max-width: 600px; border-radius: 20px;">
+          <div class="modal-content" style="max-width: 800px; border-radius: 20px;">
             <span class="close-modal" onclick="closeReviewModal()">&times;</span>
             <h2
               style="color: var(--primary); border-bottom: 2px solid #f3f4f6; padding-bottom: 15px; margin-bottom: 20px; font-weight: 800;">
@@ -1978,23 +1993,199 @@ if ($already_submitted && !$can_edit) {
     // Review Modal
     window.showReviewModal = function () {
       const data = new FormData(document.getElementById('mainForm'));
-      let html = `<div class="review-grid">
-               <p><strong>Name:</strong> ${data.get('student_name')}</p>
-               <p><strong>Roll No:</strong> ${data.get('roll_no')}</p>
-               <p><strong>Sem:</strong> ${data.get('current_semester')}</p>
-               <p><strong>Mobile:</strong> ${data.get('mobile_no')}</p>
-               <p><strong>Fees:</strong> ${data.get('admission_fees')}</p>
-             </div>
-             <h4>Subjects</h4>
-             <ul>`;
+      
+      const fatherName = document.getElementById('father_name_input').value.trim();
+      const fatherAddr = document.getElementById('father_addr_input').value.trim();
+      
+      const semType = document.getElementById('sem_type_input').value;
+      const semNum = document.getElementById('sem_num_input').value;
+      const semString = semType && semNum ? `${semType} ${semNum}` : "Not selected";
+      
+      const feeAmtVal = document.getElementById('fee_amount').value.trim();
+      const feeRcptVal = document.getElementById('fee_receipt').value.trim();
+      const feeDateVal = document.getElementById('fee_date').value;
 
-      // Loop subjects mainly for checking
+      const challanFiles = [];
+      const challanInputs = document.querySelectorAll('input[name="challan[]"]');
+      challanInputs.forEach((input) => {
+        if (input.files && input.files[0]) {
+          challanFiles.push(input.files[0].name);
+        }
+      });
+
+      const resultFiles = [];
+      const resultInputs = document.querySelectorAll('input[name="results[]"]');
+      resultInputs.forEach((input) => {
+        if (input.files && input.files[0]) {
+          resultFiles.push(input.files[0].name);
+        }
+      });
+
+      const sigType = document.getElementById("signatureType").value;
+      let sigPreview = "";
+      if (sigType === 'typed') {
+        const typedSig = document.getElementById("typedSignature").value;
+        sigPreview = `<span style="font-family: 'Dancing Script', cursive; font-size: 24px; border-bottom: 1px double #141413;">${typedSig}</span> (Typed)`;
+      } else if (sigType === 'draw') {
+        const drawData = document.getElementById("signatureImage").value;
+        if (drawData) {
+          sigPreview = `<img src="${drawData}" style="max-height: 60px; border: 1px solid var(--border-color); border-radius: 4px; background: white;" /> (Drawn)`;
+        } else {
+          sigPreview = `<span style="color: red;">No signature drawn</span>`;
+        }
+      } else if (sigType === 'upload') {
+        const sigUpload = document.querySelector('input[name="student_signature"]');
+        const filename = (sigUpload && sigUpload.files && sigUpload.files[0]) ? sigUpload.files[0].name : "No file uploaded";
+        sigPreview = `<span>📁 ${filename}</span> (Uploaded)`;
+      } else {
+        sigPreview = `<span style="color: red;">No signature method selected</span>`;
+      }
+
+      let html = `
+        <div style="font-family: 'Inter', sans-serif; color: var(--text-body); font-size: 14px; text-align: left;">
+          
+          <!-- Top Header Profile Card -->
+          <div style="display: flex; gap: 20px; align-items: start; background: #faf9f5; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+            <div style="flex-shrink: 0;">
+              <img src="${document.getElementById('uploadedImage').src}" style="width: 100px; height: 130px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); background: #eee;" onerror="this.src='img/placeholder-user.png'" />
+            </div>
+            <div style="flex-grow: 1;">
+              <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: var(--text-main); margin: 0 0 10px 0;">${data.get('student_name') || 'Not entered'}</h3>
+              <p style="margin: 3px 0;"><strong>Roll / App No:</strong> ${data.get('roll_no') || 'Not entered'}</p>
+              <p style="margin: 3px 0;"><strong>Course:</strong> ${data.get('course') || 'Not entered'}</p>
+              <p style="margin: 3px 0;"><strong>Category:</strong> ${data.get('category') || 'Not entered'}</p>
+              <p style="margin: 3px 0;"><strong>Reg Type:</strong> ${data.get('reg_type') === 'old' ? 'Senior (Enrollment)' : '1st Semester (New)'}</p>
+            </div>
+          </div>
+
+          <!-- Personal and Contact details grid -->
+          <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin: 20px 0 10px 0;">Personal & Contact Details</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+            <div><strong>Father's Name:</strong> ${fatherName || 'Not entered'}</div>
+            <div><strong>Mobile No:</strong> ${data.get('mobile_no') || 'Not entered'}</div>
+            <div style="grid-column: span 2;"><strong>Permanent Address:</strong> ${fatherAddr || 'Not entered'}</div>
+            <div style="grid-column: span 2;"><strong>Email ID:</strong> ${data.get('email_id') || 'Not entered'}</div>
+          </div>
+
+          <!-- Academic & Admission Fees details grid -->
+          <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin: 20px 0 10px 0;">Academic & Payment Details</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+            <div><strong>Course Type:</strong> ${data.get('course_type') || 'Not entered'}</div>
+            <div><strong>Current Semester:</strong> ${semString}</div>
+            <div><strong>Exam Form Date:</strong> ${data.get('exam_date') || 'Not entered'}</div>
+            <div><strong>Admission Fee Amount:</strong> ${feeAmtVal ? feeAmtVal + '/-' : 'Not entered'}</div>
+            <div><strong>Fee Receipt No:</strong> ${feeRcptVal || 'Not entered'}</div>
+            <div><strong>Receipt Payment Date:</strong> ${feeDateVal || 'Not entered'}</div>
+          </div>
+
+          <!-- Regular Subjects list -->
+          <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin: 20px 0 10px 0;">Regular Subjects</h4>
+          <div style="margin-bottom: 15px; overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+              <thead>
+                <tr style="background: #efe9de; border-bottom: 1px solid var(--border-color); text-align: left;">
+                  <th style="padding: 6px; width: 5%;">#</th>
+                  <th style="padding: 6px; width: 50%;">Subject Name</th>
+                  <th style="padding: 6px; width: 10%;">Sem</th>
+                  <th style="padding: 6px; width: 25%;">Paper Code</th>
+                  <th style="padding: 6px; text-align: center; width: 5%;">Th</th>
+                  <th style="padding: 6px; text-align: center; width: 5%;">Pr</th>
+                </tr>
+              </thead>
+              <tbody>
+      `;
+
+      let hasRegular = false;
       for (let i = 1; i <= 6; i++) {
         if (data.get(`subject${i}`)) {
-          html += `<li>${data.get(`subject${i}`)} (Sem ${data.get(`sem${i}`)})</li>`;
+          hasRegular = true;
+          const thVal = data.get(`theory${i}`) ? '✓' : '✗';
+          const prVal = data.get(`practical${i}`) ? '✓' : '✗';
+          html += `
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 6px;">${i}</td>
+              <td style="padding: 6px;">${data.get(`subject${i}`)}</td>
+              <td style="padding: 6px;">${data.get(`sem${i}`)}</td>
+              <td style="padding: 6px;">${data.get(`paper_code${i}`)}</td>
+              <td style="padding: 6px; text-align: center;">${thVal}</td>
+              <td style="padding: 6px; text-align: center;">${prVal}</td>
+            </tr>
+          `;
         }
       }
-      html += `</ul>`;
+      if (!hasRegular) {
+        html += `<tr><td colspan="6" style="padding: 8px; text-align: center; color: var(--text-light);">No regular subjects entered</td></tr>`;
+      }
+
+      html += `
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Ex Subjects list -->
+          <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin: 20px 0 10px 0;">Ex. (Backlog) Subjects</h4>
+          <div style="margin-bottom: 15px; overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+              <thead>
+                <tr style="background: #efe9de; border-bottom: 1px solid var(--border-color); text-align: left;">
+                  <th style="padding: 6px; width: 5%;">#</th>
+                  <th style="padding: 6px; width: 50%;">Subject Name</th>
+                  <th style="padding: 6px; width: 10%;">Sem</th>
+                  <th style="padding: 6px; width: 25%;">Paper Code</th>
+                  <th style="padding: 6px; text-align: center; width: 5%;">Th</th>
+                  <th style="padding: 6px; text-align: center; width: 5%;">Pr</th>
+                </tr>
+              </thead>
+              <tbody>
+      `;
+
+      let hasEx = false;
+      for (let i = 1; i <= 7; i++) {
+        if (data.get(`exsubject${i}`)) {
+          hasEx = true;
+          const thVal = data.get(`extheory${i}`) ? '✓' : '✗';
+          const prVal = data.get(`expractical${i}`) ? '✓' : '✗';
+          html += `
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 6px;">${i}</td>
+              <td style="padding: 6px;">${data.get(`exsubject${i}`)}</td>
+              <td style="padding: 6px;">${data.get(`exsem${i}`)}</td>
+              <td style="padding: 6px;">${data.get(`expaper_code${i}`)}</td>
+              <td style="padding: 6px; text-align: center;">${thVal}</td>
+              <td style="padding: 6px; text-align: center;">${prVal}</td>
+            </tr>
+          `;
+        }
+      }
+      if (!hasEx) {
+        html += `<tr><td colspan="6" style="padding: 8px; text-align: center; color: var(--text-light);">No backlog subjects entered</td></tr>`;
+      }
+
+      html += `
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Uploaded Documents and Verification Signature -->
+          <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin: 20px 0 10px 0;">Verification & Attachments</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+            <div>
+              <p style="margin: 0 0 5px 0;"><strong>Fee Challans:</strong></p>
+              ${challanFiles.length > 0 ? `<ul style="margin:0; padding-left:20px;">` + challanFiles.map(f => `<li>${f}</li>`).join('') + `</ul>` : `<span style="color:red;">No challan file uploaded</span>`}
+              
+              <p style="margin: 10px 0 5px 0;"><strong>Previous Results:</strong></p>
+              ${resultFiles.length > 0 ? `<ul style="margin:0; padding-left:20px;">` + resultFiles.map(f => `<li>${f}</li>`).join('') + `</ul>` : `<span style="color:var(--text-light);">No previous result file uploaded</span>`}
+            </div>
+            <div style="border-left: 1px solid var(--border-color); padding-left: 15px;">
+              <p style="margin: 0 0 10px 0;"><strong>Student Signature:</strong></p>
+              <div style="margin-top: 5px;">
+                ${sigPreview}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      `;
       document.getElementById('reviewContent').innerHTML = html;
       document.getElementById('reviewModal').style.display = 'flex';
     }

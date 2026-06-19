@@ -25,12 +25,21 @@ function generateTempPassword($name, $dob)
 
 // 1. Bulk Upload
 if (isset($_POST['upload_csv']) && $_FILES['student_csv']['name']) {
-    $handle = fopen($_FILES['student_csv']['tmp_name'], "r");
+    $file = $_FILES['student_csv']['tmp_name'];
+    $handle = fopen($file, "r");
     fgetcsv($handle); // skip header
-    $count = 0;
+    
+    $rows = [];
+    $errors = [];
+    $rowNum = 1;
+
     while ($data = fgetcsv($handle)) {
-        if (count($data) < 7)
+        $rowNum++;
+        if (count($data) < 7) {
+            $errors[] = "Row $rowNum: Incomplete columns (expected at least 7, got " . count($data) . ").";
             continue;
+        }
+        
         $roll = trim($data[0]);
         $name = trim($data[1]);
         $email = trim($data[2]);
@@ -40,22 +49,75 @@ if (isset($_POST['upload_csv']) && $_FILES['student_csv']['name']) {
         $passY = intval($data[6]);
         $phone = isset($data[7]) ? trim($data[7]) : '';
 
-        $tempPass = generateTempPassword($name, $dob);
-        if (!$tempPass)
-            continue;
-        $hash = password_hash($tempPass, PASSWORD_DEFAULT);
+        // Clean phone number
+        $cleanPhone = '';
+        if ($phone !== '') {
+            $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+            if (strlen($cleanPhone) == 11 && substr($cleanPhone, 0, 1) === '0') {
+                $cleanPhone = substr($cleanPhone, 1);
+            }
+            if (strlen($cleanPhone) == 12 && substr($cleanPhone, 0, 2) === '91') {
+                $cleanPhone = substr($cleanPhone, 2);
+            }
+        }
 
+        // Validate Row
+        $rowErrors = [];
+        if (empty($roll)) {
+            $rowErrors[] = "Roll number is empty";
+        }
+        if (empty($name)) {
+            $rowErrors[] = "Full Name is empty";
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $rowErrors[] = "Invalid email format ('$email')";
+        }
+        $tempPass = generateTempPassword($name, $dob);
+        if (!$tempPass) {
+            $rowErrors[] = "Invalid date of birth format ('$dob')";
+        }
+        if ($phone !== '' && !preg_match('/^[0-9]{10}$/', $cleanPhone)) {
+            $rowErrors[] = "Phone number must be exactly 10 digits (got '$phone')";
+        }
+
+        if (!empty($rowErrors)) {
+            $errors[] = "Row $rowNum: " . implode(", ", $rowErrors);
+        } else {
+            $rows[] = [
+                'roll' => $roll,
+                'name' => $name,
+                'email' => $email,
+                'dob' => $dob,
+                'phone' => $cleanPhone,
+                'course' => $course,
+                'admY' => $admY,
+                'passY' => $passY,
+                'tempPass' => $tempPass
+            ];
+        }
+    }
+    fclose($handle);
+
+    if (!empty($errors)) {
+        $_SESSION['error_msg'] = "CSV Validation Failed:<br><ul class='text-left list-disc pl-5'><li>" . implode("</li><li>", array_map('htmlspecialchars', $errors)) . "</li></ul>";
+        header("Location: manage_students.php");
+        exit;
+    }
+
+    // If no errors, process all rows
+    $count = 0;
+    foreach ($rows as $row) {
+        $hash = password_hash($row['tempPass'], PASSWORD_DEFAULT);
         $sql = "INSERT INTO student_accounts (roll_no, full_name, email, dob, phone_number, password_hash, course, admission_year, expected_passing_year, account_status, is_temp_password) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', 1) 
                 ON CONFLICT (roll_no) DO UPDATE SET full_name=EXCLUDED.full_name, email=EXCLUDED.email, dob=EXCLUDED.dob, phone_number=EXCLUDED.phone_number, password_hash=EXCLUDED.password_hash, is_temp_password=1";
         $stmt = $pdo->prepare($sql);
-        
-        if ($stmt->execute([$roll, $name, $email, $dob, $phone, $hash, $course, $admY, $passY])) {
-            sendCredentialEmail($email, $name, $roll, $tempPass);
+        if ($stmt->execute([$row['roll'], $row['name'], $row['email'], $row['dob'], $row['phone'], $hash, $row['course'], $row['admY'], $row['passY']])) {
+            sendCredentialEmail($row['email'], $row['name'], $row['roll'], $row['tempPass']);
             $count++;
         }
     }
-    fclose($handle);
+
     $_SESSION['success_msg'] = "Successfully processed $count students.";
     header("Location: manage_students.php");
     exit;
@@ -72,23 +134,91 @@ if (isset($_POST['add_student'])) {
     $admY = intval($_POST['admission_year']);
     $passY = intval($_POST['pass_year']);
 
-    $tempPass = generateTempPassword($name, $dob);
-    $hash = password_hash($tempPass, PASSWORD_DEFAULT);
+    // Clean phone number
+    $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+    if (strlen($cleanPhone) == 11 && substr($cleanPhone, 0, 1) === '0') {
+        $cleanPhone = substr($cleanPhone, 1);
+    }
+    if (strlen($cleanPhone) == 12 && substr($cleanPhone, 0, 2) === '91') {
+        $cleanPhone = substr($cleanPhone, 2);
+    }
 
-    $check = $pdo->prepare("SELECT id FROM student_accounts WHERE roll_no = ? OR email = ?"); 
-    $check->execute([$roll, $email]); 
-    if ($check->rowCount() > 0) {
-        $_SESSION['error_msg'] = "Student already exists (Roll/Email).";
+    if (empty($roll) || empty($name) || empty($email) || empty($dob) || empty($course) || empty($admY) || empty($passY)) {
+        $_SESSION['error_msg'] = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error_msg'] = "Invalid email format.";
+    } elseif ($phone !== '' && !preg_match('/^[0-9]{10}$/', $cleanPhone)) {
+        $_SESSION['error_msg'] = "Phone number must be exactly 10 digits (got '$phone').";
     } else {
-        $sql = "INSERT INTO student_accounts (roll_no, full_name, email, dob, phone_number, password_hash, course, admission_year, expected_passing_year, account_status, is_temp_password) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', 1)";
-        $stmt = $pdo->prepare($sql);
-        
-        if ($stmt->execute([$roll, $name, $email, $dob, $phone, $hash, $course, $admY, $passY])) {
-            sendCredentialEmail($email, $name, $roll, $tempPass);
-            $_SESSION['success_msg'] = "Student added successfully.";
+        $tempPass = generateTempPassword($name, $dob);
+        if (!$tempPass) {
+            $_SESSION['error_msg'] = "Failed to generate password. Please check the date of birth.";
         } else {
-            $_SESSION['error_msg'] = "Error inserting student.";
+            $hash = password_hash($tempPass, PASSWORD_DEFAULT);
+
+            $check = $pdo->prepare("SELECT id FROM student_accounts WHERE roll_no = ? OR email = ?"); 
+            $check->execute([$roll, $email]); 
+            if ($check->rowCount() > 0) {
+                $_SESSION['error_msg'] = "Student already exists (Roll/Email).";
+            } else {
+                $sql = "INSERT INTO student_accounts (roll_no, full_name, email, dob, phone_number, password_hash, course, admission_year, expected_passing_year, account_status, is_temp_password) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', 1)";
+                $stmt = $pdo->prepare($sql);
+                
+                if ($stmt->execute([$roll, $name, $email, $dob, $cleanPhone, $hash, $course, $admY, $passY])) {
+                    sendCredentialEmail($email, $name, $roll, $tempPass);
+                    $_SESSION['success_msg'] = "Student added successfully.";
+                } else {
+                    $_SESSION['error_msg'] = "Error inserting student.";
+                }
+            }
+        }
+    }
+    header("Location: manage_students.php");
+    exit;
+}
+
+// 2b. Individual Edit
+if (isset($_POST['edit_student'])) {
+    $id = intval($_POST['edit_student_id']);
+    $roll = trim($_POST['roll_no']);
+    $name = trim($_POST['full_name']);
+    $email = trim($_POST['email']);
+    $dob = trim($_POST['dob']);
+    $phone = trim($_POST['phone']);
+    $course = trim($_POST['course']);
+    $admY = intval($_POST['admission_year']);
+    $passY = intval($_POST['pass_year']);
+    $status = trim($_POST['account_status']);
+
+    // Clean phone number
+    $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+    if (strlen($cleanPhone) == 11 && substr($cleanPhone, 0, 1) === '0') {
+        $cleanPhone = substr($cleanPhone, 1);
+    }
+    if (strlen($cleanPhone) == 12 && substr($cleanPhone, 0, 2) === '91') {
+        $cleanPhone = substr($cleanPhone, 2);
+    }
+
+    if (empty($roll) || empty($name) || empty($email) || empty($dob) || empty($course) || empty($admY) || empty($passY) || empty($status)) {
+        $_SESSION['error_msg'] = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error_msg'] = "Invalid email format.";
+    } elseif ($phone !== '' && !preg_match('/^[0-9]{10}$/', $cleanPhone)) {
+        $_SESSION['error_msg'] = "Phone number must be exactly 10 digits (got '$phone').";
+    } else {
+        $check = $pdo->prepare("SELECT id FROM student_accounts WHERE (roll_no = ? OR email = ?) AND id != ?");
+        $check->execute([$roll, $email, $id]);
+        if ($check->rowCount() > 0) {
+            $_SESSION['error_msg'] = "Another student with the same Roll Number or Email already exists.";
+        } else {
+            $sql = "UPDATE student_accounts SET roll_no=?, full_name=?, email=?, dob=?, phone_number=?, course=?, admission_year=?, expected_passing_year=?, account_status=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
+            $stmt = $pdo->prepare($sql);
+            if ($stmt->execute([$roll, $name, $email, $dob, $cleanPhone, $course, $admY, $passY, $status, $id])) {
+                $_SESSION['success_msg'] = "Student details updated successfully.";
+            } else {
+                $_SESSION['error_msg'] = "Failed to update student details.";
+            }
         }
     }
     header("Location: manage_students.php");
@@ -324,9 +454,14 @@ $branches = [
                                                 <?php endif; ?>
                                             </td>
                                             <td class="px-4 py-4 text-right">
-                                                <a href="?delete_id=<?= $row['id'] ?>" onclick="return confirm('Delete this student?')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
-                                                    <i class="bi bi-trash3"></i>
-                                                </a>
+                                                <div class="flex justify-end gap-2">
+                                                    <button type="button" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" onclick='openEditModal(<?= json_encode($row, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)' title="Edit Student">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </button>
+                                                    <a href="?delete_id=<?= $row['id'] ?>" onclick="return confirm('Delete this student?')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Student">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -342,7 +477,7 @@ $branches = [
     <!-- Add Student Modal -->
     <div class="modal fade" id="addModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <form method="POST" class="modal-content">
+            <form method="POST" class="modal-content" id="addStudentForm">
                 <div class="modal-header">
                     <h5 class="modal-title">Add New Student</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -363,7 +498,7 @@ $branches = [
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Phone</label>
-                            <input type="text" name="phone" class="form-control">
+                            <input type="text" name="phone" class="form-control" required pattern="[0-9]{10}" title="Exactly 10 digits">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Date of Birth</label>
@@ -396,6 +531,71 @@ $branches = [
         </div>
     </div>
 
+    <!-- Edit Student Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" class="modal-content" id="editStudentForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Student Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="edit_student_id" id="edit_student_id">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Roll Number</label>
+                            <input type="text" name="roll_no" id="edit_roll_no" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="full_name" id="edit_full_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" id="edit_email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" id="edit_phone" class="form-control" required pattern="[0-9]{10}" title="Exactly 10 digits">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" name="dob" id="edit_dob" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Course</label>
+                            <select name="course" id="edit_course" class="form-select" required>
+                                <option value="">Select Course</option>
+                                <?php foreach ($branches as $branch): ?>
+                                    <option value="<?= $branch ?>"><?= $branch ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Admission Year</label>
+                            <input type="number" name="admission_year" id="edit_admission_year" class="form-control" min="2020" max="2030" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Expected Passing Year</label>
+                            <input type="number" name="pass_year" id="edit_pass_year" class="form-control" min="2023" max="2035" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Account Status</label>
+                            <select name="account_status" id="edit_account_status" class="form-select" required>
+                                <option value="active">Active</option>
+                                <option value="blocked">Blocked</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="edit_student" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/loader.js"></script>
     <script>
@@ -405,10 +605,34 @@ $branches = [
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
 
+        // openEditModal function
+        function openEditModal(student) {
+            document.getElementById('edit_student_id').value = student.id;
+            document.getElementById('edit_roll_no').value = student.roll_no;
+            document.getElementById('edit_full_name').value = student.full_name;
+            document.getElementById('edit_email').value = student.email;
+            document.getElementById('edit_phone').value = student.phone_number || '';
+            document.getElementById('edit_dob').value = student.dob || '';
+            document.getElementById('edit_course').value = student.course;
+            document.getElementById('edit_admission_year').value = student.admission_year;
+            document.getElementById('edit_pass_year').value = student.expected_passing_year;
+            document.getElementById('edit_account_status').value = student.account_status || 'active';
+            
+            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+            editModal.show();
+        }
+
         // Show global loader on manual student addition form
-        document.querySelector('form.modal-content')?.addEventListener('submit', function() {
+        document.getElementById('addStudentForm')?.addEventListener('submit', function() {
             if (typeof showGlobalLoader === 'function') {
                 showGlobalLoader("Adding student and sending account credential email. Please wait...");
+            }
+        });
+
+        // Show global loader on student edit form
+        document.getElementById('editStudentForm')?.addEventListener('submit', function() {
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Updating student details. Please wait...");
             }
         });
 

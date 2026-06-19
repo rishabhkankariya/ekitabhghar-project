@@ -171,15 +171,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $exam_date = $_POST['exam_date'] ?? '';
             $course = $_POST['course'] ?? '';
 
-            // Check if student already submitted
-            $check_stmt = $pdo->prepare("SELECT id, can_edit, student_photo, student_signature, previous_result FROM students WHERE email_id = ?");
-            $check_stmt->execute([$email_id]);
-            $existing = $check_stmt->fetch(PDO::FETCH_ASSOC);
+            // Clean mobile number
+            $cleanMobile = preg_replace('/[^0-9]/', '', $mobile_no);
+            if (strlen($cleanMobile) === 11 && substr($cleanMobile, 0, 1) === '0') {
+                $cleanMobile = substr($cleanMobile, 1);
+            }
+            if (strlen($cleanMobile) === 12 && substr($cleanMobile, 0, 2) === '91') {
+                $cleanMobile = substr($cleanMobile, 2);
+            }
 
-            if ($existing && $existing['can_edit'] == 0) {
-                $message = "⚠ You have already submitted the exam form and it is under review.";
+            if (!preg_match('/^[0-9]{10}$/', $cleanMobile)) {
+                $message = "⚠ Submission Rejected: Mobile number must be a valid 10-digit number. Current value: '$mobile_no'. Please ask the admin to update it in the portal.";
                 $messageType = "error";
             } else {
+                $mobile_no = $cleanMobile;
+
+                // Check if student already submitted
+                $check_stmt = $pdo->prepare("SELECT id, can_edit, student_photo, student_signature, previous_result FROM students WHERE email_id = ?");
+                $check_stmt->execute([$email_id]);
+                $existing = $check_stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($existing && $existing['can_edit'] == 0) {
+                    $message = "⚠ You have already submitted the exam form and it is under review.";
+                    $messageType = "error";
+                } else {
                 // If editing, retain old files if new ones aren't uploaded
                 if ($existing) {
                     if (empty($savedPhoto))
@@ -335,6 +350,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
     }
+}
 }
 // PDO closes automatically
 ?>
