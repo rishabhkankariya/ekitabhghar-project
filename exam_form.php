@@ -777,7 +777,10 @@ if ($already_submitted && !$can_edit) {
 
 <body>
 
-  <?php if (!$already_submitted || $can_edit): ?>
+  <?php 
+  $is_active = ($start_date !== 0 && $end_date !== 0 && $current_time >= $start_date && $current_time <= $end_date);
+  if ($is_active && (!$already_submitted || $can_edit)): 
+  ?>
     <!-- Year Selection Modal -->
     <div id="selectionModal" <?php if ($can_edit)
       echo 'style="display:none;"'; ?>>
@@ -786,7 +789,7 @@ if ($already_submitted && !$can_edit) {
         <p class="selection-subtitle">Please select your current status to continue</p>
         <div class="selection-options">
           <div class="selection-btn" onclick="selectFlow('new')">
-            <i class="fas fa-baby"></i>
+            <i class="fas fa-user-plus"></i>
             <span>1st Semester<br>(New Student)</span>
           </div>
           <div class="selection-btn" onclick="selectFlow('old')">
