@@ -25,8 +25,7 @@ $toast_type = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['message'])) {
   $stmt_insert = $pdo->prepare("INSERT INTO messages (admin_id, admin_name, message) VALUES (?, ?, ?)");
   if ($stmt_insert->execute([$admin_id, $admin_name, $_POST['message']])) {
-    // [TESTING MODE] Skip email notification to all students
-    // sendNotificationEmail($message);
+    sendNotificationEmail($_POST['message']);
     $_SESSION['toast'] = ['type' => 'success', 'message' => 'Message successfully broadcasted!'];
     header("Location: admin_message.php");
     exit();
@@ -48,8 +47,28 @@ $result_messages = $pdo->query("SELECT * FROM messages ORDER BY sent_at DESC");
 function sendNotificationEmail($messageContent)
 {
   global $pdo;
-  $stmt = $pdo->query("SELECT email FROM student_accounts");
-  // Email disabled in test mode
+  $stmt = $pdo->query("SELECT email, full_name FROM student_accounts");
+  $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $subject = "Important Announcement from Administration";
+  
+  $htmlBody = "
+  <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);'>
+      <div style='background: #4A90E2; color: white; padding: 25px; text-align: center;'>
+          <h2 style='margin:0; font-size: 22px;'>📢 New Announcement</h2>
+      </div>
+      <div style='padding: 30px; line-height: 1.6; color: #333; background: #fff;'>
+          <p style='font-size: 15px;'>" . nl2br(htmlspecialchars($messageContent)) . "</p>
+          <div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888; text-align: center;'>
+              This is an official broadcast from Kitabghar. Please do not reply directly to this email.
+          </div>
+      </div>
+  </div>";
+  
+  foreach ($students as $student) {
+      if (!empty($student['email'])) {
+          sendEmail($student['email'], $student['full_name'], $subject, $htmlBody);
+      }
+  }
 }
 
 ?>

@@ -122,11 +122,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                   'changing_email' => $changingEmail
                 ];
 
-                // [TESTING MODE] Skip email, show OTP on screen
-                $_SESSION['profile_update_otp_sent'] = true;
-                $showOtpForm = true;
-                $message = "🔑 [TEST MODE] Your OTP is: $otp";
-                $messageType = "success";
+                $subject = "Your Profile Update Verification OTP - E-Kitabghar";
+                $body = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; padding: 20px;'>
+                    <h2 style='color: #4A90E2;'>Profile Update Verification</h2>
+                    <p>Dear {$user['full_name']},</p>
+                    <p>You requested to update your profile details. Use the following OTP to verify your identity:</p>
+                    <div style='font-size: 24px; font-weight: bold; color: #4A90E2; padding: 10px; background: #f0f4f8; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                        $otp
+                    </div>
+                    <p>This OTP is valid for 5 minutes.</p>
+                </div>";
+                
+                $res = sendEmail($new_email, $user['full_name'], $subject, $body);
+                if ($res === true) {
+                    $_SESSION['profile_update_otp_sent'] = true;
+                    $showOtpForm = true;
+                    $message = "Verification code has been sent to your new email address.";
+                    $messageType = "success";
+                } else {
+                    $message = "Failed to send verification email. Error: " . $res;
+                    $messageType = "error";
+                }
               } else {
                 // Just update Name or Image
                 $stmt = $pdo->prepare("UPDATE student_accounts SET full_name=?, profile_image=? WHERE email=?");

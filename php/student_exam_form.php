@@ -324,11 +324,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     </body>
                     </html>";
 
-                    // [TESTING MODE] Skip confirmation email
-                    // $res = sendEmail($email_id, $student_name, $subject, $body);
-                    // if ($res !== true) {
-                    //     $message .= " However, confirmation email could not be sent.";
-                    // }
+                    $res = sendEmail($email_id, $student_name, $subject, $body);
+                    if ($res !== true) {
+                        $message .= " However, confirmation email could not be sent.";
+                    }
                 } else {
                     $message = "⚠ Submission failed.";
                     $messageType = "error";

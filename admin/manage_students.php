@@ -51,8 +51,7 @@ if (isset($_POST['upload_csv']) && $_FILES['student_csv']['name']) {
         $stmt = $pdo->prepare($sql);
         
         if ($stmt->execute([$roll, $name, $email, $dob, $phone, $hash, $course, $admY, $passY])) {
-            // [TESTING MODE] Skip credential email
-            // sendCredentialEmail($email, $name, $roll, $tempPass);
+            sendCredentialEmail($email, $name, $roll, $tempPass);
             $count++;
         }
     }
@@ -86,9 +85,8 @@ if (isset($_POST['add_student'])) {
         $stmt = $pdo->prepare($sql);
         
         if ($stmt->execute([$roll, $name, $email, $dob, $phone, $hash, $course, $admY, $passY])) {
-            // [TESTING MODE] Skip credential email
-            // sendCredentialEmail($email, $name, $roll, $tempPass);
-            $_SESSION['success_msg'] = "Student added successfully. (Email disabled in test mode)";
+            sendCredentialEmail($email, $name, $roll, $tempPass);
+            $_SESSION['success_msg'] = "Student added successfully.";
         } else {
             $_SESSION['error_msg'] = "Error inserting student.";
         }

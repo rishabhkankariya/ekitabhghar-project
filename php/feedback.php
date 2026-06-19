@@ -30,8 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p>Best Regards,<br><strong>Kitabghar Team</strong></p>
             <p style='font-size:12px;color:#777;'>This is an automated email. Please do not reply.</p>";
 
-        // [TESTING MODE] Skip email
-        // $res = sendEmail($email, $name, $subject, $body);
+        sendEmail($email, $name, $subject, $body);
         echo "<script>alert('Feedback submitted successfully!'); window.location.href = '../feedback.html';</script>";
     } else {
         echo "Error submitting feedback.";

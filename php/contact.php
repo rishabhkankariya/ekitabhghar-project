@@ -54,11 +54,23 @@ try {
             <p style="font-size:11px;text-align:center;color:#aaa;">&copy; ' . date("Y") . ' Kitabghar. All rights reserved.</p>
         </div>';
 
-        // [TESTING MODE] Skip user thank-you email
-        // sendEmail($email, $name, $userSubject, $userBody);
+        // Send user thank-you email
+        sendEmail($email, $name, $userSubject, $userBody);
 
-        // [TESTING MODE] Skip admin notification email
-        // sendEmail($adminEmail, 'Admin', $adminSubject, $adminBody);
+        // Send admin notification email
+        $adminEmail = SMTP_FROM_EMAIL;
+        $adminSubject = "New Contact Message: " . $subject_field;
+        $adminBody = '
+        <div style="max-width:600px;margin:auto;padding:20px;border:1px solid #eee;border-radius:10px;font-family:sans-serif;background:#fefefe;">
+            <h2 style="color:#e056fd;text-align:center;">🔔 New Contact Submission</h2>
+            <p><strong>From:</strong> ' . $name . ' (' . $email . ')</p>
+            <p><strong>Subject:</strong> ' . $subject_field . '</p>
+            <div style="margin:20px 0;padding:15px;background:#f9f9f9;border-left:4px solid #e056fd;">
+                <strong>Message:</strong><br>
+                <p style="margin:5px 0;color:#333;">' . nl2br($message) . '</p>
+            </div>
+        </div>';
+        sendEmail($adminEmail, 'Admin', $adminSubject, $adminBody);
 
         // Success redirect
         $_SESSION['toast'] = ['type' => 'success', 'message' => 'Message sent successfully!'];

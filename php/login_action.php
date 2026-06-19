@@ -47,8 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['login_otp'] = $otp;
                 $_SESSION['login_otp_expiry'] = time() + 300;
 
-                // [TESTING MODE] Skip email, show OTP on screen via URL param
-                header("Location: ../verify_login_otp.html?debug_otp=" . $otp);
+                $subject = "Your Login OTP - E-Kitabghar";
+                $body = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; padding: 20px;'>
+                    <h2 style='color: #4A90E2;'>Login Verification</h2>
+                    <p>Dear {$row['full_name']},</p>
+                    <p>Your one-time passcode (OTP) for logging in is:</p>
+                    <div style='font-size: 24px; font-weight: bold; color: #4A90E2; padding: 10px; background: #f0f4f8; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                        $otp
+                    </div>
+                    <p>This OTP is valid for 5 minutes.</p>
+                </div>";
+                sendEmail($row['email'], $row['full_name'], $subject, $body);
+
+                header("Location: ../verify_login_otp.html");
                 exit;
             } else {
                 // Permanent Login

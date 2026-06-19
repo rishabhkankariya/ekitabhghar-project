@@ -98,10 +98,9 @@ if ($data['status'] == "authorized") {
         // Save PDF
         $pdf->Output($receipt_path, "F");
 
-        // [TESTING MODE] Skip receipt email
-        // $subject = "Your Payment Receipt - Kitabghar";
-        // $body = "Thank you for your support! Please find your receipt attached.";
-        // $res = sendEmail($email, '', $subject, $body, '', [], [$receipt_path]);
+        $subject = "Your Payment Receipt - Kitabghar";
+        $body = "Thank you for your support! Please find your receipt attached.";
+        sendEmail($email, '', $subject, $body, '', [], [$receipt_path]);
 
         // === [8] STORE RECEIPT IN SESSION & REDIRECT === //
         $_SESSION['receipt'] = $receipt_path;

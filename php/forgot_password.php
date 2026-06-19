@@ -35,10 +35,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $_SESSION["reset_name"] = $full_name;
       $_SESSION["otp_expiry"] = time() + 300; // OTP expires in 5 minutes
 
-      // [TESTING MODE] Skip email, show OTP on screen
-      $message = "🔑 [TEST MODE] Your OTP is: <strong>$otp</strong>";
-      $messageType = "success";
-      $_SESSION["show_otp_form"] = true;
+      $subject = "Your Password Reset OTP - E-Kitabghar";
+      $body = "
+      <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; padding: 20px;'>
+          <h2 style='color: #2563EB;'>Password Reset Request</h2>
+          <p>Dear $full_name,</p>
+          <p>You requested to reset your password. Use the following OTP to verify your identity:</p>
+          <div style='font-size: 24px; font-weight: bold; color: #2563EB; padding: 10px; background: #f8fafc; text-align: center; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;'>
+              $otp
+          </div>
+          <p>This OTP is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+      </div>";
+
+      $res = sendEmail($email, $full_name, $subject, $body);
+      if ($res === true) {
+          $message = "A verification code has been sent to your registered email.";
+          $messageType = "success";
+          $_SESSION["show_otp_form"] = true;
+      } else {
+          $message = "Failed to send verification email. Error: " . $res;
+          $messageType = "error";
+      }
     } else {
       $message = "No student account found with this Email/Roll No.";
       $messageType = "error";
@@ -72,8 +89,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message = "Success! Your password has been updated.";
         $resetType = "success";
 
-        // [TESTING MODE] Skip confirmation email
-        // sendEmail($email, $_SESSION['reset_name'], $subject, $body);
+        $subject = "Your Password Has Been Reset Successfully";
+        $body = "
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; padding: 20px;'>
+            <h2 style='color: #10B981;'>Password Changed Successfully</h2>
+            <p>Dear " . $_SESSION['reset_name'] . ",</p>
+            <p>Your password has been successfully reset. You can now log in using your new password.</p>
+            <p>If you did not initiate this change, please contact the administrator immediately.</p>
+        </div>";
+        sendEmail($email, $_SESSION['reset_name'], $subject, $body);
 
         session_destroy();
       } else {

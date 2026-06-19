@@ -37,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $can_edit = ($action === 'enable') ? 1 : 0;
     $stmt = $pdo->prepare("UPDATE students SET can_edit = ? WHERE id = ?");
     if ($stmt->execute([$can_edit, $student_id])) {
+        if ($can_edit === 1) {
+            sendAccessEmail($student_email, $student_name);
+        }
         $response_message = ($action === 'enable') ? 'Access enabled' : 'Access disabled';
         echo json_encode(['success' => true, 'message' => $response_message]);
     } else {

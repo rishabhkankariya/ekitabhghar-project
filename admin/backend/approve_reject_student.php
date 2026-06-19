@@ -21,7 +21,12 @@ if ($input && isset($input['action']) && isset($input['ids'])) {
         if (!$student) continue;
 
         if ($action === 'approve') {
-            $pdo->prepare("UPDATE students SET status = 'approved' WHERE id = ?")->execute([$id]);
+            if ($pdo->prepare("UPDATE students SET status = 'approved' WHERE id = ?")->execute([$id])) {
+                $subject = "Exam Form Approved";
+                $message = "Your exam form has been approved.";
+                $htmlBody = prepareHtml($student['student_name'], $message);
+                sendEmail($student['email_id'], $student['student_name'], $subject, $htmlBody);
+            }
         } elseif ($action === 'reject') {
             try {
                 $pdo->beginTransaction();
@@ -29,6 +34,11 @@ if ($input && isset($input['action']) && isset($input['ids'])) {
                     ->execute([$student['id'], $student['roll_no'], $student['student_name'], $student['current_semester'], $student['category'], $student['mobile_no'], $student['email_id'], $student['exam_date'], $reason]);
                 $pdo->prepare("DELETE FROM students WHERE id = ?")->execute([$id]);
                 $pdo->commit();
+                
+                $subject = "Exam Form Rejected";
+                $message = "Your exam form has been rejected. Reason: " . $reason;
+                $htmlBody = prepareHtml($student['student_name'], $message);
+                sendEmail($student['email_id'], $student['student_name'], $subject, $htmlBody);
             } catch (Exception $e) {
                 $pdo->rollBack();
             }
@@ -79,6 +89,8 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $update = $pdo->prepare("UPDATE students SET status = 'approved' WHERE id = ?");
         $success = $update->execute([$id]);
         if ($success) {
+            $htmlBody = prepareHtml($name, $message);
+            sendEmail($email, $name, $subject, $htmlBody);
             $_SESSION['message'] = "Student approved and email sent.";
             $_SESSION['message_type'] = "success";
         } else {
@@ -93,6 +105,12 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                 ->execute([$student['id'], $student['roll_no'], $student['student_name'], $student['current_semester'], $student['category'], $student['mobile_no'], $student['email_id'], $student['exam_date'], $reason]);
             $pdo->prepare("DELETE FROM students WHERE id = ?")->execute([$id]);
             $pdo->commit();
+            
+            $subject = "Exam Form Rejected";
+            $message = "Your exam form has been rejected. Reason: " . ($reason ? $reason : 'N/A');
+            $htmlBody = prepareHtml($name, $message);
+            sendEmail($email, $name, $subject, $htmlBody);
+            
             $_SESSION['message'] = "Student rejected, archived & email sent.";
             $_SESSION['message_type'] = "danger";
         } catch (Exception $e) {
@@ -104,6 +122,11 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $update = $pdo->prepare("UPDATE students SET can_edit = 1 WHERE id = ?");
         $success = $update->execute([$id]);
         if ($success) {
+            $subject = "Exam Form Edit Access Granted";
+            $message = "The administrator has granted you permission to edit your exam form. You can now log in to the student portal and make the necessary changes to your application.";
+            $htmlBody = prepareHtml($name, $message);
+            sendEmail($email, $name, $subject, $htmlBody);
+            
             $_SESSION['message'] = "Student can now edit their form. Email sent.";
             $_SESSION['message_type'] = "primary";
         } else {
