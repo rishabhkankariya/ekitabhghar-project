@@ -13,210 +13,235 @@ $email = $_SESSION['user_email'];
 $message = "";
 $messageType = "";
 
-// Single Session Enforcement
-$check_sess = $pdo->prepare("SELECT session_token FROM student_accounts WHERE email = ?");
-$check_sess->execute([$email]);
-$sess_row = $check_sess->fetch(PDO::FETCH_ASSOC);
-if ($sess_row) {
-  if (!empty($sess_row['session_token']) && $sess_row['session_token'] !== session_id()) {
-    session_unset();
+// Single Session Enforcement & User Detail Fetch
+try {
+  $check_sess = $pdo->prepare("SELECT session_token FROM student_accounts WHERE email = ?");
+  $check_sess->execute([$email]);
+  $sess_row = $check_sess->fetch(PDO::FETCH_ASSOC);
+  if ($sess_row) {
+    if (!empty($sess_row['session_token']) && $sess_row['session_token'] !== session_id()) {
+      session_unset();
+      session_destroy();
+      header("Location: student_login.html?error=You have been logged out because your account was accessed from another device.");
+      exit;
+    }
+  }
+  $updateType = "";
+  $showOtpForm = ($_SESSION['profile_update_otp_sent'] ?? false) && isset($_SESSION['profile_update_data']);
+
+  $stmt = $pdo->prepare("SELECT id, roll_no, full_name, email, profile_image FROM student_accounts WHERE email = ?");
+  $stmt->execute([$email]);
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if ($result) {
+    $user = $result;
+  } else {
     session_destroy();
-    header("Location: student_login.html?error=You have been logged out because your account was accessed from another device.");
+    header("Location: student_login.html?error=Account not found. Please login again.");
     exit;
   }
-}
-$updateType = "";
-$showOtpForm = ($_SESSION['profile_update_otp_sent'] ?? false) && isset($_SESSION['profile_update_data']);
-
-$stmt = $pdo->prepare("SELECT id, roll_no, full_name, email, profile_image FROM student_accounts WHERE email = ?");
-$stmt->execute([$email]);
-$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($result) {
-  $user = $result;
-} else {
-  session_destroy();
-  header("Location: student_login.html?error=Account not found. Please login again.");
-  exit;
+} catch (PDOException $e) {
+  error_log("Database initialization error in profile_update.php: " . $e->getMessage());
+  $message = "Database connection or schema error. Please try again later.";
+  $messageType = "error";
+  // Define fallback dummy user to prevent HTML crashes
+  $user = [
+    'id' => 0,
+    'roll_no' => '',
+    'full_name' => 'Student',
+    'email' => $email,
+    'profile_image' => 'users.png'
+  ];
+  $updateType = "";
+  $showOtpForm = false;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $step = $_POST['step'] ?? 'init';
+  try {
+    $step = $_POST['step'] ?? 'init';
 
-  if ($step === 'init') {
-    // Initial submission - validate and send OTP if needed
-    if (!isset($_POST["captcha"]) || !isset($_SESSION["captcha"])) {
-      $message = "CAPTCHA validation failed. Session expired.";
-      $messageType = "error";
-    } else {
-      $entered_captcha = strtoupper(trim($_POST["captcha"]));
-      $actual_captcha = $_SESSION["captcha"];
-      unset($_SESSION["captcha"]);
-
-      if ($entered_captcha !== $actual_captcha) {
-        $message = "Incorrect CAPTCHA. Please try again.";
+    if ($step === 'init') {
+      // Initial submission - validate and send OTP if needed
+      if (!isset($_POST["captcha"]) || !isset($_SESSION["captcha"])) {
+        $message = "CAPTCHA validation failed. Session expired.";
         $messageType = "error";
       } else {
-        // Validate Current Password
-        $stmt = $pdo->prepare("SELECT password_hash FROM student_accounts WHERE email = ?");
-        $stmt->execute([$email]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $current_password_hash = $row ? $row['password_hash'] : null;
+        $entered_captcha = strtoupper(trim($_POST["captcha"]));
+        $actual_captcha = $_SESSION["captcha"];
+        unset($_SESSION["captcha"]);
 
-        if (!password_verify($_POST['current-password'], $current_password_hash)) {
-          $message = "Error: Incorrect current password.";
+        if ($entered_captcha !== $actual_captcha) {
+          $message = "Incorrect CAPTCHA. Please try again.";
           $messageType = "error";
         } else {
-          $new_username = trim($_POST['username']);
-          $new_email = trim($_POST['email']);
-          $changingEmail = ($new_email !== $email);
-          $changingPassword = !empty($_POST['password']);
+          // Validate Current Password
+          $stmt = $pdo->prepare("SELECT password_hash FROM student_accounts WHERE email = ?");
+          $stmt->execute([$email]);
+          $row = $stmt->fetch(PDO::FETCH_ASSOC);
+          $current_password_hash = $row ? $row['password_hash'] : null;
 
-          // Check if new email is already taken
-          if ($changingEmail) {
-            $stmt = $pdo->prepare("SELECT id FROM student_accounts WHERE email = ? AND email != ?");
-            $stmt->execute([$new_email, $email]);
-            if ($stmt->rowCount() > 0) {
-              $message = "Error: This email is already registered with another account.";
-              $messageType = "error";
-            }
-          }
+          $current_password = $_POST['current-password'] ?? '';
+          if (empty($current_password_hash) || !password_verify($current_password, $current_password_hash)) {
+            $message = "Error: Incorrect current password.";
+            $messageType = "error";
+          } else {
+            $new_username = trim($_POST['username'] ?? '');
+            $new_email = trim($_POST['email'] ?? '');
+            $changingEmail = ($new_email !== $email);
+            $changingPassword = !empty($_POST['password']);
 
-          if (empty($message)) {
-            if ($changingPassword) {
-              if ($_POST['password'] !== $_POST['confirm-password']) {
-                $message = "Error: New password and confirm password do not match.";
-                $messageType = "error";
-              }
-              $target_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
-            } else {
-              $target_password = $current_password_hash;
-            }
-
-            // Profile Image Logic
-            $profile_image = $user['profile_image'];
-            if (!empty($_FILES["profile_image"]["name"]) && $_FILES["profile_image"]["error"] === UPLOAD_ERR_OK) {
-              // Use absolute server path to avoid relative path issues with Apache
-              $upload_dir = __DIR__ . '/php/uploads/';
-              // Create directory if it doesn't exist
-              if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0755, true);
-              }
-              $safe_name = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($_FILES["profile_image"]["name"]));
-              $target_file = $upload_dir . $safe_name;
-              $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-              if (@getimagesize($_FILES["profile_image"]["tmp_name"])) {
-                if (in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                  if (move_uploaded_file($_FILES["profile_image"]["tmp_name"], $target_file)) {
-                    $profile_image = $safe_name;
-                  } else {
-                    error_log("Profile image upload failed: could not move to $target_file");
-                    $message = "Image upload failed. Check server permissions on php/uploads/";
-                    $messageType = "error";
-                  }
-                } else {
-                  $message = "Invalid image type. Use JPG, PNG, GIF or WEBP.";
-                  $messageType = "error";
-                }
-              } else {
-                $message = "Uploaded file is not a valid image.";
+            // Check if new email is already taken
+            if ($changingEmail) {
+              $stmt = $pdo->prepare("SELECT id FROM student_accounts WHERE email = ? AND email != ?");
+              $stmt->execute([$new_email, $email]);
+              if ($stmt->rowCount() > 0) {
+                $message = "Error: This email is already registered with another account.";
                 $messageType = "error";
               }
             }
 
             if (empty($message)) {
-              if ($changingEmail || $changingPassword) {
-                // Request OTP
-                $otp = rand(100000, 999999);
-                $_SESSION['profile_update_otp'] = $otp;
-                $_SESSION['profile_update_expiry'] = time() + 300;
-                $_SESSION['profile_update_data'] = [
-                  'full_name' => $new_username,
-                  'email' => $new_email,
-                  'password_hash' => $target_password,
-                  'profile_image' => $profile_image,
-                  'changing_email' => $changingEmail
-                ];
-
-                $subject = "Your Profile Update Verification OTP - E-Kitabghar";
-                $body = "
-                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; padding: 20px;'>
-                    <h2 style='color: #4A90E2;'>Profile Update Verification</h2>
-                    <p>Dear {$user['full_name']},</p>
-                    <p>You requested to update your profile details. Use the following OTP to verify your identity:</p>
-                    <div style='font-size: 24px; font-weight: bold; color: #4A90E2; padding: 10px; background: #f0f4f8; text-align: center; border-radius: 8px; margin: 20px 0;'>
-                        $otp
-                    </div>
-                    <p>This OTP is valid for 5 minutes.</p>
-                </div>";
-                
-                $res = sendEmail($new_email, $user['full_name'], $subject, $body);
-                if ($res === true) {
-                    $_SESSION['profile_update_otp_sent'] = true;
-                    $showOtpForm = true;
-                    $message = "Verification code has been sent to your new email address.";
-                    $messageType = "success";
-                } else {
-                    $message = "Failed to send verification email. Error: " . $res;
-                    $messageType = "error";
+              if ($changingPassword) {
+                $new_p = $_POST['password'] ?? '';
+                $confirm_p = $_POST['confirm-password'] ?? '';
+                if ($new_p !== $confirm_p) {
+                  $message = "Error: New password and confirm password do not match.";
+                  $messageType = "error";
                 }
+                $target_password = password_hash($new_p, PASSWORD_BCRYPT);
               } else {
-                // Just update Name or Image
-                $stmt = $pdo->prepare("UPDATE student_accounts SET full_name=?, profile_image=? WHERE email=?");
-                if ($stmt->execute([$new_username, $profile_image, $email])) {
-                  $message = "Profile updated successfully!";
-                  $messageType = "success";
-                  $updateType = "success";
+                $target_password = $current_password_hash;
+              }
+
+              // Profile Image Logic
+              $profile_image = $user['profile_image'];
+              if (!empty($_FILES["profile_image"]["name"]) && $_FILES["profile_image"]["error"] === UPLOAD_ERR_OK) {
+                // Use absolute server path to avoid relative path issues with Apache
+                $upload_dir = __DIR__ . '/php/uploads/';
+                // Create directory if it doesn't exist
+                if (!is_dir($upload_dir)) {
+                  mkdir($upload_dir, 0755, true);
+                }
+                $safe_name = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($_FILES["profile_image"]["name"]));
+                $target_file = $upload_dir . $safe_name;
+                $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                if (@getimagesize($_FILES["profile_image"]["tmp_name"])) {
+                  if (in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                    if (move_uploaded_file($_FILES["profile_image"]["tmp_name"], $target_file)) {
+                      $profile_image = $safe_name;
+                    } else {
+                      error_log("Profile image upload failed: could not move to $target_file");
+                      $message = "Image upload failed. Check server permissions on php/uploads/";
+                      $messageType = "error";
+                    }
+                  } else {
+                    $message = "Invalid image type. Use JPG, PNG, GIF or WEBP.";
+                    $messageType = "error";
+                  }
+                } else {
+                  $message = "Uploaded file is not a valid image.";
+                  $messageType = "error";
+                }
+              }
+
+              if (empty($message)) {
+                if ($changingEmail || $changingPassword) {
+                  // Request OTP
+                  $otp = rand(100000, 999999);
+                  $_SESSION['profile_update_otp'] = $otp;
+                  $_SESSION['profile_update_expiry'] = time() + 300;
+                  $_SESSION['profile_update_data'] = [
+                    'full_name' => $new_username,
+                    'email' => $new_email,
+                    'password_hash' => $target_password,
+                    'profile_image' => $profile_image,
+                    'changing_email' => $changingEmail
+                  ];
+
+                  $subject = "Your Profile Update Verification OTP - E-Kitabghar";
+                  $body = "
+                  <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; padding: 20px;'>
+                      <h2 style='color: #4A90E2;'>Profile Update Verification</h2>
+                      <p>Dear {$user['full_name']},</p>
+                      <p>You requested to update your profile details. Use the following OTP to verify your identity:</p>
+                      <div style='font-size: 24px; font-weight: bold; color: #4A90E2; padding: 10px; background: #f0f4f8; text-align: center; border-radius: 8px; margin: 20px 0;'>
+                          $otp
+                      </div>
+                      <p>This OTP is valid for 5 minutes.</p>
+                  </div>";
+                  
+                  $res = sendEmail($new_email, $user['full_name'], $subject, $body);
+                  if ($res === true) {
+                      $_SESSION['profile_update_otp_sent'] = true;
+                      $showOtpForm = true;
+                      $message = "Verification code has been sent to your new email address.";
+                      $messageType = "success";
+                  } else {
+                      $message = "Failed to send verification email. Error: " . $res;
+                      $messageType = "error";
+                  }
+                } else {
+                  // Just update Name or Image
+                  $stmt = $pdo->prepare("UPDATE student_accounts SET full_name=?, profile_image=? WHERE email=?");
+                  if ($stmt->execute([$new_username, $profile_image, $email])) {
+                    $message = "Profile updated successfully!";
+                    $messageType = "success";
+                    $updateType = "success";
+                  }
                 }
               }
             }
           }
         }
       }
-    }
-  } elseif ($step === 'verify') {
-    $entered_otp = trim($_POST['otp']);
-    if (isset($_SESSION['profile_update_otp']) && time() < $_SESSION['profile_update_expiry']) {
-      if ($entered_otp == $_SESSION['profile_update_otp']) {
-        if (!isset($_SESSION['profile_update_data'])) {
-          $message = "Session data lost. Please start over.";
-          $messageType = "error";
-          unset($_SESSION['profile_update_otp_sent']);
-        } else {
-          $data = $_SESSION['profile_update_data'];
-          $stmt = $pdo->prepare("UPDATE student_accounts SET full_name=?, email=?, password_hash=?, profile_image=? WHERE email=?");
-
-          if ($stmt->execute([$data['full_name'], $data['email'], $data['password_hash'], $data['profile_image'], $email])) {
-            if ($data['changing_email']) {
-              $_SESSION['user_email'] = $data['email'];
-            }
-            $message = "Success! Profile changes verified and applied.";
-            $messageType = "success";
-            $updateType = "success";
-            unset($_SESSION['profile_update_otp']);
-            unset($_SESSION['profile_update_otp_sent']);
-            unset($_SESSION['profile_update_data']);
-          } else {
-            $message = "Error updating database.";
+    } elseif ($step === 'verify') {
+      $entered_otp = trim($_POST['otp'] ?? '');
+      if (isset($_SESSION['profile_update_otp']) && time() < $_SESSION['profile_update_expiry']) {
+        if ($entered_otp == $_SESSION['profile_update_otp']) {
+          if (!isset($_SESSION['profile_update_data'])) {
+            $message = "Session data lost. Please start over.";
             $messageType = "error";
+            unset($_SESSION['profile_update_otp_sent']);
+          } else {
+            $data = $_SESSION['profile_update_data'];
+            $stmt = $pdo->prepare("UPDATE student_accounts SET full_name=?, email=?, password_hash=?, profile_image=? WHERE email=?");
+
+            if ($stmt->execute([$data['full_name'], $data['email'], $data['password_hash'], $data['profile_image'], $email])) {
+              if ($data['changing_email']) {
+                $_SESSION['user_email'] = $data['email'];
+              }
+              $message = "Success! Profile changes verified and applied.";
+              $messageType = "success";
+              $updateType = "success";
+              unset($_SESSION['profile_update_otp']);
+              unset($_SESSION['profile_update_otp_sent']);
+              unset($_SESSION['profile_update_data']);
+            } else {
+              $message = "Error updating database.";
+              $messageType = "error";
+            }
           }
+        } else {
+          $message = "Incorrect verification code.";
+          $messageType = "error";
+          $showOtpForm = true;
         }
       } else {
-        $message = "Incorrect verification code.";
+        $message = "Verification code expired. Please start over.";
         $messageType = "error";
-        $showOtpForm = true;
+        unset($_SESSION['profile_update_otp_sent']);
       }
-    } else {
-      $message = "Verification code expired. Please start over.";
-      $messageType = "error";
+    } elseif ($step === 'cancel') {
       unset($_SESSION['profile_update_otp_sent']);
+      unset($_SESSION['profile_update_otp']);
+      unset($_SESSION['profile_update_data']);
+      header("Location: profile_update.php");
+      exit;
     }
-  } elseif ($step === 'cancel') {
-    unset($_SESSION['profile_update_otp_sent']);
-    unset($_SESSION['profile_update_otp']);
-    unset($_SESSION['profile_update_data']);
-    header("Location: profile_update.php");
-    exit;
+  } catch (Throwable $e) {
+    error_log("Error during profile update: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+    $message = "Error updating profile: " . $e->getMessage();
+    $messageType = "error";
   }
 }
 ?>
