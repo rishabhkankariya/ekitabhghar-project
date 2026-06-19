@@ -210,6 +210,7 @@ CREATE TABLE IF NOT EXISTS announcements (
 CREATE TABLE IF NOT EXISTS imp_announcements (
     id SERIAL PRIMARY KEY,
     message TEXT NOT NULL,
+    is_active INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
