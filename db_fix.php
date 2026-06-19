@@ -64,6 +64,30 @@ try {
     }
 }
 
+// 2b. Create email_queue table
+echo "Step 1b: Creating 'email_queue' table...\n";
+try {
+    $sqlEmailQueue = "CREATE TABLE IF NOT EXISTS email_queue (
+        id SERIAL PRIMARY KEY,
+        to_email VARCHAR(255) NOT NULL,
+        to_name VARCHAR(255) NOT NULL,
+        subject VARCHAR(255) NOT NULL,
+        body TEXT NOT NULL,
+        alt_body TEXT,
+        bcc TEXT,
+        attachments TEXT,
+        status VARCHAR(50) DEFAULT 'pending',
+        attempts INTEGER DEFAULT 0,
+        error_message TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        sent_at TIMESTAMP NULL
+    );";
+    $pdo->exec($sqlEmailQueue);
+    echo "✅ Success: 'email_queue' table is ready.\n\n";
+} catch (PDOException $e) {
+    echo "❌ Error creating 'email_queue' table: " . $e->getMessage() . "\n\n";
+}
+
 // 3. Fix Permission Issues (e.g., visitor_count permission denied)
 echo "Step 2: Repairing schema permissions...\n";
 try {
@@ -77,6 +101,7 @@ try {
     // Explicitly grant permissions on visitor_count in case schema-wide fails
     $pdo->exec("GRANT ALL PRIVILEGES ON TABLE visitor_count TO \"$currentUser\"");
     $pdo->exec("GRANT ALL PRIVILEGES ON TABLE student_login_logs TO \"$currentUser\"");
+    $pdo->exec("GRANT ALL PRIVILEGES ON TABLE email_queue TO \"$currentUser\"");
     
     // Set default privileges for future tables
     $pdo->exec("ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO \"$currentUser\"");
