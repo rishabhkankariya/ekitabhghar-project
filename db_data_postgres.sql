@@ -215,7 +215,8 @@ INSERT INTO videos (id, title, video_path) VALUES
 (49, 'VIDEO 1', 'video1_1744383721.mp4');
 
 INSERT INTO visitor_count (id, count) VALUES
-(1, 50);
+(1, 50)
+ON CONFLICT (id) DO UPDATE SET count = EXCLUDED.count;
 
 -- Update sequence IDs for serial primary keys
 SELECT setval(pg_get_serial_sequence('admin', 'admin_id'), COALESCE(max(admin_id), 1)) FROM admin;
