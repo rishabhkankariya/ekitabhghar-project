@@ -617,6 +617,53 @@ $videos = $pdo->query("SELECT * FROM videos ORDER BY id DESC")->fetchAll();
             if (!f.classList.contains('hidden')) f.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
+    <script src="../js/loader.js"></script>
+    <script>
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (e.defaultPrevented) return;
+                
+                const submitter = e.submitter;
+                let msg = "Processing request...";
+                
+                if (submitter) {
+                    const name = submitter.name;
+                    if (name === 'create_gallery') {
+                        msg = "Uploading photo to gallery...";
+                    } else if (name === 'delete_gallery') {
+                        msg = "Removing image from gallery...";
+                    } else if (name === 'create_announcement') {
+                        msg = "Posting announcement...";
+                    } else if (name === 'delete_announcement') {
+                        msg = "Deleting announcement...";
+                    } else if (name === 'create_alert') {
+                        msg = "Publishing system alert...";
+                    } else if (name === 'delete_alert') {
+                        msg = "Removing alert...";
+                    } else if (name === 'delete_slide') {
+                        msg = "Deleting slide image...";
+                    } else if (name === 'create_event') {
+                        msg = "Scheduling campus event...";
+                    } else if (name === 'delete_event') {
+                        msg = "Removing event...";
+                    } else if (name === 'create_video') {
+                        msg = "Uploading production video...";
+                    } else if (name === 'delete_video') {
+                        msg = "Deleting video...";
+                    }
+                } else {
+                    const hasFileInput = form.querySelector('input[type="file"]');
+                    if (hasFileInput && form.querySelector('input[name="create_slide"]')) {
+                        msg = "Uploading slide image...";
+                    }
+                }
+                
+                if (typeof showGlobalLoader === 'function') {
+                    showGlobalLoader(msg);
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

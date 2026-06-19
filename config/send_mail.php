@@ -23,10 +23,16 @@ foreach ($possiblePaths as $path) {
 if (!$autoloadLoaded) {
     $triedPaths = implode(', ', $possiblePaths);
     error_log("PHPMailer autoload FAILED. Tried: $triedPaths");
-    // Do NOT silently continue — log and define a stub so callers get a clear error
+    // Define stubs so callers don't crash
     if (!function_exists('sendEmail')) {
         function sendEmail($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc = [], $attachments = []) {
             error_log("sendEmail() called but PHPMailer vendor/autoload.php was not found.");
+            return "PHPMailer not found. Run: composer install in /var/www/html";
+        }
+    }
+    if (!function_exists('sendEmailReal')) {
+        function sendEmailReal($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc = [], $attachments = []) {
+            error_log("sendEmailReal() called but PHPMailer vendor/autoload.php was not found.");
             return "PHPMailer not found. Run: composer install in /var/www/html";
         }
     }
@@ -36,18 +42,9 @@ if (!$autoloadLoaded) {
 require_once __DIR__ . '/mail_config.php';
 
 /**
- * Robust email sending function using PHPMailer and Brevo SMTP.
- * 
- * @param string $toEmail   Recipient email
- * @param string $toName    Recipient name
- * @param string $subject   Email subject
- * @param string $htmlBody  HTML content of the email
- * @param string $altBody   (Optional) Plain text version
- * @param array  $bcc       (Optional) BCC recipients
- * @param array  $attachments (Optional) File attachments
- * @return bool|string      Returns true on success, or error message on failure
+ * Real synchronous SMTP email sending function using PHPMailer and Brevo SMTP.
  */
-function sendEmail($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc = [], $attachments = [])
+function sendEmailReal($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc = [], $attachments = [])
 {
     $mail = new PHPMailer(true);
 
@@ -120,3 +117,127 @@ function sendEmail($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc =
         return $mail->ErrorInfo;
     }
 }
+
+/**
+ * Asynchronous email sending wrapper that queues email in database.
+ */
+function sendEmail($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc = [], $attachments = [])
+{
+    global $pdo;
+
+    // Fallback if PDO is not initialized
+    if (!isset($pdo)) {
+        try {
+            require_once dirname(__DIR__) . '/php/connection.php';
+        } catch (Exception $e) {
+            error_log("Failed to include connection.php in sendEmail: " . $e->getMessage());
+        }
+    }
+
+    // If we still don't have $pdo, fallback to synchronous SMTP sending directly
+    if (!isset($pdo)) {
+        error_log("Database connection not available. Falling back to synchronous SMTP sending.");
+        return sendEmailReal($toEmail, $toName, $subject, $htmlBody, $altBody, $bcc, $attachments);
+    }
+
+    try {
+        // Ensure email_queue table exists (cached static variable to execute once per request)
+        static $emailQueueTableChecked = false;
+        if (!$emailQueueTableChecked) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS email_queue (
+                id SERIAL PRIMARY KEY,
+                to_email VARCHAR(255) NOT NULL,
+                to_name VARCHAR(255) NOT NULL,
+                subject VARCHAR(255) NOT NULL,
+                body TEXT NOT NULL,
+                alt_body TEXT,
+                bcc TEXT,
+                attachments TEXT,
+                status VARCHAR(50) DEFAULT 'pending',
+                attempts INTEGER DEFAULT 0,
+                error_message TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                sent_at TIMESTAMP NULL
+            )");
+            $emailQueueTableChecked = true;
+        }
+
+        // Persist attachments if any to a dedicated persistent folder
+        $persistedAttachments = [];
+        if (!empty($attachments)) {
+            $destDir = dirname(__DIR__) . '/php/uploads/email_attachments/';
+            if (!is_dir($destDir)) {
+                @mkdir($destDir, 0777, true);
+            }
+
+            if (is_array($attachments)) {
+                foreach ($attachments as $file) {
+                    if (is_array($file) && isset($file['path'])) {
+                        $origPath = $file['path'];
+                        $origName = $file['name'] ?? basename($origPath);
+                    } else {
+                        $origPath = $file;
+                        $origName = basename($origPath);
+                    }
+
+                    if (file_exists($origPath)) {
+                        $ext = pathinfo($origName, PATHINFO_EXTENSION);
+                        $uniqName = uniqid('att_', true) . ($ext ? '.' . $ext : '');
+                        $newPath = $destDir . $uniqName;
+                        if (@copy($origPath, $newPath)) {
+                            $persistedAttachments[] = [
+                                'path' => $newPath,
+                                'name' => $origName
+                            ];
+                        } else {
+                            $persistedAttachments[] = [
+                                'path' => $origPath,
+                                'name' => $origName
+                            ];
+                        }
+                    }
+                }
+            } else {
+                if (file_exists($attachments)) {
+                    $origName = basename($attachments);
+                    $ext = pathinfo($origName, PATHINFO_EXTENSION);
+                    $uniqName = uniqid('att_', true) . ($ext ? '.' . $ext : '');
+                    $newPath = $destDir . $uniqName;
+                    if (@copy($attachments, $newPath)) {
+                        $persistedAttachments[] = [
+                            'path' => $newPath,
+                            'name' => $origName
+                        ];
+                    } else {
+                        $persistedAttachments[] = [
+                            'path' => $attachments,
+                            'name' => $origName
+                        ];
+                    }
+                }
+            }
+        }
+
+        $bccJson = json_encode(is_array($bcc) ? $bcc : ($bcc ? [$bcc] : []));
+        $attachmentsJson = json_encode($persistedAttachments);
+
+        // Insert into database queue
+        $stmt = $pdo->prepare("INSERT INTO email_queue (to_email, to_name, subject, body, alt_body, bcc, attachments) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$toEmail, $toName, $subject, $htmlBody, $altBody, $bccJson, $attachmentsJson]);
+
+        // Spawn cron_email_sender.php in background asynchronously
+        $senderScript = __DIR__ . '/cron_email_sender.php';
+        $cmd = 'php ' . escapeshellarg($senderScript);
+        if (substr(php_uname(), 0, 7) == "Windows") {
+            pclose(popen("start /B " . $cmd, "r"));
+        } else {
+            pclose(popen($cmd . " > /dev/null 2>&1 &", "r"));
+        }
+
+        return true;
+    } catch (Exception $dbEx) {
+        error_log("Failed to queue email to database: " . $dbEx->getMessage() . ". Falling back to synchronous SMTP sending.");
+        return sendEmailReal($toEmail, $toName, $subject, $htmlBody, $altBody, $bcc, $attachments);
+    }
+}
+?>
