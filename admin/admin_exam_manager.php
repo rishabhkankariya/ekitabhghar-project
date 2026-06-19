@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['admin_id'])) {
     echo "<script>window.location.href = 'admin_login.php';</script>";
@@ -12,6 +12,74 @@ require_once '../php/connection.php';
 
 $toast_message = "";
 $toast_type = "";
+
+// Send notification emails to all active students
+function sendExamNotification($pdo, $start_date, $end_date) {
+    try {
+        // Fetch all active student accounts
+        $stmt = $pdo->query("SELECT email, full_name FROM student_accounts WHERE account_status = 'active'");
+        $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $start_formatted = date("F j, Y - h:i A", strtotime($start_date));
+        $end_formatted = date("F j, Y - h:i A", strtotime($end_date));
+        
+        $success_count = 0;
+        $fail_count = 0;
+        
+        foreach ($students as $student) {
+            $toEmail = $student['email'];
+            $toName = $student['full_name'];
+            $subject = "📢 Exam Registration Form is Now Active - E-Kitabghar Portal";
+            
+            $body = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);'>
+                <div style='background: linear-gradient(135deg, #4f46e5, #ec4899); padding: 30px 20px; text-align: center; color: white;'>
+                    <h2 style='margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px;'>Exam Registration Open</h2>
+                    <p style='margin: 5px 0 0; opacity: 0.9; font-size: 14px;'>RGPV Polytechnic Division</p>
+                </div>
+                <div style='padding: 30px 20px; color: #1e293b; line-height: 1.6;'>
+                    <p>Dear <strong>$toName</strong>,</p>
+                    <p>This is to notify you that the exam registration portal is now active and open for form submissions.</p>
+                    
+                    <div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 20px 0;'>
+                        <table style='width: 100%; border-collapse: collapse;'>
+                            <tr>
+                                <td style='padding: 6px 0; font-weight: bold; color: #475569; width: 40%;'>📅 Start Date:</td>
+                                <td style='padding: 6px 0; color: #1e293b;'>$start_formatted</td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 6px 0; font-weight: bold; color: #475569;'>⏰ End Date:</td>
+                                <td style='padding: 6px 0; color: #dc2626; font-weight: bold;'>$end_formatted</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <p>Please log in to your student portal dashboard to complete and submit your exam form before the deadline.</p>
+                    
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <a href='http://20.197.16.200/student_login.html' style='background: #4f46e5; color: white; padding: 12px 30px; text-decoration: none; font-weight: bold; border-radius: 8px; display: inline-block; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.15);'>Go to Student Portal</a>
+                    </div>
+                    
+                    <p style='font-size: 12px; color: #64748b; margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 20px;'>
+                        This is an automated notification. Please do not reply directly to this email.
+                    </p>
+                </div>
+            </div>";
+            
+            $res = sendEmail($toEmail, $toName, $subject, $body);
+            if ($res === true) {
+                $success_count++;
+            } else {
+                $fail_count++;
+                error_log("Failed to send exam notification email to $toEmail: $res");
+            }
+        }
+        return ['success' => $success_count, 'fail' => $fail_count];
+    } catch (PDOException $e) {
+        error_log("Failed to fetch students for notification: " . $e->getMessage());
+        return false;
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $start_date = $_POST["start_date"] ?? "";
@@ -28,7 +96,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt = $pdo->prepare("INSERT INTO exam_settings (start_date, end_date) VALUES (?, ?)");
         }
         if ($stmt->execute([$start_date, $end_date])) {
-            $toast_message = "Exam settings updated successfully!";
+            // Trigger student notifications
+            $notif_res = sendExamNotification($pdo, $start_date, $end_date);
+            if ($notif_res) {
+                $toast_message = "Exam settings updated successfully! Notified " . $notif_res['success'] . " students." . ($notif_res['fail'] > 0 ? " (Failed: " . $notif_res['fail'] . ")" : "");
+            } else {
+                $toast_message = "Exam settings updated, but failed to fetch students for email notification.";
+            }
             $toast_type = "success";
         } else {
             $toast_message = "Error updating settings.";
@@ -54,8 +128,6 @@ if (!empty($current_start_date) && !empty($current_end_date)) {
         $is_active = true;
     }
 }
-
-function sendExamNotification($start, $end) { /* disabled */ }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -185,7 +257,7 @@ function sendExamNotification($start, $end) { /* disabled */ }
                     <div
                         class="inline-flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                         <i class="bi bi-info-circle"></i>
-                        [TEST MODE] Email notifications are disabled. Students will see updates on their dashboard.
+                        Campus-wide email alerts are live. All active students will be notified when settings are updated.
                     </div>
                 </div>
             </div>

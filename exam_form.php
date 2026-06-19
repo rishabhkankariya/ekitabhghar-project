@@ -976,7 +976,6 @@ if ($already_submitted && !$can_edit) {
                 </option>
                 <option value="Diploma in Plastic Technology" <?= ($master_course == 'Diploma in Plastic Technology') ? 'selected' : '' ?>>Plastic Technology</option>
                 <option value="Diploma in Refinery & Petrochemical Engineering" <?= ($master_course == 'Diploma in Refinery & Petrochemical Engineering') ? 'selected' : '' ?>>Refinery & Petrochemical Engineering</option>
-                <option value="Other" <?= ($master_course == 'Other') ? 'selected' : '' ?>>Other</option>
               </select>
             </div>
 
