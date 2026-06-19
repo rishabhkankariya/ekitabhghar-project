@@ -2,15 +2,35 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Check if vendor/autoload.php exists in root
-$autoloadPath = __DIR__ . '/../vendor/autoload.php';
-if (!file_exists($autoloadPath)) {
-    // Try one level up if called from elsewhere
-    $autoloadPath = __DIR__ . '/../../vendor/autoload.php';
+// Resolve vendor autoload — always use the document root as the anchor
+// __DIR__ here is /var/www/html/config (on server) or similar
+// We walk up one level to reach the project root where vendor/ lives
+$possiblePaths = [
+    __DIR__ . '/../vendor/autoload.php',           // config/../vendor (standard)
+    dirname(__DIR__) . '/vendor/autoload.php',      // explicit one level up
+    $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php', // webroot/vendor
+];
+
+$autoloadLoaded = false;
+foreach ($possiblePaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        $autoloadLoaded = true;
+        break;
+    }
 }
 
-if (file_exists($autoloadPath)) {
-    require_once $autoloadPath;
+if (!$autoloadLoaded) {
+    $triedPaths = implode(', ', $possiblePaths);
+    error_log("PHPMailer autoload FAILED. Tried: $triedPaths");
+    // Do NOT silently continue — log and define a stub so callers get a clear error
+    if (!function_exists('sendEmail')) {
+        function sendEmail($toEmail, $toName, $subject, $htmlBody, $altBody = '', $bcc = [], $attachments = []) {
+            error_log("sendEmail() called but PHPMailer vendor/autoload.php was not found.");
+            return "PHPMailer not found. Run: composer install in /var/www/html";
+        }
+    }
+    return; // stop loading rest of file
 }
 
 require_once __DIR__ . '/mail_config.php';
