@@ -14,7 +14,7 @@ $sql = "CREATE TABLE IF NOT EXISTS student_accounts (
     admission_year INT NOT NULL,
     expected_passing_year INT NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    is_temp_password BOOLEAN DEFAULT TRUE,
+    is_temp_password INT DEFAULT 1,
     account_status VARCHAR(20) DEFAULT 'active',
     last_login_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
