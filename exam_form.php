@@ -49,6 +49,10 @@ $student_query = $pdo->prepare("SELECT * FROM students WHERE email_id = ?");
 $student_query->execute([$user_email]);
 $student_data = $student_query->fetch(PDO::FETCH_ASSOC);
 
+if ($student_data === false) {
+  $student_data = null;
+}
+
 $already_submitted = ($student_data !== null);
 $can_edit = $student_data['can_edit'] ?? 0;
 
@@ -61,12 +65,14 @@ $exam_query = $pdo->query("SELECT start_date, end_date FROM exam_settings LIMIT 
 $exam_settings = $exam_query->fetch(PDO::FETCH_ASSOC);
 
 if (!$exam_settings) {
-  die("Exam settings not found.");
+  $exam_settings = ['start_date' => null, 'end_date' => null];
 }
 
-// Convert MySQL DATETIME to timestamps
-$start_date = strtotime($exam_settings['start_date']);
-$end_date = strtotime($exam_settings['end_date']);
+$start_date_str = $exam_settings['start_date'] ?? '';
+$end_date_str = $exam_settings['end_date'] ?? '';
+
+$start_date = $start_date_str ? strtotime($start_date_str) : 0;
+$end_date = $end_date_str ? strtotime($end_date_str) : 0;
 $current_time = time();
 
 $status_message = "";
@@ -795,6 +801,16 @@ if ($already_submitted && !$can_edit) {
   <?php if ($already_submitted && !$can_edit): ?>
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
       <?= $status_message ?>
+    </div>
+  <?php elseif ($start_date === 0 || $end_date === 0): ?>
+    <div class="main-container" style="padding: 60px 40px; text-align: center;">
+      <div style="font-size: 64px; margin-bottom: 20px;">🔒</div>
+      <h2 style="color: var(--primary); font-size: 28px; font-weight: 800; margin-bottom: 10px;">Registration Not Active</h2>
+      <p style="color: var(--text-light); font-size: 16px; margin-bottom: 25px;">Exam form registration has not been scheduled yet.</p>
+      <div style="margin-top: 30px;">
+        <a href="dashboard.php" style="color: #6366f1; text-decoration: none; font-weight: 600;"><i
+            class="bi bi-arrow-left"></i> Back to Dashboard</a>
+      </div>
     </div>
   <?php elseif ($current_time < $start_date): ?>
     <div class="main-container" style="padding: 60px 40px; text-align: center;">

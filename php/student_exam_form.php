@@ -224,7 +224,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     // UPDATE
                     $sql = "UPDATE students SET roll_no=?, student_name=?, course=?, father_address=?, course_type=?, current_semester=?, admission_fees=?, category=?, mobile_no=?, email_id=?, exam_date=?, student_signature=?, subjects=?, ex_subjects=?, student_photo=?, previous_result=?, status='pending', can_edit=0 WHERE id=?";
                     $stmt = $pdo->prepare($sql);
-                    $stmt->execute([
+                    $exec_success = $stmt->execute([
                         $roll_no, $student_name, $course, $father_address, $course_type,
                         $current_semester, $admission_fees, $category, $mobile_no, $email_id,
                         $exam_date, $savedSignature, $subjects_json, $ex_subjects_json,
@@ -235,7 +235,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $sql = "INSERT INTO students (roll_no, student_name, course, father_address, course_type, current_semester, admission_fees, category, mobile_no, email_id, exam_date, student_signature, subjects, ex_subjects, student_photo, previous_result) 
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     $stmt = $pdo->prepare($sql);
-                    $stmt->execute([
+                    $exec_success = $stmt->execute([
                         $roll_no, $student_name, $course, $father_address, $course_type,
                         $current_semester, $admission_fees, $category, $mobile_no, $email_id,
                         $exam_date, $savedSignature, $subjects_json, $ex_subjects_json,
@@ -276,7 +276,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         }
                     }
                 }
-                if ($stmt->execute()) {
+                if ($exec_success) {
                     $message = "✅ Exam Form Submitted successfully!";
                     $messageType = "success";
 
