@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS students (
     father_address TEXT NOT NULL,
     course_type VARCHAR(50) NOT NULL,
     current_semester VARCHAR(50) NOT NULL,
-    admission_fees NUMERIC(10, 2) NOT NULL,
+    admission_fees VARCHAR(100) NOT NULL,
     category VARCHAR(50) NOT NULL,
     mobile_no VARCHAR(15) NOT NULL,
     email_id VARCHAR(100) NOT NULL UNIQUE,
