@@ -285,200 +285,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     // Insert uploaded challans into challans table
                     if (!empty($challanPaths)) {
-            // Handle Drawn Signature
-            if (isset($_POST["signature_type"]) && $_POST["signature_type"] === "draw" && !empty($_POST["signatureImage"])) {
-                $imageData = str_replace("data:image/png;base64,", "", $_POST["signatureImage"]);
-                $imageData = base64_decode($imageData);
-                $fileName = $uploadDir . "drawn_signature_" . time() . ".png";
-                file_put_contents($fileName, $imageData);
-                $savedSignature = $fileName;
-            }
-            $uploadDirr = "image/"; // Folder to store images
-            if (!is_dir($uploadDirr)) {
-                mkdir($uploadDirr, 0777, true); // Create the folder if it doesn’t exist
-            }
-
-            $savedPhoto = ""; // Variable to store image path
-
-            // Handle Student Photo Upload
-            if (!empty($_FILES["student_photo"]["name"])) {
-                $fileTmpPath = $_FILES["student_photo"]["tmp_name"];
-                $fileName = time() . "_" . basename($_FILES["student_photo"]["name"]); // Unique file name
-                $fileDest = $uploadDirr . $fileName;
-
-                $allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-                if (!in_array($_FILES["student_photo"]["type"], $allowedTypes) || $_FILES["student_photo"]["size"] > 2 * 1024 * 1024) {
-                    $message = "Invalid file. Only JPG, JPEG, PNG allowed & max size 2MB.";
-                    $messageType = "error";
-                } elseif (move_uploaded_file($fileTmpPath, $fileDest)) {
-                    $savedPhoto = $fileDest; // Save file path
-                }
-            }
-            $resultsDir = "results/";
-            if (!is_dir($resultsDir)) {
-                mkdir($resultsDir, 0777, true);
-            }
-
-            $savedResults = [];
-            if (isset($_FILES['results']['name']) && is_array($_FILES['results']['name'])) {
-                $current_semester = $_POST['current_semester'] ?? '';
-                $res_category = (stripos($current_semester, 'Ex') !== false) ? 'Ex' : 'Regular';
-                foreach ($_FILES['results']['name'] as $index => $name) {
-                    if (empty($name))
-                        continue;
-
-                    $tmpName = $_FILES['results']['tmp_name'][$index];
-                    $fileType = $_FILES['results']['type'][$index];
-                    $fileSize = $_FILES['results']['size'][$index];
-                    $error = $_FILES['results']['error'][$index];
-
-                    if ($error === UPLOAD_ERR_OK) {
-                        $allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-                        if (!in_array($fileType, $allowedTypes) || $fileSize > 5 * 1024 * 1024)
-                            continue;
-
-                        $uniqueName = time() . "_res_" . $index . "_" . basename($name);
-                        $destination = $resultsDir . $uniqueName;
-
-                        if (move_uploaded_file($tmpName, $destination)) {
-                            $savedResults[] = [
-                                'file_path' => $destination,
-                                'type' => $res_category,
-                                'uploaded_at' => date('Y-m-d H:i:s')
-                            ];
-                        }
-                    }
-                }
-            }
-            $results_json = json_encode($savedResults);
-
-            // Collect form data
-            $roll_no = $_POST['roll_no'] ?? '';
-            $student_name = $_POST['student_name'] ?? '';
-            $father_address = $_POST['father_address'] ?? '';
-            $course_type = $_POST['course_type'] ?? '';
-            $current_semester = $_POST['current_semester'] ?? '';
-            $admission_fees = $_POST['admission_fees'] ?? '';
-            $category = $_POST['category'] ?? '';
-            $mobile_no = $_POST['mobile_no'] ?? '';
-            $email_id = $_POST['email_id'] ?? '';
-            $exam_date = $_POST['exam_date'] ?? '';
-            $course = $_POST['course'] ?? '';
-
-            // Check if student already submitted
-            $check_stmt = $pdo->prepare("SELECT id, can_edit, student_photo, student_signature, previous_result FROM students WHERE email_id = ?");
-            $check_stmt->execute([$email_id]);
-            $existing = $check_stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($existing && $existing['can_edit'] == 0) {
-                $message = "⚠ You have already submitted the exam form and it is under review.";
-                $messageType = "error";
-            } else {
-                // If editing, retain old files if new ones aren't uploaded
-                if ($existing) {
-                    if (empty($savedPhoto))
-                        $savedPhoto = $existing['student_photo'];
-                    if (empty($savedSignature))
-                        $savedSignature = $existing['student_signature'];
-                    if (empty($savedResults))
-                        $results_json = $existing['previous_result'];
-                }
-
-                // Collect Subjects as JSON
-                $subjects = [];
-                for ($i = 1; $i <= 6; $i++) {
-                    if (!empty($_POST["subject$i"])) {
-                        $subjects[] = [
-                            "subject" => trim($_POST["subject$i"]),
-                            "semester" => trim($_POST["sem$i"] ?? ""),
-                            "paper_code" => trim($_POST["paper_code$i"] ?? ""),
-                            "theory" => isset($_POST["theory$i"]) ? 1 : 0,
-                            "practical" => isset($_POST["practical$i"]) ? 1 : 0
-                        ];
-                    }
-                }
-                $subjects_json = json_encode($subjects, JSON_UNESCAPED_UNICODE) ?: "[]";
-
-                // Collect Extra Subjects as JSON
-                $ex_subjects = [];
-                for ($i = 1; $i <= 7; $i++) {
-                    if (!empty($_POST["exsubject$i"])) {
-                        $ex_subjects[] = [
-                            "subject" => trim($_POST["exsubject$i"]),
-                            "semester" => trim($_POST["exsem$i"] ?? ""),
-                            "paper_code" => trim($_POST["expaper_code$i"] ?? ""),
-                            "theory" => isset($_POST["extheory$i"]) ? 1 : 0,
-                            "practical" => isset($_POST["expractical$i"]) ? 1 : 0
-                        ];
-                    }
-                }
-                $ex_subjects_json = json_encode($ex_subjects, JSON_UNESCAPED_UNICODE) ?: "[]";
-
-                if ($existing) {
-                    // UPDATE
-                    $sql = "UPDATE students SET roll_no=?, student_name=?, course=?, father_address=?, course_type=?, current_semester=?, admission_fees=?, category=?, mobile_no=?, email_id=?, exam_date=?, student_signature=?, subjects=?, ex_subjects=?, student_photo=?, previous_result=?, status='pending', can_edit=0 WHERE id=?";
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute([
-                        $roll_no, $student_name, $course, $father_address, $course_type,
-                        $current_semester, $admission_fees, $category, $mobile_no, $email_id,
-                        $exam_date, $savedSignature, $subjects_json, $ex_subjects_json,
-                        $savedPhoto, $results_json, $existing['id']
-                    ]);
-                } else {
-                    // INSERT
-                    $sql = "INSERT INTO students (roll_no, student_name, course, father_address, course_type, current_semester, admission_fees, category, mobile_no, email_id, exam_date, student_signature, subjects, ex_subjects, student_photo, previous_result) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute([
-                        $roll_no, $student_name, $course, $father_address, $course_type,
-                        $current_semester, $admission_fees, $category, $mobile_no, $email_id,
-                        $exam_date, $savedSignature, $subjects_json, $ex_subjects_json,
-                        $savedPhoto, $results_json
-                    ]);
-                }
-                $challanUploadDir = "challans/";
-                $challanPaths = [];
-
-                if (!is_dir($challanUploadDir)) {
-                    mkdir($challanUploadDir, 0777, true);
-                }
-
-                if (isset($_FILES['challan']['name']) && is_array($_FILES['challan']['name'])) {
-                    foreach ($_FILES['challan']['name'] as $index => $name) {
-                        if (empty($name))
-                            continue; // Skip empty fields
-
-                        $tmpName = $_FILES['challan']['tmp_name'][$index];
-                        $fileType = $_FILES['challan']['type'][$index];
-                        $fileSize = $_FILES['challan']['size'][$index];
-                        $error = $_FILES['challan']['error'][$index];
-
-                        if ($error === UPLOAD_ERR_OK) {
-                            $allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-
-                            if (!in_array($fileType, $allowedTypes) || $fileSize > 5 * 1024 * 1024) {
-                                $message .= "<br>⚠ Challan '$name' skipped: Invalid type or file too big.";
-                                continue;
-                            }
-
-                            $uniqueName = time() . "_" . $index . "_" . basename($name); // Added index to ensure uniqueness for simultaneous uploads
-                            $destination = $challanUploadDir . $uniqueName;
-
-                            if (move_uploaded_file($tmpName, $destination)) {
-                                $challanPaths[] = $destination; // Save for inserting later
-                            }
-                        }
-                    }
-                }
-                if ($stmt->execute()) {
-                    $message = "✅ Exam Form Submitted successfully!";
-                    $messageType = "success";
-
-                    // Correctly get student ID for both INSERT and UPDATE
-                    $student_id = $existing ? $existing['id'] : $pdo->lastInsertId();
-
-                    // Insert uploaded challans into challans table
-                    if (!empty($challanPaths)) {
                         foreach ($challanPaths as $path) {
                             $challanStmt = $pdo->prepare("INSERT INTO challans (student_id, file_path) VALUES (?, ?)");
                             $challanStmt->execute([$student_id, $path]);
@@ -489,6 +295,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <!DOCTYPE html>
                     <html>
                     <head>
+    <!-- Favicon -->
+    <link rel='apple-touch-icon' sizes='180x180' href='../apple-touch-icon.png'>
+    <link rel='icon' type='image/png' sizes='32x32' href='../favicon-32x32.png'>
+    <link rel='icon' type='image/png' sizes='16x16' href='../favicon-16x16.png'>
+    <link rel='icon' type='image/x-icon' href='../favicon.ico'>
+    <link rel='manifest' href='../site.webmanifest'>
+                      <style>
+                        body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 0; margin: 0; }
+                        .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+                        .title { font-size: 22px; color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; }
+                        .info-section { font-size: 18px; color: #34495e; margin-top: 25px; margin-bottom: 10px; }
+                        .info-row { margin: 5px 0; }
                         .label { font-weight: bold; color: #2c3e50; }
                         .value { color: #555; }
                       </style>
