@@ -1,5 +1,9 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+$autoloadPath = __DIR__ . '/../vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    $autoloadPath = __DIR__ . '/../../../vendor/autoload.php';
+}
+require_once $autoloadPath;
 session_start();
 
 if (!isset($_SESSION['admin_id'])) {

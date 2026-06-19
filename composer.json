@@ -1,0 +1,14 @@
+{
+    "name": "rishabhkankariya/ekitabhghar",
+    "description": "E-Kitabghar PHP project dependencies",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.9",
+        "mpdf/mpdf": "^8.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "mpdf/psr-log-aware-trait": true
+        }
+    }
+}
