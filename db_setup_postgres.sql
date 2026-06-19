@@ -278,7 +278,7 @@ CREATE TABLE IF NOT EXISTS feedback (
     email VARCHAR(100) NOT NULL,
     rating INT NOT NULL,
     message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 27. Table: contact_messages
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 28. Table: users
