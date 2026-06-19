@@ -290,6 +290,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               if (icon) icon.classList.add('hidden');
               btn.querySelector('.spinner').classList.remove('hidden');
             }
+            const stepEl = this.querySelector('input[name="step"]');
+            const step = stepEl ? stepEl.value : '';
+            let msg = "Processing your request...";
+            if (step === 'request_otp') {
+              msg = "Validating account and sending reset OTP code...";
+            } else if (step === 'verify_otp') {
+              msg = "Verifying reset OTP code...";
+            } else if (step === 'reset_password') {
+              msg = "Saving your new password and sending confirmation...";
+            }
+            if (typeof showGlobalLoader === 'function') {
+              showGlobalLoader(msg);
+            }
           });
         });
       </script>
@@ -371,6 +384,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       });
     });
   </script>
+  <script src="../js/loader.js"></script>
 </body>
 
 </html>

@@ -280,6 +280,14 @@ if (!empty($current_start_date) && !empty($current_end_date)) {
         <script>setTimeout(() => { document.getElementById('toast').remove(); }, 5000);</script>
     <?php endif; ?>
 
+    <script src="../js/loader.js"></script>
+    <script>
+        document.querySelector('form')?.addEventListener('submit', function() {
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Updating schedule and sending notifications to all active students. Please wait...");
+            }
+        });
+    </script>
 </body>
 
 </html>

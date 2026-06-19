@@ -93,6 +93,7 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>AOS.init({ duration: 800, once: true });</script>
 
+    <script src="js/loader.js"></script>
     <script>
         const verifyBtn = document.getElementById("verify-otp-btn");
         const resendBtn = document.getElementById("resend-otp-btn");
@@ -149,11 +150,20 @@
         resendBtn.addEventListener("click", () => {
             resendBtn.classList.add('opacity-50', 'pointer-events-none');
             document.getElementById('resend-spinner').classList.remove('hidden');
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Requesting a new login OTP code...");
+            }
 
             fetch("php/resend_login_otp.php", { method: "POST" })
                 .then(res => res.json())
                 .then(data => {
+                    if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
                     alert(data.message);
+                    resendBtn.classList.remove('opacity-50', 'pointer-events-none');
+                    document.getElementById('resend-spinner').classList.add('hidden');
+                })
+                .catch(() => {
+                    if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
                     resendBtn.classList.remove('opacity-50', 'pointer-events-none');
                     document.getElementById('resend-spinner').classList.add('hidden');
                 });
@@ -169,6 +179,9 @@
             btnLabel.classList.add('hidden');
             btnIcon.classList.add('hidden');
             verifyBtn.disabled = true;
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Verifying OTP and logging you in...");
+            }
         }
 
         function stopLoading() {
@@ -176,6 +189,9 @@
             btnLabel.classList.remove('hidden');
             btnIcon.classList.remove('hidden');
             verifyBtn.disabled = false;
+            if (typeof hideGlobalLoader === 'function') {
+                hideGlobalLoader();
+            }
         }
 
         otpInput.addEventListener('input', function () {

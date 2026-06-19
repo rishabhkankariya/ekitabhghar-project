@@ -397,11 +397,33 @@ $branches = [
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/loader.js"></script>
     <script>
         // Select all functionality
         document.getElementById('selectAll').addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('input[name="student_ids[]"]');
             checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Show global loader on manual student addition form
+        document.querySelector('form.modal-content')?.addEventListener('submit', function() {
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Adding student and sending account credential email. Please wait...");
+            }
+        });
+
+        // Show global loader on bulk action form
+        document.getElementById('bulkActionForm')?.addEventListener('submit', function() {
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Applying bulk action updates to student accounts...");
+            }
+        });
+
+        // Show global loader on CSV Upload form
+        document.querySelector('form[enctype="multipart/form-data"]')?.addEventListener('submit', function() {
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Processing CSV import and sending account credential emails. Please wait...");
+            }
         });
     </script>
 </body>

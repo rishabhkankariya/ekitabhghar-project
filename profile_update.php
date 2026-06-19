@@ -753,6 +753,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           txt.textContent = step === 'init' ? "Processing..." : "Verifying...";
           spin.classList.remove('hidden');
         }
+        
+        // Show global loader modal
+        if (typeof showGlobalLoader === 'function') {
+          showGlobalLoader(step === 'init' ? "Validating data and sending verification OTP to your email..." : "Verifying OTP and updating your profile...");
+        }
       });
     }
 
@@ -787,6 +792,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </script>
   <?php endif; ?>
 
+  <script src="js/loader.js"></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script>AOS.init();</script>
 </body>

@@ -133,7 +133,7 @@ if ($already_submitted && !$can_edit) {
 
   <!-- Fonts -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&family=Dancing+Script:wght@700&display=swap"
     rel="stylesheet">
 
   <!-- Icons -->
@@ -145,18 +145,20 @@ if ($already_submitted && !$can_edit) {
 
   <style>
     :root {
-      --primary: #4F46E5;
-      --primary-dark: #4338ca;
-      --secondary: #ec4899;
-      /* Pinkish accent */
-      --bg-color: #f3f4f6;
+      --primary: #cc785c;
+      --primary-dark: #a9583e;
+      --primary-disabled: #e6dfd8;
+      --secondary: #cc785c;
+      --bg-color: #faf9f5;
       --card-bg: #ffffff;
-      --text-main: #1f2937;
-      --text-light: #6b7280;
-      --border-color: #e5e7eb;
-      --error: #ef4444;
-      --success: #10b981;
-      --warning: #f59e0b;
+      --text-main: #141413;
+      --text-body: #3d3d3a;
+      --text-light: #6c6a64;
+      --border-color: #e6dfd8;
+      --error: #c64545;
+      --success: #5db872;
+      --warning: #e8a55a;
+      --surface-dark: #181715;
     }
 
     * {
@@ -164,12 +166,19 @@ if ($already_submitted && !$can_edit) {
     }
 
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Inter', sans-serif;
       background-color: var(--bg-color);
       margin: 0;
       padding: 20px;
-      color: var(--text-main);
+      color: var(--text-body);
       line-height: 1.5;
+    }
+
+    h1, h2, h3, .header-title, .selection-title, .section-title {
+      font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
     }
 
     .approved {
@@ -189,19 +198,21 @@ if ($already_submitted && !$can_edit) {
       max-width: 1000px;
       margin: 0 auto;
       background: var(--card-bg);
-      border-radius: 16px;
-      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(20, 20, 19, 0.05);
       overflow: hidden;
       position: relative;
     }
 
     /* Header Section */
     .header-section {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
+      background: var(--surface-dark);
+      color: #faf9f5;
       padding: 40px 20px;
       text-align: center;
       position: relative;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .logo-container img {
@@ -211,18 +222,20 @@ if ($already_submitted && !$can_edit) {
     }
 
     .header-title {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 28px;
+      font-weight: 500;
       margin: 0;
       text-transform: uppercase;
       letter-spacing: 1px;
+      color: #faf9f5;
     }
 
     .header-subtitle {
       font-size: 16px;
-      opacity: 0.9;
+      opacity: 0.8;
       margin-top: 5px;
-      font-weight: 300;
+      font-weight: 400;
+      color: #a09d96;
     }
 
     /* Photo Badge (Floating) */
@@ -232,8 +245,9 @@ if ($already_submitted && !$can_edit) {
       right: 20px;
       background: rgba(255, 255, 255, 0.95);
       padding: 10px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px rgba(20, 20, 19, 0.08);
       width: 130px;
       backdrop-filter: blur(5px);
       z-index: 10;
@@ -243,9 +257,9 @@ if ($already_submitted && !$can_edit) {
     .photo-view-box {
       width: 100px;
       height: 130px;
-      background: #f0f0f0;
-      border: 2px dashed #cbd5e1;
-      border-radius: 8px;
+      background: #f5f0e8;
+      border: 1px dashed var(--border-color);
+      border-radius: 6px;
       margin: 0 auto 10px;
       display: flex;
       align-items: center;
@@ -257,7 +271,7 @@ if ($already_submitted && !$can_edit) {
 
     .photo-view-box.drag-over {
       border-color: var(--primary);
-      background: #e0e7ff;
+      background: #e8e0d2;
     }
 
     .photo-view-box img {
@@ -287,9 +301,18 @@ if ($already_submitted && !$can_edit) {
       color: white;
     }
 
+    .btn-primary-sm:hover {
+      background: var(--primary-dark);
+    }
+
     .btn-secondary-sm {
-      background: var(--text-main);
-      color: white;
+      background: #efe9de;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary-sm:hover {
+      background: #e8e0d2;
     }
 
     .btn-danger-sm {
@@ -314,6 +337,7 @@ if ($already_submitted && !$can_edit) {
     /* Form Content */
     .form-content {
       padding: 40px;
+      background: white;
     }
 
     /* Form Groups & Grid */
@@ -332,9 +356,11 @@ if ($already_submitted && !$can_edit) {
     .form-label {
       display: block;
       margin-bottom: 8px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .form-label i {
@@ -350,12 +376,13 @@ if ($already_submitted && !$can_edit) {
     .form-control {
       width: 100%;
       padding: 12px 15px;
-      font-size: 15px;
+      font-size: 14px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
       transition: all 0.3s ease;
-      font-family: 'Outfit', sans-serif;
-      background: #ffffff;
+      font-family: 'Inter', sans-serif;
+      background: #faf9f5;
+      color: var(--text-body);
     }
 
     select.form-control,
@@ -363,7 +390,7 @@ if ($already_submitted && !$can_edit) {
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23cc785c' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 15px center;
       background-size: 12px;
@@ -374,13 +401,15 @@ if ($already_submitted && !$can_edit) {
     .form-control:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.15);
+      background: #ffffff;
     }
 
     .form-control[readonly] {
-      background-color: #f8fafc;
+      background-color: #f5f0e8;
       color: var(--text-light);
       cursor: not-allowed;
+      border-color: var(--border-color);
     }
 
     textarea.form-control {
@@ -406,20 +435,20 @@ if ($already_submitted && !$can_edit) {
 
     /* Section Dividers */
     .section-title {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 500;
       color: var(--text-main);
       margin: 40px 0 20px;
       padding-bottom: 10px;
-      border-bottom: 2px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
     .section-title i {
-      color: var(--secondary);
-      background: #fdf2f8;
+      color: var(--primary);
+      background: #efe9de;
       padding: 8px;
       border-radius: 8px;
     }
@@ -427,7 +456,7 @@ if ($already_submitted && !$can_edit) {
     /* Tables */
     .table-wrapper {
       overflow-x: auto;
-      border-radius: 12px;
+      border-radius: 8px;
       border: 1px solid var(--border-color);
       margin-bottom: 20px;
     }
@@ -436,12 +465,11 @@ if ($already_submitted && !$can_edit) {
       width: 100%;
       border-collapse: collapse;
       min-width: 800px;
-      /* Force scroll on small screens */
     }
 
     .styled-table thead {
-      background: var(--text-main);
-      color: white;
+      background: var(--surface-dark);
+      color: #faf9f5;
     }
 
     .styled-table th,
@@ -453,7 +481,7 @@ if ($already_submitted && !$can_edit) {
     }
 
     .styled-table tbody tr:hover {
-      background-color: #f9fafb;
+      background-color: #faf9f5;
     }
 
     .table-input {
@@ -462,6 +490,14 @@ if ($already_submitted && !$can_edit) {
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 13px;
+      background: #faf9f5;
+    }
+
+    .table-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.15);
+      background: #ffffff;
     }
 
     .check-center {
@@ -477,9 +513,9 @@ if ($already_submitted && !$can_edit) {
 
     /* Signature & Challan Area */
     .upload-zone {
-      background: #f8fafc;
+      background: #faf9f5;
       border: 2px dashed var(--border-color);
-      border-radius: 12px;
+      border-radius: 8px;
       padding: 20px;
       text-align: center;
       transition: all 0.3s;
@@ -487,7 +523,7 @@ if ($already_submitted && !$can_edit) {
 
     .upload-zone:hover {
       border-color: var(--primary);
-      background: #eef2ff;
+      background: #efe9de;
     }
 
     .signature-pad-container canvas {
@@ -505,22 +541,23 @@ if ($already_submitted && !$can_edit) {
     #typedSignature {
       font-family: 'Dancing Script', cursive;
       font-size: 24px;
+      color: var(--text-main);
     }
 
     /* Guidelines Box */
     .guidelines-box {
-      background: #fffbeb;
-      border: 1px solid #fcd34d;
-      border-radius: 12px;
+      background: #f5f0e8;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       padding: 20px;
       margin: 30px 0;
       font-size: 14px;
     }
 
     .guidelines-box h3 {
-      color: #b45309;
+      color: var(--primary);
       margin-top: 0;
-      font-size: 16px;
+      font-size: 18px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -529,7 +566,7 @@ if ($already_submitted && !$can_edit) {
     .guidelines-box ul {
       margin: 10px 0 0;
       padding-left: 20px;
-      color: #78350f;
+      color: var(--text-body);
     }
 
     .guidelines-box li {
@@ -538,11 +575,11 @@ if ($already_submitted && !$can_edit) {
 
     /* Submit Section */
     .submit-section {
-      background: #f9fafb;
+      background: #efe9de;
       padding: 30px;
       text-align: center;
       border-top: 1px solid var(--border-color);
-      border-radius: 0 0 16px 16px;
+      border-radius: 0 0 12px 12px;
     }
 
     .captcha-row {
@@ -556,44 +593,47 @@ if ($already_submitted && !$can_edit) {
 
     .btn-lg {
       padding: 14px 40px;
-      font-size: 18px;
-      font-weight: 700;
-      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
       transition: all 0.3s;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: none;
     }
 
     .btn-submit {
-      background: linear-gradient(135deg, #10b981, #059669);
+      background: var(--primary);
       color: white;
       width: 100%;
       max-width: 400px;
     }
 
     .btn-submit:disabled {
-      background: #d1d5db;
+      background: var(--primary-disabled);
+      color: var(--text-light);
       cursor: not-allowed;
-      box-shadow: none;
     }
 
     .btn-submit:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px rgba(16, 185, 129, 0.3);
+      background: var(--primary-dark);
     }
 
     .btn-refresh {
-      background: var(--secondary);
+      background: var(--primary);
       color: white;
       width: 40px;
       height: 40px;
-      border-radius: 50%;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       border: none;
       cursor: pointer;
+    }
+
+    .btn-refresh:hover {
+      background: var(--primary-dark);
     }
 
     /* Selection Modal */
@@ -605,7 +645,7 @@ if ($already_submitted && !$can_edit) {
       top: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(20, 20, 19, 0.75);
       backdrop-filter: blur(8px);
       align-items: center;
       justify-content: center;
@@ -613,13 +653,14 @@ if ($already_submitted && !$can_edit) {
     }
 
     .selection-card {
-      background: white;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
       padding: 40px;
-      border-radius: 24px;
+      border-radius: 12px;
       max-width: 600px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 50px rgba(20, 20, 19, 0.15);
       animation: modalSlideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -637,7 +678,7 @@ if ($already_submitted && !$can_edit) {
 
     .selection-title {
       font-size: 28px;
-      font-weight: 800;
+      font-weight: 500;
       color: var(--text-main);
       margin-bottom: 10px;
     }
@@ -655,21 +696,20 @@ if ($already_submitted && !$can_edit) {
 
     .selection-btn {
       padding: 30px 20px;
-      border: 2px solid var(--border-color);
-      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 15px;
-      background: #fafafa;
+      background: white;
     }
 
     .selection-btn:hover {
       border-color: var(--primary);
-      background: #f0f4ff;
-      transform: translateY(-5px);
+      background: var(--bg-color);
     }
 
     .selection-btn i {
@@ -678,8 +718,9 @@ if ($already_submitted && !$can_edit) {
     }
 
     .selection-btn span {
-      font-weight: 700;
-      font-size: 16px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-main);
     }
 
     /* Modal */
@@ -691,7 +732,7 @@ if ($already_submitted && !$can_edit) {
       top: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(20, 20, 19, 0.6);
       backdrop-filter: blur(4px);
       align-items: center;
       justify-content: center;
@@ -700,7 +741,8 @@ if ($already_submitted && !$can_edit) {
     .modal-content {
       background: white;
       padding: 30px;
-      border-radius: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
       max-width: 800px;
       width: 90%;
       max-height: 90vh;
@@ -1625,6 +1667,9 @@ if ($already_submitted && !$can_edit) {
         finalSubmitBtn.disabled = true;
         submitText.textContent = "Submitting Application...";
         submitSpinner.classList.remove("hidden");
+        if (typeof showGlobalLoader === 'function') {
+          showGlobalLoader("Uploading files and submitting your exam registration...");
+        }
       }
     });
 
@@ -1959,6 +2004,7 @@ if ($already_submitted && !$can_edit) {
     }
 
   </script>
+  <script src="js/loader.js"></script>
 </body>
 
 </html>

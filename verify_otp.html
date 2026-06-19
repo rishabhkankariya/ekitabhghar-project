@@ -62,6 +62,7 @@
     AOS.init();
   </script>
 
+  <script src="js/loader.js"></script>
   <script>
     const verifyBtn = document.getElementById("verify-otp-btn");
     const resendBtn = document.getElementById("resend-otp-btn");
@@ -78,6 +79,9 @@
 
       verifySpinner.classList.remove("hidden");
       verifyBtn.disabled = true;
+      if (typeof showGlobalLoader === 'function') {
+        showGlobalLoader("Verifying your registration OTP code...");
+      }
 
       fetch("php/verify_otp.php", {
         method: "POST",
@@ -88,6 +92,7 @@
         .then(data => {
           verifySpinner.classList.add("hidden");
           verifyBtn.disabled = false;
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
 
           if (data.success) {
             alert("✅ " + data.message);
@@ -100,6 +105,7 @@
           console.error("Error:", err);
           verifySpinner.classList.add("hidden");
           verifyBtn.disabled = false;
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           errorMsg.innerText = "❌ Something went wrong.";
         });
     });
@@ -107,6 +113,9 @@
     resendBtn.addEventListener("click", () => {
       resendSpinner.classList.remove("hidden");
       resendBtn.disabled = true;
+      if (typeof showGlobalLoader === 'function') {
+        showGlobalLoader("Requesting a new verification OTP code...");
+      }
 
       fetch("php/resend_otp.php", {
         method: "POST",
@@ -117,12 +126,14 @@
         .then(data => {
           resendSpinner.classList.add("hidden");
           resendBtn.disabled = false;
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           alert("📩 " + data.message);
         })
         .catch(err => {
           console.error("Error:", err);
           resendSpinner.classList.add("hidden");
           resendBtn.disabled = false;
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           alert("❌ Failed to resend OTP.");
         });
     });

@@ -221,6 +221,7 @@
         }
     </style>
 
+    <script src="js/loader.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init();
@@ -341,6 +342,10 @@
             const btnSpinner = document.getElementById('btn-spinner');
             btnText.classList.add('hidden');
             btnSpinner.classList.remove('hidden');
+            
+            if (typeof showGlobalLoader === 'function') {
+                showGlobalLoader("Verifying credentials and logging in...");
+            }
         });
 
         // Check for URL errors (from PHP redirects)

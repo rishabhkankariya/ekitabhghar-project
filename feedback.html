@@ -481,6 +481,9 @@
                 submitBtn.disabled = true;
                 btnText.textContent = "Sending Feedback...";
                 btnSpinner.classList.remove('hidden');
+                if (typeof showGlobalLoader === 'function') {
+                    showGlobalLoader("Submitting feedback and sending email notifications. Please wait...");
+                }
             });
         }
     </script>
@@ -625,6 +628,7 @@
         // Set current year
         document.getElementById("currentYear").textContent = new Date().getFullYear();
     </script>
+    <script src="js/loader.js"></script>
 </body>
 
 </html>

@@ -804,6 +804,10 @@ if (!isset($_SESSION['admin_id'])) {
       const action = currentStatus == 1 ? 'disable' : 'enable';
       if (!confirm(`Are you sure you want to ${action} edit access for this student?`)) return;
 
+      if (typeof showGlobalLoader === 'function') {
+        showGlobalLoader("Updating student edit access permissions and sending email alert...");
+      }
+
       fetch('backend/toggle_edit_access.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -811,6 +815,7 @@ if (!isset($_SESSION['admin_id'])) {
       })
         .then(res => res.json())
         .then(data => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           if (data.success) {
             // Update UI
             const newStatus = currentStatus == 1 ? 0 : 1;
@@ -834,6 +839,7 @@ if (!isset($_SESSION['admin_id'])) {
           }
         })
         .catch(err => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           console.error(err);
           showToast('Server error', 'error');
         });
@@ -1008,6 +1014,10 @@ if (!isset($_SESSION['admin_id'])) {
       sendBtn.disabled = true;
       sendBtn.innerText = "Sending...";
 
+      if (typeof showGlobalLoader === 'function') {
+        showGlobalLoader("Sending custom email notification to student...");
+      }
+
       // ✅ Use dedicated message endpoint
       fetch('backend/send_custom_mail.php', {
         method: 'POST',
@@ -1020,6 +1030,7 @@ if (!isset($_SESSION['admin_id'])) {
       })
         .then(res => res.json())
         .then(data => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           if (data.status === 'success') {
             showToast("✅ Message sent successfully!", "success");
             closeModal('message-modal');
@@ -1031,6 +1042,7 @@ if (!isset($_SESSION['admin_id'])) {
           }
         })
         .catch(err => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           console.error("[JS] sendMessage() Error:", err);
           showToast("⚠️ Something went wrong while sending the message.", "error");
         })
@@ -1043,6 +1055,9 @@ if (!isset($_SESSION['admin_id'])) {
     // Approve Student with Reason
     function confirmApprove() {
       if (!currentApproveId) return;
+      if (typeof showGlobalLoader === 'function') {
+        showGlobalLoader("Approving student form and sending account credentials email...");
+      }
       window.location.href = `backend/approve_reject_student.php?action=approve&id=${currentApproveId}`;
     }
 
@@ -1051,14 +1066,22 @@ if (!isset($_SESSION['admin_id'])) {
       const reason = document.getElementById('reject-reason').value.trim();
       if (!reason) return showToast("⚠️ Please enter a reason.", "error");
 
+      if (typeof showGlobalLoader === 'function') {
+        showGlobalLoader("Rejecting student form and sending rejection alert email...");
+      }
+
       fetch(`backend/approve_reject_student.php?action=reject&id=${currentRejectId}&reason=${encodeURIComponent(reason)}`)
         .then(res => res.text())
         .then(response => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           showToast("❌ Student rejected.", "error");
           closeModal('reject-modal');
           setTimeout(() => location.reload(), 1500);
         })
-        .catch(() => showToast("⚠️ Failed to reject student.", "error"));
+        .catch(() => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+          showToast("⚠️ Failed to reject student.", "error");
+        });
     }
 
 
@@ -1147,6 +1170,7 @@ if (!isset($_SESSION['admin_id'])) {
       }, 500);
     }
   </script>
+  <script src="../js/loader.js"></script>
 </body>
 
 </html>

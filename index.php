@@ -3458,12 +3458,18 @@ require_once 'admin/php/fetch.php';
             contributeBtn.disabled = true;
             document.getElementById('contributeBtnText').textContent = 'Uploading Notes...';
             document.getElementById('contributeBtnSpinner').classList.remove('hidden');
+            if (typeof showGlobalLoader === 'function') {
+              showGlobalLoader("Uploading files and contributing notes. Please wait...");
+            }
           }
           if (this.action.includes('contact.php')) {
             const btn = document.getElementById('contactSubmitBtn');
             btn.disabled = true;
             document.getElementById('contactBtnText').textContent = 'Sending...';
             document.getElementById('contactBtnSpinner').classList.remove('hidden');
+            if (typeof showGlobalLoader === 'function') {
+              showGlobalLoader("Sending your message to the administration. Please wait...");
+            }
           }
         });
       });
@@ -3716,6 +3722,7 @@ require_once 'admin/php/fetch.php';
 
   <!-- Connectivity Handler -->
   <script src="js/connectivity.js"></script>
+  <script src="js/loader.js"></script>
 </body>
 
 </html>

@@ -98,6 +98,10 @@ require '../php/connection.php';
         return;
       }
 
+      if (typeof showGlobalLoader === 'function') {
+        showGlobalLoader("Sending email reply to student support request...");
+      }
+
       fetch('backend/send_email.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,6 +113,7 @@ require '../php/connection.php';
       })
         .then(res => res.json())
         .then(data => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
           if (data.status === 'success') {
             showToast('Email sent successfully');
             closeModal();
@@ -116,7 +121,10 @@ require '../php/connection.php';
             showToast(data.message || 'Failed to send', false);
           }
         })
-        .catch(() => showToast('Server error occurred', false));
+        .catch(() => {
+          if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+          showToast('Server error occurred', false);
+        });
     }
 
     // Fetch messages on page load
@@ -158,6 +166,10 @@ require '../php/connection.php';
         let data = new FormData();
         data.append('id', messageId);
 
+        if (typeof showGlobalLoader === 'function') {
+          showGlobalLoader("Deleting support request ticket...");
+        }
+
         // Perform the AJAX request
         fetch('backend/delete_message.php', {
           method: 'POST',
@@ -165,6 +177,7 @@ require '../php/connection.php';
         })
           .then(response => response.json())  // Parse the JSON response
           .then(data => {
+            if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
             // Check if the response was successful
             if (data.status === 'success') {
               // Show a success toast message
@@ -182,6 +195,7 @@ require '../php/connection.php';
             }
           })
           .catch(error => {
+            if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
             // Show a generic error toast if something goes wrong with the request
             showToast('An error occurred. Please try again.', 'error');
           });
@@ -193,6 +207,7 @@ require '../php/connection.php';
     document.addEventListener('DOMContentLoaded', loadMessages);
   </script>
 
+  <script src="../js/loader.js"></script>
 </body>
 
 </html>
