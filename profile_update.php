@@ -95,16 +95,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // Profile Image Logic
             $profile_image = $user['profile_image'];
-            if (!empty($_FILES["profile_image"]["name"])) {
-              $target_dir = "php/uploads/";
-              $target_file = $target_dir . basename($_FILES["profile_image"]["name"]);
+            if (!empty($_FILES["profile_image"]["name"]) && $_FILES["profile_image"]["error"] === UPLOAD_ERR_OK) {
+              // Use absolute server path to avoid relative path issues with Apache
+              $upload_dir = __DIR__ . '/php/uploads/';
+              // Create directory if it doesn't exist
+              if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
+              }
+              $safe_name = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($_FILES["profile_image"]["name"]));
+              $target_file = $upload_dir . $safe_name;
               $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-              if (getimagesize($_FILES["profile_image"]["tmp_name"])) {
-                if (in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+              if (@getimagesize($_FILES["profile_image"]["tmp_name"])) {
+                if (in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
                   if (move_uploaded_file($_FILES["profile_image"]["tmp_name"], $target_file)) {
-                    $profile_image = basename($_FILES["profile_image"]["name"]);
+                    $profile_image = $safe_name;
+                  } else {
+                    error_log("Profile image upload failed: could not move to $target_file");
+                    $message = "Image upload failed. Check server permissions on php/uploads/";
+                    $messageType = "error";
                   }
+                } else {
+                  $message = "Invalid image type. Use JPG, PNG, GIF or WEBP.";
+                  $messageType = "error";
                 }
+              } else {
+                $message = "Uploaded file is not a valid image.";
+                $messageType = "error";
               }
             }
 
@@ -451,8 +467,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="flex flex-col items-center gap-4">
               <div class="relative group">
                 <div class="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] overflow-hidden ring-8 ring-indigo-50 shadow-2xl">
-                  <img id="imagePreview" src="php/uploads/<?php echo htmlspecialchars($user['profile_image']); ?>"
-                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <img id="imagePreview"
+                    src="<?php echo !empty($user['profile_image']) ? 'php/uploads/' . htmlspecialchars($user['profile_image']) : 'img/users.png'; ?>"
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onerror="this.src='img/users.png'" />
                 </div>
                 <label for="profile_image_input"
                   class="absolute -bottom-2 -right-2 bg-indigo-600 text-white w-12 h-12 rounded-2xl shadow-lg border-4 border-white flex items-center justify-center cursor-pointer hover:bg-indigo-700 hover:scale-110 transition-all active:scale-95 z-10">

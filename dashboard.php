@@ -28,7 +28,7 @@ if ($sess_row) {
   }
 }
 
-// 3. Fetch User Details from new table
+// 3. Fetch User Details
 $user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT full_name, email, profile_image, last_login_at, last_login_ip, last_login_location, admission_year, expected_passing_year FROM student_accounts WHERE id = ?");
 $stmt->execute([$user_id]);
@@ -40,7 +40,7 @@ if (!$user) {
   exit;
 }
 
-// Calculate Student-Specific Academic Session from student_accounts data
+// Calculate Student-Specific Academic Session
 $student_session = "";
 if (!empty($user['admission_year']) && !empty($user['expected_passing_year'])) {
   $student_session = $user['admission_year'] . "-" . substr($user['expected_passing_year'], -2);
@@ -48,25 +48,23 @@ if (!empty($user['admission_year']) && !empty($user['expected_passing_year'])) {
 
 // 4. Force Profile Image Update (If missing or default)
 if (empty($user['profile_image']) || $user['profile_image'] === 'users.png') {
-  // Check if we are already on the update page handled in profile_update.php
   header("Location: profile_update.php?error=Profile image is compulsory for the first time!");
   exit;
 }
 
-$username = $user['full_name'];
+$username    = $user['full_name'];
 $profile_pic = "php/uploads/" . $user['profile_image'];
 
 // 5. Intelligent Security Log Handling
-$last_ip = $user['last_login_ip'] ?? '';
+$last_ip   = $user['last_login_ip'] ?? '';
 $last_time = $user['last_login_at'] ?? '';
-$last_loc = $user['last_login_location'] ?? '';
+$last_loc  = $user['last_login_location'] ?? '';
 
 // If data is missing (first login after update), capture it now
 if (empty($last_ip) || $last_ip === '0.0.0.0' || $last_ip === '::1' || $last_ip === '127.0.0.1') {
 
   if (!function_exists('getRealIP')) {
-    function getRealIP()
-    {
+    function getRealIP() {
       if (!empty($_SERVER['HTTP_CLIENT_IP']))
         return $_SERVER['HTTP_CLIENT_IP'];
       if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
@@ -75,17 +73,16 @@ if (empty($last_ip) || $last_ip === '0.0.0.0' || $last_ip === '::1' || $last_ip 
     }
   }
 
-  $last_ip = getRealIP();
+  $last_ip   = getRealIP();
   $last_time = date('Y-m-d H:i:s');
-  $last_loc = "Local Network Access";
+  $last_loc  = "Local Network Access";
 
-  // Check for Localhost and fetch Public IP
+  // Fetch Public IP if localhost
   if ($last_ip === '127.0.0.1' || $last_ip === '::1' || $last_ip === 'localhost') {
     $context = stream_context_create(['http' => ['timeout' => 3]]);
     $external_ip = @file_get_contents('https://api.ipify.org', false, $context);
-
     if ($external_ip) {
-      $last_ip = trim($external_ip); // Update the main IP variable to show public IP
+      $last_ip = trim($external_ip);
     }
   }
 
@@ -93,58 +90,52 @@ if (empty($last_ip) || $last_ip === '0.0.0.0' || $last_ip === '::1' || $last_ip 
   if (filter_var($last_ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
     $context = stream_context_create(['http' => ['timeout' => 3]]);
     $details = @json_decode(file_get_contents("http://ip-api.com/json/{$last_ip}?fields=status,message,country,regionName,city,zip", false, $context));
-
     if ($details && $details->status === 'success') {
       $last_loc = "{$details->city}, {$details->regionName}, {$details->country} ({$details->zip})";
     }
   }
 
-  // Create Logs Table if not exists (Safety check) - PostgreSQL syntax
-  $pdo->exec("CREATE TABLE IF NOT EXISTS student_login_logs (
-      id SERIAL PRIMARY KEY,
-      student_id INT NOT NULL,
-      ip_address VARCHAR(45),
-      login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      location VARCHAR(255)
-  )");
+  // Update login info + log — try-catch prevents any DB error from crashing the dashboard
+  try {
+    $upd = $pdo->prepare("UPDATE student_accounts SET last_login_ip = ?, last_login_at = ?, last_login_location = ? WHERE id = ?");
+    $upd->execute([$last_ip, $last_time, $last_loc, $user_id]);
 
-  // Update DB with the (possibly public) IP and correct location
-  $upd = $pdo->prepare("UPDATE student_accounts SET last_login_ip = ?, last_login_at = ?, last_login_location = ? WHERE id = ?");
-  $upd->execute([$last_ip, $last_time, $last_loc, $user_id]);
+    $check_log = $pdo->prepare("SELECT id FROM student_login_logs WHERE student_id = ? AND login_time >= NOW() - INTERVAL '2 minutes' ORDER BY id DESC LIMIT 1");
+    $check_log->execute([$user_id]);
+    $existing_log = $check_log->fetch(PDO::FETCH_ASSOC);
 
-  // Smart Log Update: Check if we have a recent log entry (last 2 mins)
-  $check_log = $pdo->prepare("SELECT id FROM student_login_logs WHERE student_id = ? AND login_time >= NOW() - INTERVAL '2 minutes' ORDER BY id DESC LIMIT 1");
-  $check_log->execute([$user_id]);
-  $existing_log = $check_log->fetch(PDO::FETCH_ASSOC);
-
-  if ($existing_log) {
-    // Update existing recent log
-    $log_stmt = $pdo->prepare("UPDATE student_login_logs SET ip_address = ?, location = ?, login_time = ? WHERE id = ?");
-    $log_stmt->execute([$last_ip, $last_loc, $last_time, $existing_log['id']]);
-  } else {
-    // Insert new log if no recent one found
-    $log_stmt = $pdo->prepare("INSERT INTO student_login_logs (student_id, ip_address, login_time, location) VALUES (?, ?, ?, ?)");
-    $log_stmt->execute([$user_id, $last_ip, $last_time, $last_loc]);
+    if ($existing_log) {
+      $log_stmt = $pdo->prepare("UPDATE student_login_logs SET ip_address = ?, location = ?, login_time = ? WHERE id = ?");
+      $log_stmt->execute([$last_ip, $last_loc, $last_time, $existing_log['id']]);
+    } else {
+      $log_stmt = $pdo->prepare("INSERT INTO student_login_logs (student_id, ip_address, login_time, location) VALUES (?, ?, ?, ?)");
+      $log_stmt->execute([$user_id, $last_ip, $last_time, $last_loc]);
+    }
+  } catch (PDOException $e) {
+    // Non-critical: never crash dashboard over a logging failure
+    error_log("Login log update failed (non-critical): " . $e->getMessage());
   }
 }
 
 $last_login = [
-  'time' => $last_time,
-  'ip' => $last_ip,
+  'time'     => $last_time,
+  'ip'       => $last_ip,
   'location' => $last_loc
 ];
 
 // 6. Finalize Display Session
 $display_session = "2024-25"; // Hard fallback
 
-// Priority 1: Student Specific Data from student_accounts
 if (!empty($student_session)) {
   $display_session = $student_session;
 } else {
-  // Priority 2: Admin set global session from exam_settings
-  $session_query = $pdo->query("SELECT academic_session FROM exam_settings LIMIT 1");
-  if ($session_query && $row = $session_query->fetch(PDO::FETCH_ASSOC)) {
-    $display_session = $row['academic_session'];
+  try {
+    $session_query = $pdo->query("SELECT academic_session FROM exam_settings LIMIT 1");
+    if ($session_query && $row = $session_query->fetch(PDO::FETCH_ASSOC)) {
+      $display_session = $row['academic_session'];
+    }
+  } catch (PDOException $e) {
+    error_log("Could not fetch academic_session: " . $e->getMessage());
   }
 }
 ?>
@@ -327,6 +318,7 @@ if (!empty($student_session)) {
           <div class="relative">
             <img src="<?= htmlspecialchars($profile_pic); ?>"
               class="w-12 h-12 rounded-2xl object-cover ring-4 ring-indigo-50 shadow-md hover:scale-105 transition-transform cursor-pointer"
+              onerror="this.src='img/users.png'"
               alt="Profile" />
           </div>
         </div>
@@ -410,18 +402,20 @@ if (!empty($student_session)) {
           </div>
 
           <?php
-          // Fetch Last 4 Logs
+          // Fetch Last 4 Logs — wrapped in try-catch
           $recent_logs = [];
-          $log_query = $pdo->prepare("SELECT ip_address, login_time, location FROM student_login_logs WHERE student_id = ? ORDER BY login_time DESC LIMIT 4");
-          if ($log_query) {
+          try {
+            $log_query = $pdo->prepare("SELECT ip_address, login_time, location FROM student_login_logs WHERE student_id = ? ORDER BY login_time DESC LIMIT 4");
             $log_query->execute([$user_id]);
             while ($row = $log_query->fetch(PDO::FETCH_ASSOC)) {
               $recent_logs[] = $row;
             }
+          } catch (PDOException $e) {
+            error_log("Could not fetch login logs: " . $e->getMessage());
           }
-          // Fallback
+          // Fallback if no logs
           if (empty($recent_logs)) {
-            $recent_logs[] = ['ip_address' => $last_ip, 'login_time' => $last_time, 'location' => $last_loc ?? 'Local Network'];
+            $recent_logs[] = ['ip_address' => $last_ip, 'login_time' => $last_time, 'location' => $last_loc ?: 'Local Network'];
           }
           ?>
 
@@ -515,17 +509,13 @@ if (!empty($student_session)) {
     closeBtn.addEventListener("click", closeSidebar);
     overlay.addEventListener("click", closeSidebar);
 
-    // Auto-close sidebar when clicking links (mobile)
     document.querySelectorAll('#sidebar nav a').forEach(link => {
       link.addEventListener('click', () => {
         if (window.innerWidth < 1025) closeSidebar();
       });
     });
 
-    AOS.init({
-      duration: 800,
-      once: true
-    });
+    AOS.init({ duration: 800, once: true });
 
     // Inactivity Timer
     let inactivityTime = 180;
@@ -552,10 +542,8 @@ if (!empty($student_session)) {
       });
     }
 
-    // Start timer
     timer = setInterval(updateCountdown, 1000);
 
-    // Reset on interaction
     ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(event => {
       document.addEventListener(event, resetTimer);
     });
